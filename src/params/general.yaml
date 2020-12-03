@@ -1,0 +1,31 @@
+
+supervisor:
+  robot_name: "robot"
+  
+  ontologies:
+    robot: robot
+    
+#   services:
+#     point_close: 
+#       name: /pr2_point_close/point_close
+#       type: deictic_gestures/PointAt  
+#     disambiguate: 
+#       name: /KSP/disambiguate
+#       type: knowledge_sharing_planner_msgs/Disambiguation
+#     verbalize:
+#       name: /KSP/verbalize
+#       type: knowledge_sharing_planner_msgs/Verbalization
+#     hatp_planner:
+#       name: /fake_plan_publisher/get_plan
+#       type: hatp_msgs/PlanningRequest
+  
+  topics:
+    say: say
+    current_facts: current_facts
+    
+  action_servers:
+    dialogue: dialogue_as 
+    plan_motion: planMotion
+    execute_motion: executeMotion
+    
+  

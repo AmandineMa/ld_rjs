@@ -1,0 +1,12 @@
+MAS director_task {
+
+	infrastructure: Centralised(threaded,1,1,3)
+	
+//	executionControl: jason.control.ExecutionControlGUI
+
+	agents:
+		supervisor [verbose=3] agentArchClass arch.agarch.SupervisorAgArch beliefBaseClass rjs.agent.TimeBB;
+
+	aslSourcePath:
+		"src/asl";
+}
