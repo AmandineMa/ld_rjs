@@ -5,12 +5,11 @@ import org.ros.node.topic.Publisher;
 import arch.actions.internal.Disambiguate;
 import arch.actions.internal.GetSparqlVerba;
 import arch.actions.internal.PR2MotionPlanDrop;
+import arch.actions.internal.PR2MotionPlanMove;
 import arch.actions.internal.PR2MotionPlanPick;
 import arch.actions.internal.PR2MotionPlanPlace;
-import arch.actions.internal.PR2MotionPlanMove;
 import arch.actions.robot.Listen;
 import arch.actions.robot.PR2MotionExecute;
-import arch.actions.robot.PointClose;
 import arch.actions.ros.StartROSNode;
 import dialogue_as.dialogue_actionActionFeedback;
 import dialogue_as.dialogue_actionActionGoal;
@@ -58,14 +57,11 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 			case "disambiguate":
 				action = new Disambiguate(actionExec, rosAgArch);
 				break;
-			case "sparql_verbalization":
+			case "sparqlVerbalization":
 				action = new GetSparqlVerba(actionExec, rosAgArch);
 				break;
 			case "listen":
 				action = new Listen(actionExec, rosAgArch, dialogueActionClient);
-				break;
-			case "pointObject":
-				action = new PointClose(actionExec,rosAgArch);
 				break;
 			case "planPick":
 				action = new PR2MotionPlanPick(actionExec, rosAgArch, pr2MotionPlanActionClient);

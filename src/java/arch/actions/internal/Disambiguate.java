@@ -1,7 +1,6 @@
 package arch.actions.internal;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
 
 import org.ros.exception.RemoteException;
 import org.ros.node.service.ServiceResponseListener;
@@ -9,6 +8,8 @@ import org.ros.node.service.ServiceResponseListener;
 import jason.asSemantics.ActionExec;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.StringTermImpl;
+import knowledge_sharing_planner_msgs.Disambiguation;
+import knowledge_sharing_planner_msgs.DisambiguationRequest;
 import knowledge_sharing_planner_msgs.DisambiguationResponse;
 import knowledge_sharing_planner_msgs.Triplet;
 import rjs.arch.actions.AbstractAction;
@@ -22,8 +23,9 @@ public class Disambiguate extends AbstractAction {
 
 	@Override
 	public void execute() {
-		String individual = removeQuotes(actionExec.getActionTerm().getTerm(0).toString());
-		String ontology = removeQuotes(actionExec.getActionTerm().getTerm(1).toString());
+		String individual = removeQuotes(actionTerms.get(0).toString());
+		String ontology = removeQuotes(actionTerms.get(1).toString());
+		boolean replan = Boolean.parseBoolean(actionTerms.get(2).toString());
 		
 		ServiceResponseListener<DisambiguationResponse> respListener = new ServiceResponseListener<DisambiguationResponse>() {
 
@@ -43,16 +45,16 @@ public class Disambiguate extends AbstractAction {
 				rosAgArch.actionExecuted(actionExec);
 			}
 		};
-		
-		Map<String, Object> parameters = new HashMap<String, Object>();
-		parameters.put("individual", individual);
-		parameters.put("ontology", rosnode.getParameters().getString("supervisor/ontologies/"+ontology));
+		DisambiguationRequest disambiReq = rosnode.newServiceRequestFromType(Disambiguation._TYPE);
+		disambiReq.setIndividual(individual);
+		disambiReq.setOntology(rosnode.getParameters().getString("supervisor/ontologies/"+ontology));
 		Triplet ctx = rosAgArch.createMessage(Triplet._TYPE);
 		ctx.setFrom(individual);
 		ctx.setRelation("isOnTopOf");
 		ctx.setOn("table_l_0");
-		parameters.put("baseFacts", ctx);
-		rosnode.callAsyncService("disambiguate", respListener, parameters);
+		disambiReq.setBaseFacts(Arrays.asList(ctx));
+		disambiReq.setReplan(replan);
+		rosnode.callAsyncService("disambiguate", respListener, disambiReq);
 
 	}
 

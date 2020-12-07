@@ -2,19 +2,13 @@ package ros;
 
 import java.util.HashMap;
 
-import org.ros.message.Duration;
 import org.ros.message.MessageListener;
 import org.ros.namespace.GraphName;
 import org.ros.node.topic.Subscriber;
 
-import com.github.rosjava_actionlib.ActionClient;
-import com.github.rosjava_actionlib.ActionClientListener;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-
-import actionlib_msgs.GoalStatusArray;
-import dialogue_as.*;
 
 import rjs.ros.AbstractRosNode;
 import rjs.utils.SimpleFact;

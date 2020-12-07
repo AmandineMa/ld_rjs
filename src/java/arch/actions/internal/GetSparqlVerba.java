@@ -1,8 +1,6 @@
 package arch.actions.internal;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.ros.exception.RemoteException;
 import org.ros.node.service.ServiceResponseListener;
@@ -11,6 +9,8 @@ import jason.asSemantics.ActionExec;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
+import knowledge_sharing_planner_msgs.Verbalization;
+import knowledge_sharing_planner_msgs.VerbalizationRequest;
 import knowledge_sharing_planner_msgs.VerbalizationResponse;
 import rjs.arch.actions.AbstractAction;
 import rjs.arch.agarch.AbstractROSAgArch;
@@ -25,7 +25,8 @@ public class GetSparqlVerba extends AbstractAction {
 	public void execute() {
 		ListTermImpl listTerm = (ListTermImpl) actionExec.getActionTerm().getTerm(0);
 		@SuppressWarnings("unchecked")
-		List<String> sparql = removeQuotes((List<Term>) actionExec.getActionTerm().getTerm(0));
+		List<String> sparql = removeQuotes((List<Term>) actionTerms.get(0));
+		String receiverID = removeQuotes(actionTerms.get(1).toString());
 		
 		ServiceResponseListener<VerbalizationResponse> respListener = new ServiceResponseListener<VerbalizationResponse>() {
 
@@ -43,10 +44,10 @@ public class GetSparqlVerba extends AbstractAction {
 				rosAgArch.actionExecuted(actionExec);
 			}
 		}; 
-		
-		Map<String, Object> parameters = new HashMap<String, Object>();
-		parameters.put("sparqlquery", sparql);
-		rosnode.callAsyncService("verbalize", respListener, parameters);
+		VerbalizationRequest verbaReq = rosnode.newServiceRequestFromType(Verbalization._TYPE);
+		verbaReq.setSparqlQuery(sparql);
+		verbaReq.setReceiverId(receiverID);
+		rosnode.callAsyncService("verbalize", respListener, verbaReq);
 
 	}
 
