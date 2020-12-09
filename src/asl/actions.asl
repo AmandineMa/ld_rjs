@@ -1,3 +1,4 @@
+//TODO change all parameters into list
 @pick[atomic]
 +!pick(Object): true <-
 	planPick(Object);
@@ -28,8 +29,10 @@
 	planMove(Pose);
 	execute("move").
 
-+!getUnRef(Object, Human): true <-
++!getUnRef(Params): true <-
+	.nth(0, Params,Object);
 	disambiguate(Object,robot, false);
 	?sparql_result(Object,S);
+	.nth(1, Params,Human);
 	sparqlVerbalization(S, Human).
 	

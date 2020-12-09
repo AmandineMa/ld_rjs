@@ -1,16 +1,16 @@
 // Agents plan_manager in project disambi_task
 { include("common.asl")}
 /* Initial beliefs and rules */
-//action(0,"planned","TellHumanToTake", ["robot","human"], 0).
-//actionParams(0, ["cube_3"]).
-//action(1,"planned","Take", ["human"], 0).
-//actionParams(1, ["cube_3"]).
-//action(2,"planned","TellHumanToPack", ["robot","human"], 0).
-//actionParams(2, ["cube_3", "area_black"]).
-//link(0,[]).
-//link(1,[0]).
-//link(2,[1]).
-//plan(0,[0,1,2]).
+action(0,"planned","getUnRef", ["robot","human"], 0).
+actionParams(0, ["cube_1", "human"]).
+action(1,"planned","getUnRef", ["robot","human"], 0).
+actionParams(1, ["cube_2", "human"]).
+action(2,"planned","getUnRef", ["robot","human"], 0).
+actionParams(2, ["cube_3", "human"]).
+link(0,[]).
+link(1,[0]).
+link(2,[1]).
+plan(0,[0,1,2]).
 
 /* Initial goals */
 !start.
@@ -33,11 +33,15 @@
 	!getNewPlan(Goal).
 	
 +!getNewPlan(Goal) : true <-
-	getHatpPlan(Goal);
+//	getHatpPlan(Goal);
 	?plan(ID,_);
 	-+currentPlan(ID, Goal).
 	
 +currentPlan(ID, Goal) : true <-
+	rjs.jia.get_param("/supervisor/actsToMonitor", "List", ActsToMonitor);
+	for(.member(Y,ActsToMonitor)){
+		.count(action(_,"planned", "getUnRef",_,_),C);
+	}
 	?plan(ID,Actions);
 	+pendingActions(Actions);
 	.findall(X, 

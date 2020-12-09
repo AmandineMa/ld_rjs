@@ -33,9 +33,10 @@ robotState(idle).
 
 +!executeAction(ID,Name) : true <-
 	-+robotState(acting);
-	.concat("/robot_decision/action_names/",Name,HATPName);
-	rjs.jia.get_param(HATPName, "String", ActName);
-	.term2string(Action,ActName);
+//	.concat("/robot_decision/action_names/",Name,HATPName);
+//	rjs.jia.get_param(HATPName, "String", ActName);
+//	.term2string(Action,ActName);
+	Action=Name;
 	.send(plan_manager, tell, action(ID,"ongoing"));
 	if(rjs.jia.believes(actionParams(ID,Params))){
 		?actionParams(ID,Params);

@@ -18,11 +18,13 @@ supervisor:
   
   topics:
     say: say
-    current_facts: current_facts
+    mementar_occasions: current_facts
     
   action_servers:
     dialogue: dialogue_as 
     plan_motion: planMotion
     execute_motion: executeMotion
     
+  actsToMonitor:
+     - getUnRef  
   
