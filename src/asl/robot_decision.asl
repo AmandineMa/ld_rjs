@@ -13,7 +13,7 @@ robotState(idle).
 
 +!start : true <-
 	.verbose(2);
-	rjs.jia.log_beliefs;
+//	rjs.jia.log_beliefs;
 	!getRobotName.
 
 +action(ID,Name,Agents,Cost) : robotState(idle) & robotName(Agent) & .member(Agent,Agents) <-

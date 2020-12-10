@@ -16,7 +16,7 @@ public class RosNode extends AbstractRosNode {
 	
 	private Subscriber<MementarOccasion> mementSub;
 	private List<MementarOccasion> perceptions = Collections.synchronizedList(new ArrayList<MementarOccasion>());
-
+	
 	public RosNode(String name) {
 		super(name);
 	}

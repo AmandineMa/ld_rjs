@@ -18,7 +18,7 @@ plan(0,[0,1,2]).
 +!start : true <- 
 	.verbose(2); 
 	!getRobotName;
-//	rjs.jia.log_beliefs;
+	rjs.jia.log_beliefs;
 	+newGoal("ThrowAll",0).
 
 /* Plans */
@@ -38,10 +38,7 @@ plan(0,[0,1,2]).
 	-+currentPlan(ID, Goal).
 	
 +currentPlan(ID, Goal) : true <-
-	rjs.jia.get_param("/supervisor/actsToMonitor", "List", ActsToMonitor);
-	for(.member(Y,ActsToMonitor)){
-		.count(action(_,"planned", "getUnRef",_,_),C);
-	}
+	!setMementarSub;
 	?plan(ID,Actions);
 	+pendingActions(Actions);
 	.findall(X, 
@@ -53,6 +50,13 @@ plan(0,[0,1,2]).
 		?action(X,"planned",Name,Agents,Cost);
 		-action(X,"planned",Name,Agents,Cost);
 		+action(X,"todo",Name,Agents,Cost);
+	}.
+	
++!setMementarSub : true <-
+	rjs.jia.get_param("/supervisor/actsToMonitor", "List", ActsToMonitor);
+	for(.member(Y,ActsToMonitor)){
+		.count(action(_,"planned", Y,_,_),C);
+		mementarSubscribe(Y,C);
 	}.
 	
 wantedAction(Name,Params) :- (action(ID,"todo",Name,Agents,_) | action(ID,"ongoing",Name,_,_)) & actionParams(ID,Params).
