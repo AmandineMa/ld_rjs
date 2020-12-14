@@ -6,16 +6,19 @@ supervisor:
     robot: robot
     
   services:
+   onto_individual: 
+      name: /ontologenius/individual
+      type: ontologenius/OntologeniusService
 #    disambiguate: 
-#      name: /KSP/disambiguate
-#      type: knowledge_sharing_planner_msgs/Disambiguation
+#       name: /KSP/disambiguate
+#       type: knowledge_sharing_planner_msgs/Disambiguation
 #    verbalize:
-#      name: /KSP/verbalize
-#      type: knowledge_sharing_planner_msgs/Verbalization
-    mementar_sub:
+#       name: /KSP/verbalize
+#       type: knowledge_sharing_planner_msgs/Verbalization
+   mementar_sub:
       name: /mementar/subscribe
       type: mementar/MementarOccasionSubscription
-    mementar_unsub:
+   mementar_unsub:
       name: /mementar/unsubscribe
       type: mementar/MementarOcassionUnsubscription
 #     hatp_planner:
@@ -24,7 +27,7 @@ supervisor:
   
   topics:
     say: say
-    mementar_occasions: current_facts
+    mementar_occasions: mementar/occasions
     
   action_servers:
     dialogue: dialogue_as 
@@ -32,5 +35,6 @@ supervisor:
     execute_motion: executeMotion
     
   actsToMonitor:
-     - getUnRef  
+     - PickAction
+     - PlaceAction  
   

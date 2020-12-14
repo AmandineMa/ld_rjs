@@ -1,7 +1,6 @@
 
 robot_decision:
   action_names:
-    TellHumanToPack: tellToPack
-    TellHumanToTake: tellToTake
-    PointHumanToTake: pointObject
+    PickAction: pick
+    PlaceAction: place
     

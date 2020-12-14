@@ -32,7 +32,7 @@ public class MementarUnsubscribe extends AbstractAction {
 
 			@Override
 			public void onSuccess(MementarOcassionUnsubscriptionResponse resp) {
-				rosAgArch.removeBelief(action+"Monitoring", Arrays.asList(resp.getId()));
+				rosAgArch.removeBelief("monitoring", Arrays.asList(resp.getId(),action,"_"));
 				setResult(true);
 			}
 		};

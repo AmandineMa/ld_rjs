@@ -1,12 +1,12 @@
 // Agents plan_manager in project disambi_task
 { include("common.asl")}
 /* Initial beliefs and rules */
-action(0,"planned","getUnRef", ["robot","human"], 0).
-actionParams(0, ["cube_1", "human"]).
-action(1,"planned","getUnRef", ["robot","human"], 0).
-actionParams(1, ["cube_2", "human"]).
-action(2,"planned","getUnRef", ["robot","human"], 0).
-actionParams(2, ["cube_3", "human"]).
+action(0,"planned","PickAction", ["human_0"], 0, [1], [2,3]).
+actionParams(0, ["cube_412", "human_0"]).
+action(1,"planned","PlaceAction", ["human_0"], 0).
+actionParams(1, ["cube_412", "box_2", "human_0"]).
+//action(2,"planned","getUnRef", ["robot","human"], 0).
+//actionParams(2, ["cube_3", "human"]).
 link(0,[]).
 link(1,[0]).
 link(2,[1]).
