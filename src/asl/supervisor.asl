@@ -9,8 +9,8 @@
 /* Plans */
 
 +!start : true <- 
-//	rjs.jia.log_beliefs;
-//	.verbose(2);
+	rjs.jia.log_beliefs;
+	.verbose(2);
 	configureNode;
 	startParameterLoaderNode("/general.yaml", "/robot_decision.yaml");
 	startROSNode;

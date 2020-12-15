@@ -26,8 +26,18 @@ supervisor:
 #       type: hatp_msgs/PlanningRequest
   
   topics:
-    say: say
-    mementar_occasions: mementar/occasions
+    mementar_occasions: 
+      name: mementar/occasions
+      type: mementar/MementarOccasion
+      function: sub
+    plan:
+      name: planner/getPlan
+      type: planner_msgs/Plan
+      function: sub
+    plan_request:
+      name: planner/planRequest
+      type: planner_msgs/PlanRequest
+      function: pub
     
   action_servers:
     dialogue: dialogue_as 
