@@ -5,6 +5,7 @@ import org.ros.node.topic.Publisher;
 import arch.actions.internal.Disambiguate;
 import arch.actions.internal.GetSparqlVerba;
 import arch.actions.internal.MementarSubscribe;
+import arch.actions.internal.MementarUnsubscribe;
 import arch.actions.internal.PR2MotionPlanDrop;
 import arch.actions.internal.PR2MotionPlanMove;
 import arch.actions.internal.PR2MotionPlanPick;
@@ -84,6 +85,9 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 				break;
 			case "mementarSubscribe":
 				action = new MementarSubscribe(actionExec, rosAgArch);
+				break;
+			case "mementarUnsubscribe":
+				action = new MementarUnsubscribe(actionExec, rosAgArch);
 				break;
 			case "configureNode":
 				action = new ConfigureNode(actionExec, rosAgArch);

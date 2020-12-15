@@ -84,6 +84,7 @@ public class PlanManagerAgArch extends AgArch {
 	private void setAction(String action) {
 		actName = callOnto("getUp", action).getValues().get(0);
 		actParams = callOnto("getRelationWith", action).getValues();
+		actParams.sort(String::compareToIgnoreCase);
 	}
 	
 	private void addPercept(String state) {

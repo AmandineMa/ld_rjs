@@ -2,11 +2,11 @@
 
 action(0,"planned","PickAction", ["human_0"], ["cube_412", "human_0"], 0, []).
 
-action(1,"planned","PlaceAction", ["human_0"], ["cube_412", "box_2", "human_0"], 0, [0]).
+action(1,"planned","PlaceAction", ["human_0"], ["box_2","cube_412", "human_0"], 0, [0]).
 
-action(2,"planned","PickAction", ["human_0"], ["cube_415", "human_0"], 0, [1]).
-
-action(3,"planned","PlaceAction", ["human_0"], ["cube_415",  "box_1", "human_0"], 0, [1]).
+//action(2,"planned","PickAction", ["human_0"], ["cube_415", "human_0"], 0, [1]).
+//
+//action(3,"planned","PlaceAction", ["human_0"], ["box_1", "cube_415", "human_0"], 0, [1]).
 
 actionStates(["planned","todo","ongoing","executed"]).
 
@@ -49,8 +49,8 @@ actionStates(["planned","todo","ongoing","executed"]).
 +goal(ID, State, Task) : State == preempted | State == aborted <-	
 	true.
 	
-+goal(ID,State, Task) : State == suceeded <-
-	for(monitoring(MonID,Act,_)){
++goal(ID,State, Task) : State == succeeded <-
+	for(monitoring(MonID,Act,_,_)){
 		mementarUnsubscribe(MonID,Act);
 	}.
 	
@@ -58,8 +58,8 @@ actionStates(["planned","todo","ongoing","executed"]).
 	rjs.jia.get_param("/supervisor/actsToMonitor", "List", ActsToMonitor);
 	for(.member(Y,ActsToMonitor)){
 		.count(action(_,"planned",Y,_,_,_,_),C);
-		mementarSubscribe(Y,start,C);
-		mementarSubscribe(Y,end,C);
+		mementarSubscribe(Y,start,-1);
+		mementarSubscribe(Y,end,-1);
 	}.	
 
 +!updatePlan : true <-
@@ -92,15 +92,13 @@ wantedAction(Name,Agents,Params) :- action(ID,S,Name,Agents,Params,_,_) & (S=="t
 	-action(_,"executed",Name,Agents,Params)[source(_)];
 	-action(ID,_,Name,Agents,Params,Cost,Preds);
 	+action(ID,"executed",Name,Agents,Params,Cost,Preds);
-//	if(not (action(ID,S,Name,Agents,Params) 
-//			& actionStates(AS) 
-//			& .difference(AS,["executed"],NotEx) 
-//			& .member(S,NotEx))){
-//		?goal(GoalID,active);
-//		-goal(GoalID,active);
-//		+goal(GoalID,succeeded);
-//	}
-	.
+	!updatePlan;
+	!testRemainingActions.
+
++!testRemainingActions : .count(action(_,S,_,_,_,_,_) & S \== "executed", C) & C = 0
+	<- ?goal(GoalID,active,Task);
+		-goal(GoalID,active,Task);
+		+goal(GoalID,succeeded,Task).
 
 +action(ID,"executed",Name,Agents,Params) :  not wantedAction(Name,Params) <- true.
 	
