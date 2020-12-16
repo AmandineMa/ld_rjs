@@ -12,7 +12,7 @@
 	rjs.jia.log_beliefs;
 	.verbose(2);
 	configureNode;
-	startParameterLoaderNode("/general.yaml", "/robot_decision.yaml");
+	startParameterLoaderNode("/general.yaml", "/robot_decision.yaml", "/goals.yaml");
 	startROSNode;
 	initServices;
 	+started;

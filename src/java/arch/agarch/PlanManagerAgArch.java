@@ -20,6 +20,7 @@ public class PlanManagerAgArch extends AgArch {
 	
 	String actName;
 	List<String> actParams;
+	String actAgent;
 	Collection<Literal> perceive = new ArrayList<Literal>();
 	
 	public PlanManagerAgArch() {
@@ -85,10 +86,11 @@ public class PlanManagerAgArch extends AgArch {
 		actName = callOnto("getUp", action).getValues().get(0);
 		actParams = callOnto("getRelationWith", action).getValues();
 		actParams.sort(String::compareToIgnoreCase);
+		actAgent = callOnto("getOn", action+":hasParameterAgent").getValues().get(0);
 	}
 	
 	private void addPercept(String state) {
-		perceive.add(Tools.stringFunctorAndTermsToBelLiteral("action",Arrays.asList("_", state, actName, Tools.arrayToListTerm(Arrays.asList("human_0")), Tools.arrayToListTerm(actParams))));
+		perceive.add(Tools.stringFunctorAndTermsToBelLiteral("action",Arrays.asList("_", state, actName, actAgent, Tools.arrayToListTerm(actParams))));
 	}
 
 }

@@ -44,10 +44,10 @@ public class GetSparqlVerba extends AbstractAction {
 				rosAgArch.actionExecuted(actionExec);
 			}
 		}; 
-		VerbalizationRequest verbaReq = rosnode.newServiceRequestFromType(Verbalization._TYPE);
+		VerbalizationRequest verbaReq = getRosNode().newServiceRequestFromType(Verbalization._TYPE);
 		verbaReq.setSparqlQuery(sparql);
 		verbaReq.setReceiverId(receiverID);
-		rosnode.callAsyncService("verbalize", respListener, verbaReq);
+		getRosNode().callAsyncService("verbalize", respListener, verbaReq);
 
 	}
 

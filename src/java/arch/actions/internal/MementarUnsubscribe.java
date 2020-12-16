@@ -27,19 +27,19 @@ public class MementarUnsubscribe extends AbstractAction {
 
 			@Override
 			public void onFailure(RemoteException arg0) {
-				setResult(false);
+				setActionExecuted(false);
 			}
 
 			@Override
 			public void onSuccess(MementarOcassionUnsubscriptionResponse resp) {
 				rosAgArch.removeBelief("monitoring", Arrays.asList(resp.getId(),action,"_","_"));
-				setResult(true);
+				setActionExecuted(true);
 			}
 		};
 		
-		MementarOcassionUnsubscriptionRequest req = rosnode.newServiceRequestFromType(MementarOcassionUnsubscription._TYPE);
+		MementarOcassionUnsubscriptionRequest req = getRosNode().newServiceRequestFromType(MementarOcassionUnsubscription._TYPE);
 		req.setId(id);
-		rosnode.callAsyncService("mementar_unsub", respListener, req);
+		getRosNode().callAsyncService("mementar_unsub", respListener, req);
 	}
 
 }

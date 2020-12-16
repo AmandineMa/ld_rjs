@@ -3,6 +3,7 @@ package arch.actions;
 import org.ros.node.topic.Publisher;
 
 import arch.actions.internal.Disambiguate;
+import arch.actions.internal.GetMAHTNPlan;
 import arch.actions.internal.GetSparqlVerba;
 import arch.actions.internal.MementarSubscribe;
 import arch.actions.internal.MementarUnsubscribe;
@@ -64,6 +65,9 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 				break;
 			case "listen":
 				action = new Listen(actionExec, rosAgArch, dialogueActionClient);
+				break;
+			case "getPlan":
+				action = new GetMAHTNPlan(actionExec, rosAgArch);
 				break;
 			case "planPick":
 				action = new PR2MotionPlanPick(actionExec, rosAgArch, pr2MotionPlanActionClient);

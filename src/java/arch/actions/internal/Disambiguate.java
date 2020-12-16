@@ -46,9 +46,9 @@ public class Disambiguate extends AbstractAction {
 				rosAgArch.actionExecuted(actionExec);
 			}
 		};
-		DisambiguationRequest disambiReq = rosnode.newServiceRequestFromType(Disambiguation._TYPE);
+		DisambiguationRequest disambiReq = getRosNode().newServiceRequestFromType(Disambiguation._TYPE);
 		disambiReq.setIndividual(individual);
-		disambiReq.setOntology(rosnode.getParameters().getString("supervisor/ontologies/"+ontology));
+		disambiReq.setOntology(getRosNode().getParameters().getString("supervisor/ontologies/"+ontology));
 		Triplet ctx = rosAgArch.createMessage(Triplet._TYPE);
 		ctx.setFrom(individual);
 		ctx.setRelation("isAbove");
@@ -59,7 +59,7 @@ public class Disambiguate extends AbstractAction {
 		symbT.setIndividuals(Arrays.asList(individual));
 		symbT.setSymbols(Arrays.asList("?0"));
 		disambiReq.setSymbolTable(symbT);
-		rosnode.callAsyncService("disambiguate", respListener, disambiReq);
+		getRosNode().callAsyncService("disambiguate", respListener, disambiReq);
 
 	}
 

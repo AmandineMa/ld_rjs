@@ -13,9 +13,8 @@ public class StartROSNode extends AbstractStartROSNode {
 	}
 
 	@Override
-	public void execute() {
-		rosnode = new RosNode("supervisor");
-		configRosnode();
+	protected void instantiateRosNode() {
+		AbstractROSAgArch.setRosnode(new RosNode("supervisor"));		
 	}
 
 }

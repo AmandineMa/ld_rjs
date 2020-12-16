@@ -28,20 +28,20 @@ public class MementarSubscribe extends AbstractAction {
 
 			@Override
 			public void onFailure(RemoteException arg0) {
-				setResult(false);
+				setActionExecuted(false);
 			}
 
 			@Override
 			public void onSuccess(MementarOccasionSubscriptionResponse resp) {
 				rosAgArch.addBelief("monitoring", Arrays.asList(resp.getId(),action,type,count));
-				setResult(true);
+				setActionExecuted(true);
 			}
 		};
 		
-		MementarOccasionSubscriptionRequest req = rosnode.newServiceRequestFromType(MementarOccasionSubscription._TYPE);
+		MementarOccasionSubscriptionRequest req = getRosNode().newServiceRequestFromType(MementarOccasionSubscription._TYPE);
 		req.setData("[add]"+action+"|_|"+type);
 		req.setCount(count);
-		rosnode.callAsyncService("mementar_sub", respListener, req);
+		getRosNode().callAsyncService("mementar_sub", respListener, req);
 	}
 
 }

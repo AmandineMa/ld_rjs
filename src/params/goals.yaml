@@ -1,0 +1,12 @@
+goals:
+   dt1: 
+      name: dt1
+      worldstate:
+         isIn:  
+            cube_1:
+               - box_3
+            cube_2: 
+               - box_3
+            cube_3: 
+               - box_4
+         
