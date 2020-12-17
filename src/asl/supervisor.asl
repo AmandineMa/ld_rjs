@@ -10,7 +10,7 @@
 
 +!start : true <- 
 	rjs.jia.log_beliefs;
-	.verbose(2);
+//	.verbose(2);
 	configureNode;
 	startParameterLoaderNode("/general.yaml", "/robot_decision.yaml", "/goals.yaml");
 	startROSNode;
@@ -22,10 +22,11 @@
 //	!move("left_arm_home");
 ////	!test1 |&| !test2;
 //	initServices;
-	.create_agent(plan_manager, "src/asl/plan_manager2.asl", [agentArchClass("arch.agarch.PlanManagerAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("agent.OntoAgent")]).
-//	.create_agent(robot_decision, "src/asl/robot_decision.asl", [agentArchClass("arch.agarch.AgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("rjs.agent.LimitedAgent")]);.
+	.create_agent(plan_manager, "src/asl/plan_manager2.asl", [agentArchClass("arch.agarch.PlanManagerAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("agent.OntoAgent")]);
+	.create_agent(robot_executor, "src/asl/robot_executor.asl", [agentArchClass("arch.agarch.AgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("rjs.agent.LimitedAgent")]);.
 //	.create_agent(robot, "src/asl/disambiguation_task.asl", [agentArchClass("arch.agarch.RobotAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("rjs.agent.LimitedAgent")]);.
 	
+//TODO corriger start quand srv manquants
 	
 +~connected_srv(S) : true <- .print("service not connected : ", S).
 

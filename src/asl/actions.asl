@@ -1,11 +1,12 @@
-//TODO change all parameters into list
 @pick[atomic]
-+!pick(Object): true <-
++!pick(Params): true <-
+	.nth(0, Params,Object);
 	planPick(Object);
 	execute("pick").
 
 @place[atomic]
-+!place(Box) : planPick("armUsed", Arm) <-
++!place(Params) : planPick("armUsed", Arm) <-
+	.nth(0, Params,Box);
 	planPlace(Box, Arm);
 	execute("place");
 	-planPick("armUsed", Arm).
@@ -25,14 +26,37 @@
 	
 	
 @move[atomic]
-+!move(Pose) : true <-
++!move(Params) : true <-
+	.nth(0, Params,Pose);
 	planMove(Pose);
 	execute("move").
 
-+!getUnRef(Params): true <-
-	.nth(0, Params,Object);
++!getUnRef(Object, Human): true <-
 	disambiguate(Object,robot, false);
 	?sparql_result(Object,S);
-	.nth(1, Params,Human);
 	sparqlVerbalization(S, Human).
+	
++!sayPickPlace(VerbaCube, VerbaBox) : true <-
+	.concat("Can you put ",VerbaCube, " in ",VerbaBox,"?", Vc);
+	say(Vc).
+
+//TODO envoyer les bons params, peu importe l'ordre
++!robot_tell_human_to_tidy(Params): true <-
+	.nth(1, Params,Human);
+	.nth(0, Params,Cube);
+	!getUnRef(Cube,Human);
+	.nth(2, Params,Box);
+	!getUnRef(Box,Human);
+	?verba(Cube,VerbaCube);
+	?verba(Box,VerbaBox);
+	!sayPickPlace(VerbaCube, VerbaBox).
+
++!robot_wait_for_human_to_tidy(Params): true <- true.
+
+
+
+
+
+
+	
 	

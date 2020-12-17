@@ -1,29 +1,28 @@
 
 supervisor:
   robot_name: "robot"
+  table_name: table_1
   
   ontologies:
     robot: robot
     
   services:
    onto_individual: 
-      name: /ontologenius/individual
+      name: /ontologenius/individual/robot
       type: ontologenius/OntologeniusService
-#    disambiguate: 
-#       name: /KSP/disambiguate
-#       type: knowledge_sharing_planner_msgs/Disambiguation
-#    verbalize:
-#       name: /KSP/verbalize
-#       type: knowledge_sharing_planner_msgs/Verbalization
+   disambiguate: 
+      name: /KSP/disambiguate
+      type: knowledge_sharing_planner_msgs/Disambiguation
+   verbalize:
+      name: /KSP/verbalize
+      type: knowledge_sharing_planner_msgs/Verbalization
    mementar_sub:
-      name: /mementar/subscribe
+      name: /mementar/subscribe/robot
       type: mementar/MementarOccasionSubscription
    mementar_unsub:
-      name: /mementar/unsubscribe
+      name: /mementar/unsubscribe/robot
       type: mementar/MementarOcassionUnsubscription
-#     hatp_planner:
-#       name: /fake_plan_publisher/get_plan
-#       type: hatp_msgs/PlanningRequest
+
   
   topics:
     mementar_occasions: 
@@ -31,13 +30,20 @@ supervisor:
       type: mementar/MementarOccasion
       function: sub
     plan:
-      name: planner/getPlan
+      name: /planner/plan_answer
       type: planner_msgs/Plan
       function: sub
     plan_request:
-      name: planner/planRequest
+      name: /planner/request_new_plan
       type: planner_msgs/PlanRequest
       function: pub
+    say:
+      name: say
+      type: std_msgs/String
+      function: pub
+      
+  topic_to_change:
+      say: say
     
   action_servers:
     dialogue: dialogue_as 

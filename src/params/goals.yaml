@@ -1,12 +1,7 @@
 goals:
    dt1: 
-      name: dt1
+      name: tidy_cubes
       worldstate:
-         isIn:  
-            cube_1:
-               - box_3
-            cube_2: 
-               - box_3
-            cube_3: 
-               - box_4
-         
+         isInContainer:  
+            cube_BBCG:
+               - throw_box_green

@@ -13,7 +13,7 @@ actionStates(["planned","todo","ongoing","executed"]).
 !start.
 
 +!start : true <-
-	rjs.jia.log_beliefs;
+//	rjs.jia.log_beliefs;
 	.verbose(2);
 	!getRobotName;
 	+goal(0,active,"pile").
@@ -37,7 +37,7 @@ actionStates(["planned","todo","ongoing","executed"]).
 +!setMementarSub : true <-
 	rjs.jia.get_param("/supervisor/actsToMonitor", "List", ActsToMonitor);
 	for(.member(Y,ActsToMonitor)){
-		.count(action(_,"planned",Y,_,_,_),C);
+//		.count(action(_,"planned",Y,_,_,_),C);
 		mementarSubscribe(Y,start,-1);
 		mementarSubscribe(Y,end,-1);
 	}.	
@@ -79,14 +79,16 @@ wantedAction(Name,Agent,Params) :- action(ID,S,Name,Agent,Params,_) & (S=="todo"
 	<- ?goal(GoalID,active,Task);
 		-goal(GoalID,active,Task);
 		+goal(GoalID,succeeded,Task).
+		
++!testRemainingActions : true <- true.
 
 +action(ID,"executed",Name,Agent,Params) :  not wantedAction(Name,Params) <- true.
 	
 	
 +action(ID,"todo",Name,Agent,Params,Preds) : robotName(Agent) <-
-	.wait(2000);
-	+action(ID,"executed",Name,Agent,Params)[source(robot_executor)].
-//	.send(robot_executor, tell, action(ID,Name,Agent,Params)).
+//	.wait(2000);
+//	+action(ID,"executed",Name,Agent,Params)[source(robot_executor)].
+	.send(robot_executor, tell, action(ID,Name,Agent,Params)).
 
 
 

@@ -13,6 +13,7 @@ import arch.actions.internal.PR2MotionPlanPick;
 import arch.actions.internal.PR2MotionPlanPlace;
 import arch.actions.robot.Listen;
 import arch.actions.robot.PR2MotionExecute;
+import arch.actions.robot.Say;
 import arch.actions.ros.StartROSNode;
 import dialogue_as.dialogue_actionActionFeedback;
 import dialogue_as.dialogue_actionActionGoal;
@@ -43,7 +44,7 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 	
 	public void setRosVariables() {
 		super.setRosVariables();
-//		sayPub = createPublisher("supervisor/topics/say");
+		sayPub = createPublisher("supervisor/topic_to_change/say");
 		dialogueActionClient = new RjsActionClient<dialogue_actionActionGoal, dialogue_actionActionFeedback, dialogue_actionActionResult>(rosnode.getConnectedNode(), rosnode.getParameters().getString("/supervisor/action_servers/dialogue"), 
 				dialogue_actionActionGoal._TYPE, dialogue_actionActionFeedback._TYPE, dialogue_actionActionResult._TYPE);
 		
@@ -65,6 +66,9 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 				break;
 			case "listen":
 				action = new Listen(actionExec, rosAgArch, dialogueActionClient);
+				break;
+			case "say":
+				action = new Say(actionExec, rosAgArch, sayPub);
 				break;
 			case "getPlan":
 				action = new GetMAHTNPlan(actionExec, rosAgArch);

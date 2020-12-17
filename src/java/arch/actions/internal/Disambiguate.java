@@ -49,10 +49,11 @@ public class Disambiguate extends AbstractAction {
 		DisambiguationRequest disambiReq = getRosNode().newServiceRequestFromType(Disambiguation._TYPE);
 		disambiReq.setIndividual(individual);
 		disambiReq.setOntology(getRosNode().getParameters().getString("supervisor/ontologies/"+ontology));
+		//TODO add context to action param
 		Triplet ctx = rosAgArch.createMessage(Triplet._TYPE);
-		ctx.setFrom(individual);
+		ctx.setFrom("?0");
 		ctx.setRelation("isAbove");
-		ctx.setOn("table_1");
+		ctx.setOn(getRosNode().getParameters().getString("supervisor/table_name"));
 		disambiReq.setBaseFacts(Arrays.asList(ctx));
 		disambiReq.setReplan(replan);
 		SymbolTable symbT = rosAgArch.createMessage(SymbolTable._TYPE);
