@@ -1,7 +1,6 @@
 
 robot_decision:
   action_names:
-    PickAction: pick
-    PlaceAction: place
     robot_tell_human_to_tidy: robot_tell_human_to_tidy
+    robot_wait_for_human_to_tidy: robot_wait_for_human_to_tidy
     

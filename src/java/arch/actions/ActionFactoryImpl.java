@@ -14,6 +14,7 @@ import arch.actions.internal.PR2MotionPlanPlace;
 import arch.actions.robot.Listen;
 import arch.actions.robot.PR2MotionExecute;
 import arch.actions.robot.Say;
+import arch.actions.robot.ScanTable;
 import arch.actions.ros.StartROSNode;
 import dialogue_as.dialogue_actionActionFeedback;
 import dialogue_as.dialogue_actionActionGoal;
@@ -111,6 +112,9 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 				break;
 			case "retryInitServices":
 				action = new RetryInitServices(actionExec, rosAgArch);
+				break;
+			case "scanTable":
+				action = new ScanTable(actionExec, rosAgArch);
 				break;
 			default:
 				break;

@@ -87,6 +87,7 @@ public class PlanManagerAgArch extends AgArch {
 		actParams = callOnto("getRelationWith", action).getValues();
 		actParams.sort(String::compareToIgnoreCase);
 		actAgent = callOnto("getOn", action+":hasParameterAgent").getValues().get(0);
+		actParams.remove(actAgent);
 	}
 	
 	private void addPercept(String state) {

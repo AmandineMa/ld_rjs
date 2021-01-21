@@ -1,0 +1,14 @@
+plan_manager:
+  goals:
+     dt1: 
+        name: tidy_cubes
+        worldstate:
+           isInContainer:  
+              cube_BGCB:
+                 - throw_box_green
+              cube_GBTB:
+                 - throw_box_green
+                 
+  actsToMonitor:
+     - human_pick_cube
+     - human_drop_cube

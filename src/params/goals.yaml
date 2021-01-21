@@ -1,7 +1,0 @@
-goals:
-   dt1: 
-      name: tidy_cubes
-      worldstate:
-         isInContainer:  
-            cube_BBCG:
-               - throw_box_green

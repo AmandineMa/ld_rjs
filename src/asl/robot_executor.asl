@@ -13,7 +13,7 @@ robotState(idle).
 
 +!start : true <-
 	.verbose(2);
-	rjs.jia.log_beliefs;
+//	rjs.jia.log_beliefs;
 	!getRobotName.
 
 +action(ID,Name,Agent,Params) : robotState(idle) & robotName(Agent) <-
@@ -33,10 +33,7 @@ robotState(idle).
 
 +!executeAction(ID,Name,Agent,Params) : true <-
 	-+robotState(acting);
-	.concat("/robot_decision/action_names/",Name,HATPName);
-	rjs.jia.get_param(HATPName, "String", ActName);
-	.term2string(Action,ActName);
-//	Action=Name;
+	.lower_case(Name, Action);
 	.send(plan_manager, tell, action(ID,"ongoing",Name,Agent,Params));
 	Act =.. [Action, [Params],[]];
 	+action(ID,Name,"ongoing");

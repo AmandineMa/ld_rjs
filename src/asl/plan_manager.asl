@@ -1,154 +1,97 @@
-// Agents plan_manager in project disambi_task
 { include("common.asl")}
-/* Initial beliefs and rules */
-action(0,"planned","PickAction", ["human_0"], 0, [1], [2,3]).
-actionParams(0, ["cube_412", "human_0"]).
-action(1,"planned","PlaceAction", ["human_0"], 0).
-actionParams(1, ["cube_412", "box_2", "human_0"]).
-//action(2,"planned","getUnRef", ["robot","human"], 0).
-//actionParams(2, ["cube_3", "human"]).
-link(0,[]).
-link(1,[0]).
-link(2,[1]).
-plan(0,[0,1,2]).
 
-/* Initial goals */
+//action(0,"planned","PickAction", "human_0", ["cube_412", "human_0"], []).
+//
+//action(1,"planned","PlaceAction", "human_0", ["box_2","cube_412", "human_0"], [0]).
+//
+//action(2,"planned","PickAction", "human_0", ["cube_415", "human_0"], [1]).
+//
+//action(3,"planned","PlaceAction", "human_0", ["box_1", "cube_415", "human_0"], [1]).
+
+//action(2,"planned","Robot_wait_for_human_to_tidy","robot",["cube_BGCB","human_0","throw_box_green"],[]).
+
+actionStates(["planned","todo","ongoing","executed"]).
+
 !start.
 
-+!start : true <- 
-	.verbose(2); 
-	!getRobotName;
++!start : true <-
 	rjs.jia.log_beliefs;
-	+newGoal("ThrowAll",0).
-
-/* Plans */
-
-
-+newGoal(Goal,Priority) : true <-
-//	.abolish(_);
-	+currentGoal(Goal,Priority);
-	-newGoal(Goal,Priority)[source(_)].
+	.verbose(2);
+	!getRobotName;
+	+goal(0,active,"pile").
 	
-+currentGoal(Goal,Priority): true <-
-	!getNewPlan(Goal).
-	
-+!getNewPlan(Goal) : true <-
-//	getHatpPlan(Goal);
-	?plan(ID,_);
-	-+currentPlan(ID, Goal).
-	
-+currentPlan(ID, Goal) : true <-
++goal(ID, State, Task) : State == active <-
+	rjs.jia.get_param("plan_manager/goals/dt1/name", "String", N);
+	rjs.jia.get_param("plan_manager/goals/dt1/worldstate", "Map", G);
+	//[[name_t1,param1_t1,param2_t1],[name_t2, param1_t2]]
+	getPlan([[N,G]], ["human_0"]);
 	!setMementarSub;
-	?plan(ID,Actions);
-	+pendingActions(Actions);
-	.findall(X, 
-		action(X,"planned",Name,Agents,Cost) 
-		& .findall(Origin, link(Origin,P) & .empty(P), L) 
-		& .member(X,L), A
-	);
-	for(.member(X,A)){
-		?action(X,"planned",Name,Agents,Cost);
-		-action(X,"planned",Name,Agents,Cost);
-		+action(X,"todo",Name,Agents,Cost);
+	!updatePlan.
+	
++goal(ID, State, Task) : State == preempted | State == aborted <-	
+	true.
+	
++goal(ID,State, Task) : State == succeeded <-
+	for(monitoring(MonID,Act,_,_)){
+		mementarUnsubscribe(MonID,Act);
 	}.
 	
 +!setMementarSub : true <-
-	rjs.jia.get_param("/supervisor/actsToMonitor", "List", ActsToMonitor);
+	rjs.jia.get_param("/plan_manager/actsToMonitor", "List", ActsToMonitor);
 	for(.member(Y,ActsToMonitor)){
-		.count(action(_,"planned", Y,_,_),C);
-		mementarSubscribe(Y,C);
+//		.count(action(_,"planned",Y,_,_,_),C);
+		mementarSubscribe(Y,start,-1);
+		mementarSubscribe(Y,end,-1);
+	}.	
+
++!updatePlan : true <-
+	for(action(ID,"planned",Name,Agent,Params,Preds)){
+		.findall(P, 
+			(action(P,S,_,_,_,_) 
+			& .member(P,Preds) 
+			& actionStates(AS) 
+			& .difference(AS,["executed"],NotEx) 
+			& .member(S,NotEx)
+		), PredsL);
+		if(.empty(PredsL)){
+			-action(ID,"planned",Name,Agent,Params,Preds);
+			+action(ID,"todo",Name,Agent,Params,Preds);
+		}
 	}.
 	
-wantedAction(Name,Params) :- (action(ID,"todo",Name,Agents,_) | action(ID,"ongoing",Name,_,_)) & actionParams(ID,Params).
-	
-+actionExecuted(Name, Params) :  true <-
-	-actionExecuted(Name,Params)[source(_)];
-	!actionExecuted(Name,Params).
-	
-+action(ID, "executed") : true <-
-	-action(ID, "executed")[source(_)];
-	?action(ID,_,Name,_,_);
-	?actionParams(ID,Params);
-	!actionExecuted(Name, Params).
-	
-+!actionExecuted(Name,Params) : wantedAction(Name,Params) <-
-	-action(ID,"todo",Name,Agents,Cost);
-	+action(ID,"executed",Name,Agents,Cost);
-	?pendingActions(Actions);
-	rjs.jia.delete_from_list(ID,Actions,RemainActions);
-	if(.empty(RemainActions)){
-		+planOver;
-		-+pendingActions([]);
-	}else{
-		-+pendingActions(RemainActions);
-	}
-	!updatePlan.
-	
-+!actionExecuted(Name,Params) : not wantedAction(Name,Params) <-
-	true.
-//	?currentGoal(Goal,_);
-//	?currentPlan(ID,Goal);
-//	!endPlan(ID);
-//	!getNewPlan(Goal).
-	
-+!endPlan(IDp): true <-
-	for( .findall(IDa, action(IDa,"planned",_,_,_) | action(IDa,"todo",_,_,_), Actions ) & .member(X, Actions)){
-		.abolish(actionParams(IDa,_));
-	}
-	.abolish(action(_,"planned",_,_,_));
-	.abolish(action(_,"todo",_,_,_));
-	.abolish(link(_,_));
-	.abolish(link(_));
-	-plan(IDp,_).
-	
-+actionOnGoing(Name, Params) : true <-
-	-actionOnGoing(Name,Params)[source(_)];
-	!actionOnGoing(Name, Params).
-	
-+action(ID, "ongoing") : true <-
-	-action(ID, "ongoing")[source(_)];
-	?action(ID,_,Name,_,_);
-	?actionParams(ID,Params);
-	!actionOnGoing(Name, Params).
-	
-+!actionOnGoing(Name, Params) : not wantedAction(Name,Params) <-
-	.send(robot_decision, tell, actionOnGoingNotWanted(Name,Params)).
-	
-+!actionOnGoing(Name, Params) : wantedAction(Name,Params) <-
-	+action(ID,"ongoing",Name,Agents,Cost);
-	-action(ID,_,Name,Agents,Cost).
-	
-	
-+!updatePlan : true <-
-	
-	for(link(Origin,Preds)){
-		.findall(action(X,"planned",Name,Agents,Cost),
-			.findall(P, action(P,"executed",_,_,_) & .member(P,Preds), PredsL)
-			& .difference(Preds,PredsL,Diff)
-			& .empty(Diff)
-			& action(Origin,"planned",Name,Agents,Cost) 
-			& action(X,"planned",Name,Agents,Cost) 
-			& X=Origin, A
-		);
-		for(.member(Act,A)){
-			Act = action(AID,"planned",Name,Agents,Cost);
-			-action(AID,"planned",Name,Agents,Cost);
-			+action(AID,"todo",Name,Agents,Cost);
-		}
-	}.	
-	
-+action(ID,"todo",Name,Agents,Cost) : robotName(Agent) & .member(Agent,Agents)  & (actionParams(ID,Params) | not actionParams(ID,Params)) <-
-	if(.ground(Params)){
-		.send(robot_decision, tell, actionParams(ID,Params));
-	};
-	.send(robot_decision, tell, action(ID,Name,Agents,Cost)).
-	
-//+action(ID,"todo",Name,Agents,Cost) : (actionParams(ID,Params) | not actionParams(ID,Params)) <-
-//	if(.ground(Params)){
-//		.send(human_monitor, tell, actionParams(ID,Params));
-//	};
-//	.send(robot_decision, tell, action(ID,Name,Agents,Cost)).
+wantedAction(Name,Agent,Params) :- action(ID,S,Name,Agent,Params,_) & (S=="todo" | S=="ongoing").
 
-+planOver: true <-
-	.send(robot_decision, tell, planOver).
+@evOngoing[atomic]
++action(_,"ongoing",Name,Agent,Params)[source(_)] : action(ID,"todo",Name,Agent,Params,Preds) <-
+	-action(_,"ongoing",Name,Agent,Params)[source(_)];
+	-action(ID,"todo",Name,Agent,Params,Preds);
+	+action(ID,"ongoing",Name,Agent,Params,Preds).
 	
++action(_,"ongoing",Name,Agent,Params)[source(_)] : action(ID,"executed",Name,Agent,Params,Preds) <- true.
+
+@evExe[atomic]	
++action(_,"executed",Name,Agent,Params)[source(_)] : wantedAction(Name,Agent,Params) <-
+	-action(_,"executed",Name,Agent,Params)[source(_)];
+	-action(ID,_,Name,Agent,Params,Preds);
+	+action(ID,"executed",Name,Agent,Params,Preds);
+	!updatePlan;
+	!testRemainingActions.
+
++!testRemainingActions : .count(action(_,S,_,_,_,_) & S \== "executed", C) & C = 0
+	<- ?goal(GoalID,active,Task);
+		-goal(GoalID,active,Task);
+		.send(robot_executor, tell, planOver);
+		+goal(GoalID,succeeded,Task).
+		
++!testRemainingActions : true <- true.
+
++action(ID,"executed",Name,Agent,Params) :  not wantedAction(Name,Params) <- true.
+	
+	
++action(ID,"todo",Name,Agent,Params,Preds) : robotName(Agent) <-
+//	.wait(2000);
+//	+action(ID,"executed",Name,Agent,Params)[source(robot_executor)].
+	.send(robot_executor, tell, action(ID,Name,Agent,Params)).
+
+
+

@@ -2,6 +2,7 @@
 supervisor:
   robot_name: "robot"
   table_name: table_1
+  scan_table: false
   
   ontologies:
     robot: robot
@@ -22,11 +23,13 @@ supervisor:
    mementar_unsub:
       name: /mementar/unsubscribe/robot
       type: mementar/MementarOcassionUnsubscription
-
+   head_scan:
+      name: /dt_head_gestures/head_scan
+      type: dt_head_gestures/HeadScan
   
   topics:
     mementar_occasions: 
-      name: mementar/occasions
+      name: mementar/occasions/robot
       type: mementar/MementarOccasion
       function: sub
     plan:
@@ -49,8 +52,6 @@ supervisor:
     dialogue: dialogue_as 
     plan_motion: planMotion
     execute_motion: executeMotion
-    
-  actsToMonitor:
-     - PickAction
-     - PlaceAction  
+     
+       
   
