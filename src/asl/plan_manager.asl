@@ -9,6 +9,7 @@
 //action(3,"planned","PlaceAction", "human_0", ["box_1", "cube_415", "human_0"], [1]).
 
 //action(2,"planned","Robot_wait_for_human_to_tidy","robot",["cube_BGCB","human_0","throw_box_green"],[]).
+action(12,"planned","robot_tell_human_to_tidy","robot",["cube_BGCB","human_0","box_A1"],[]).
 
 actionStates(["planned","todo","ongoing","executed"]).
 
@@ -16,15 +17,17 @@ actionStates(["planned","todo","ongoing","executed"]).
 
 +!start : true <-
 	rjs.jia.log_beliefs;
-	.verbose(2);
+//	.verbose(2);
 	!getRobotName;
+	!getHumanName;
 	+goal(0,active,"pile").
 	
 +goal(ID, State, Task) : State == active <-
+	?humanName(Human);
 	rjs.jia.get_param("plan_manager/goals/dt1/name", "String", N);
 	rjs.jia.get_param("plan_manager/goals/dt1/worldstate", "Map", G);
 	//[[name_t1,param1_t1,param2_t1],[name_t2, param1_t2]]
-	getPlan([[N,G]], ["human_0"]);
+//	getPlan([[N,G]], [Human]);
 	!setMementarSub;
 	!updatePlan.
 	
@@ -89,8 +92,6 @@ wantedAction(Name,Agent,Params) :- action(ID,S,Name,Agent,Params,_) & (S=="todo"
 	
 	
 +action(ID,"todo",Name,Agent,Params,Preds) : robotName(Agent) <-
-//	.wait(2000);
-//	+action(ID,"executed",Name,Agent,Params)[source(robot_executor)].
 	.send(robot_executor, tell, action(ID,Name,Agent,Params)).
 
 

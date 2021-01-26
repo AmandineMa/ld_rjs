@@ -14,6 +14,7 @@ import knowledge_sharing_planner_msgs.VerbalizationRequest;
 import knowledge_sharing_planner_msgs.VerbalizationResponse;
 import rjs.arch.actions.AbstractAction;
 import rjs.arch.agarch.AbstractROSAgArch;
+import rjs.utils.Tools;
 
 public class GetSparqlVerba extends AbstractAction {
 
@@ -25,8 +26,8 @@ public class GetSparqlVerba extends AbstractAction {
 	public void execute() {
 		ListTermImpl listTerm = (ListTermImpl) actionExec.getActionTerm().getTerm(0);
 		@SuppressWarnings("unchecked")
-		List<String> sparql = removeQuotes((List<Term>) actionTerms.get(0));
-		String receiverID = removeQuotes(actionTerms.get(1).toString());
+		List<String> sparql = Tools.removeQuotes((List<Term>) actionTerms.get(0));
+		String receiverID = Tools.removeQuotes(actionTerms.get(1).toString());
 		
 		ServiceResponseListener<VerbalizationResponse> respListener = new ServiceResponseListener<VerbalizationResponse>() {
 

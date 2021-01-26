@@ -11,6 +11,7 @@ import mementar.MementarOcassionUnsubscriptionRequest;
 import mementar.MementarOcassionUnsubscriptionResponse;
 import rjs.arch.actions.AbstractAction;
 import rjs.arch.agarch.AbstractROSAgArch;
+import rjs.utils.Tools;
 
 public class MementarUnsubscribe extends AbstractAction {
 
@@ -21,7 +22,7 @@ public class MementarUnsubscribe extends AbstractAction {
 	@Override
 	public void execute() {
 		int id = Integer.parseInt(actionTerms.get(0).toString());
-		String action = removeQuotes(actionTerms.get(1).toString());
+		String action = Tools.removeQuotes(actionTerms.get(1).toString());
 		
 		ServiceResponseListener<MementarOcassionUnsubscriptionResponse> respListener = new ServiceResponseListener<MementarOcassionUnsubscriptionResponse>() {
 

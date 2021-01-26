@@ -32,7 +32,7 @@ public class GetMAHTNPlan extends AbstractAction {
 	@Override
 	public void execute() {
 		List<List<Term>> tasks = (List<List<Term>>) actionTerms.get(0);
-		List<String> humanAgentNames = removeQuotes((List<Term>) actionTerms.get(1));
+		List<String> humanAgentNames = Tools.removeQuotes((List<Term>) actionTerms.get(1));
 		
 		rosAgArch.setSubListener("plan",new MessageListener<Plan>() {
 
@@ -60,7 +60,7 @@ public class GetMAHTNPlan extends AbstractAction {
 			List<Term> task = iteTasks.next();
 			Iterator<Term> iteTask = task.iterator();
 			TaskRequest taskRequest = rosAgArch.createMessage(TaskRequest._TYPE);
-			taskRequest.setName(removeQuotes(iteTask.next().toString()));
+			taskRequest.setName(Tools.removeQuotes(iteTask.next().toString()));
 			List<String> listParameters = new ArrayList<String>();
 			while(iteTask.hasNext()) {
 				MapTermImpl taskInfos = (MapTermImpl) iteTask.next();

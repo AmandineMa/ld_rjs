@@ -15,6 +15,7 @@ import knowledge_sharing_planner_msgs.SymbolTable;
 import knowledge_sharing_planner_msgs.Triplet;
 import rjs.arch.actions.AbstractAction;
 import rjs.arch.agarch.AbstractROSAgArch;
+import rjs.utils.Tools;
 
 public class Disambiguate extends AbstractAction {
 
@@ -24,8 +25,8 @@ public class Disambiguate extends AbstractAction {
 
 	@Override
 	public void execute() {
-		String individual = removeQuotes(actionTerms.get(0).toString());
-		String ontology = removeQuotes(actionTerms.get(1).toString());
+		String individual = Tools.removeQuotes(actionTerms.get(0).toString());
+		String ontology = Tools.removeQuotes(actionTerms.get(1).toString());
 		boolean replan = Boolean.parseBoolean(actionTerms.get(2).toString());
 		
 		ServiceResponseListener<DisambiguationResponse> respListener = new ServiceResponseListener<DisambiguationResponse>() {

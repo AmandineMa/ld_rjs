@@ -8,6 +8,7 @@ import pr2_motion_tasks_msgs.planActionGoal;
 import pr2_motion_tasks_msgs.planActionResult;
 import rjs.arch.actions.ros.RjsActionClient;
 import rjs.arch.agarch.AbstractROSAgArch;
+import rjs.utils.Tools;
 
 public class PR2MotionPlanPick extends AbstractPR2MotionPlan {
 	
@@ -18,7 +19,7 @@ public class PR2MotionPlanPick extends AbstractPR2MotionPlan {
 
 	@Override
 	protected void setGoalFields() {
-		goal.setObjId(removeQuotes(actionTerms.get(0).toString()));
+		goal.setObjId(Tools.removeQuotes(actionTerms.get(0).toString()));
 		goal.setAction("pick");
 	}
 

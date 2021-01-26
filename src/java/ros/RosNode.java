@@ -28,16 +28,16 @@ public class RosNode extends AbstractRosNode {
 	public void init() {
 		super.init();
 		
-		setSubListener("mementar_occasions", new MessageListener<MementarOccasion>() {
-
-			@Override
-			public void onNewMessage(MementarOccasion occasion) {
-				synchronized (perceptions) {
-					perceptions.add(occasion);
-				}
-				
-			}
-		});
+//		setSubListener("mementar_occasions", new MessageListener<MementarOccasion>() {
+//
+//			@Override
+//			public void onNewMessage(MementarOccasion occasion) {
+//				synchronized (perceptions) {
+//					perceptions.add(occasion);
+//				}
+//				
+//			}
+//		});
 	}
 	
 	public List<MementarOccasion> getPerceptions() {

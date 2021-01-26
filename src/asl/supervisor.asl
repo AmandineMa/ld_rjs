@@ -10,35 +10,40 @@
 
 +!start : true <- 
 	rjs.jia.log_beliefs;
-	.verbose(2);
+//	.verbose(2);
 	configureNode;
-	startParameterLoaderNode("/general.yaml", "/robot_decision.yaml", "/plan_manager.yaml");
+	startParameterLoaderNode("/general.yaml", "/plan_manager.yaml");
 	startROSNode;
-	initServices;
+	!init_services;
+	!init_sub;
 	+started;
 	rjs.jia.get_param("supervisor/scan_table", "Boolean", Scan);
 	if(Scan == true){
-		scanTable; //TODO pourquoi fail alors que service renvoie success
+		scanTable; 
 	}
 	!create_agents.
 	
-+~connected_srv(S) : true <- .print("service not connected : ", S).
-
--!start [Failure, error(ErrorId), error_msg(Msg), code(CodeBody), code_src(CodeSrc), code_line(CodeLine), source(self)]: true <-
-	if(.substring(Failure, "srv_not_connected")){
-		!retry_init_services;
-	}
-	+started.
-
 -!start [code(Code),code_line(_),code_src(_),error(_),error_msg(_),source(self)] : true <- true.
-	
+
++!init_services : true <-
+	initServices.
+
+-!init_services: true <-
+	!retry_init_services.
+
 +!retry_init_services : true <-
-	retryInitServices;
-	!create_agents.	
+	retryInitServices.	
 	
 -!retry_init_services : true <-
 	.wait(3000);
 	!retry_init_services.
+
++!init_sub : true <-
+	initSub.
+	
+-!init_sub : true <-
+	.wait(3000);
+	!init_sub.
 
 +!create_agents : true <-
 	.create_agent(plan_manager, "src/asl/plan_manager.asl", [agentArchClass("arch.agarch.PlanManagerAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("agent.OntoAgent")]);

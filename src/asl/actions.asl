@@ -39,17 +39,23 @@
 +!sayPickPlace(VerbaCube, VerbaBox) : true <-
 	.concat("Can you put ",VerbaCube, " in ",VerbaBox,"?", Vc);
 	say(Vc).
+	
 
-//TODO envoyer les bons params, peu importe l'ordre
 +!robot_tell_human_to_tidy(Params): true <-
-	.nth(1, Params,Human);
-	.nth(0, Params,Cube);
-	!getUnRef(Cube,Human);
-	.nth(2, Params,Box);
-	!getUnRef(Box,Human);
+	?humanName(Human);
+	rjs.jia.delete_from_list(Human,Params,ParamsNoH);
+	for(.member(P,ParamsNoH)){
+		!getUnRef(P,Human);
+	}
+	.findall(P,.member(P,ParamsNoH) & jia.isCube(P),CubeL);
+	.findall(P,.member(P,ParamsNoH) & jia.isBox(P),BoxL);
+	.nth(0,CubeL,Cube);
+	.nth(0,BoxL,Box);
 	?verba(Cube,VerbaCube);
 	?verba(Box,VerbaBox);
 	!sayPickPlace(VerbaCube, VerbaBox).
+	
+
 
 +!robot_wait_for_human_to_tidy(Params): true <- true.
 

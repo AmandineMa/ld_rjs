@@ -1,7 +1,5 @@
 package arch.actions;
 
-import org.ros.node.topic.Publisher;
-
 import arch.actions.internal.Disambiguate;
 import arch.actions.internal.GetMAHTNPlan;
 import arch.actions.internal.GetSparqlVerba;
@@ -31,6 +29,7 @@ import rjs.arch.actions.Action;
 import rjs.arch.actions.GetHATPPlan;
 import rjs.arch.actions.ros.ConfigureNode;
 import rjs.arch.actions.ros.InitServices;
+import rjs.arch.actions.ros.InitSub;
 import rjs.arch.actions.ros.RetryInitServices;
 import rjs.arch.actions.ros.RjsActionClient;
 import rjs.arch.actions.ros.StartParameterLoaderNode;
@@ -38,14 +37,12 @@ import rjs.arch.agarch.AbstractROSAgArch;
 
 public class ActionFactoryImpl extends AbstractActionFactory {
 	
-	private Publisher<std_msgs.String> sayPub;
 	private RjsActionClient<dialogue_actionActionGoal, dialogue_actionActionFeedback, dialogue_actionActionResult> dialogueActionClient;
 	private RjsActionClient<planActionGoal, planActionFeedback, planActionResult> pr2MotionPlanActionClient;
 	private RjsActionClient<executeActionGoal, executeActionFeedback, executeActionResult> pr2MotionExecuteActionClient;
 	
 	public void setRosVariables() {
 		super.setRosVariables();
-		sayPub = createPublisher("supervisor/topic_to_change/say");
 		dialogueActionClient = new RjsActionClient<dialogue_actionActionGoal, dialogue_actionActionFeedback, dialogue_actionActionResult>(rosnode.getConnectedNode(), rosnode.getParameters().getString("/supervisor/action_servers/dialogue"), 
 				dialogue_actionActionGoal._TYPE, dialogue_actionActionFeedback._TYPE, dialogue_actionActionResult._TYPE);
 		
@@ -69,7 +66,7 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 				action = new Listen(actionExec, rosAgArch, dialogueActionClient);
 				break;
 			case "say":
-				action = new Say(actionExec, rosAgArch, sayPub);
+				action = new Say(actionExec, rosAgArch);
 				break;
 			case "getPlan":
 				action = new GetMAHTNPlan(actionExec, rosAgArch);
@@ -112,6 +109,9 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 				break;
 			case "retryInitServices":
 				action = new RetryInitServices(actionExec, rosAgArch);
+				break;
+			case "initSub":
+				action = new InitSub(actionExec, rosAgArch);
 				break;
 			case "scanTable":
 				action = new ScanTable(actionExec, rosAgArch);

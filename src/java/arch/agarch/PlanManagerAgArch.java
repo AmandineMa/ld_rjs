@@ -10,9 +10,6 @@ import java.util.regex.Pattern;
 
 import jason.asSyntax.Literal;
 import mementar.MementarOccasion;
-import ontologenius.OntologeniusService;
-import ontologenius.OntologeniusServiceRequest;
-import ontologenius.OntologeniusServiceResponse;
 import rjs.utils.Tools;
 import ros.RosNode;
 
@@ -74,13 +71,6 @@ public class PlanManagerAgArch extends AgArch {
 		return perceive;
 	}
 	
-	
-	private OntologeniusServiceResponse callOnto(String action, String param) {
-		OntologeniusServiceRequest req = rosnode.newServiceRequestFromType(OntologeniusService._TYPE);
-		req.setAction(action);
-		req.setParam(param);
-		return  rosnode.callSyncService("onto_individual", req);
-	}
 	
 	private void setAction(String action) {
 		actName = callOnto("getUp", action).getValues().get(0);

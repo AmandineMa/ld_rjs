@@ -11,6 +11,7 @@ import mementar.MementarOccasionSubscriptionRequest;
 import mementar.MementarOccasionSubscriptionResponse;
 import rjs.arch.actions.AbstractAction;
 import rjs.arch.agarch.AbstractROSAgArch;
+import rjs.utils.Tools;
 
 public class MementarSubscribe extends AbstractAction {
 
@@ -20,8 +21,8 @@ public class MementarSubscribe extends AbstractAction {
 
 	@Override
 	public void execute() {
-		String action = removeQuotes(actionTerms.get(0).toString());
-		String type = removeQuotes(actionTerms.get(1).toString());
+		String action = Tools.removeQuotes(actionTerms.get(0).toString());
+		String type = Tools.removeQuotes(actionTerms.get(1).toString());
 		int count = Integer.parseInt(actionTerms.get(2).toString());
 		
 		ServiceResponseListener<MementarOccasionSubscriptionResponse> respListener = new ServiceResponseListener<MementarOccasionSubscriptionResponse>() {
