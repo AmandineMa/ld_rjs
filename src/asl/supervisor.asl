@@ -10,7 +10,7 @@
 
 +!start : true <- 
 	rjs.jia.log_beliefs;
-//	.verbose(2);
+	.verbose(2);
 	configureNode;
 	startParameterLoaderNode("/general.yaml", "/plan_manager.yaml");
 	startROSNode;
@@ -23,20 +23,13 @@
 	}
 	!create_agents.
 	
--!start [code(Code),code_line(_),code_src(_),error(_),error_msg(_),source(self)] : true <- true.
 
 +!init_services : true <-
 	initServices.
 
 -!init_services: true <-
-	!retry_init_services.
-
-+!retry_init_services : true <-
-	retryInitServices.	
-	
--!retry_init_services : true <-
 	.wait(3000);
-	!retry_init_services.
+	!init_services.
 
 +!init_sub : true <-
 	initSub.

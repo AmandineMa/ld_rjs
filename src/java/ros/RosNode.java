@@ -1,19 +1,13 @@
 package ros;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-
-import org.ros.message.MessageListener;
 import org.ros.namespace.GraphName;
 
-import mementar.MementarOccasion;
 import rjs.ros.AbstractRosNode;
 
 public class RosNode extends AbstractRosNode {
 	
-	private List<MementarOccasion> perceptions = Collections.synchronizedList(new ArrayList<MementarOccasion>());
+//	private List<MementarOccasion> perceptions = Collections.synchronizedList(new ArrayList<MementarOccasion>());
 	
 	public RosNode(String name) {
 		super(name);
@@ -28,20 +22,6 @@ public class RosNode extends AbstractRosNode {
 	public void init() {
 		super.init();
 		
-//		setSubListener("mementar_occasions", new MessageListener<MementarOccasion>() {
-//
-//			@Override
-//			public void onNewMessage(MementarOccasion occasion) {
-//				synchronized (perceptions) {
-//					perceptions.add(occasion);
-//				}
-//				
-//			}
-//		});
-	}
-	
-	public List<MementarOccasion> getPerceptions() {
-		return perceptions;
 	}
 
 	@Override

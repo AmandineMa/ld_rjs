@@ -1,10 +1,12 @@
 package arch.actions.internal;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.ros.exception.RemoteException;
 import org.ros.node.service.ServiceResponseListener;
 
+import arch.agarch.AgArch;
 import jason.asSemantics.ActionExec;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.StringTermImpl;
@@ -50,12 +52,14 @@ public class Disambiguate extends AbstractAction {
 		DisambiguationRequest disambiReq = getRosNode().newServiceRequestFromType(Disambiguation._TYPE);
 		disambiReq.setIndividual(individual);
 		disambiReq.setOntology(getRosNode().getParameters().getString("supervisor/ontologies/"+ontology));
-		//TODO add context to action param
-		Triplet ctx = rosAgArch.createMessage(Triplet._TYPE);
-		ctx.setFrom("?0");
-		ctx.setRelation("isAbove");
-		ctx.setOn(getRosNode().getParameters().getString("supervisor/table_name"));
-		disambiReq.setBaseFacts(Arrays.asList(ctx));
+		List<String> ontoRep = ((AgArch) rosAgArch).callOnto("getOn", individual+":isAbove").getValues();
+		if(!ontoRep.isEmpty()) {
+			Triplet ctx = rosAgArch.createMessage(Triplet._TYPE);
+			ctx.setFrom("?0");
+			ctx.setRelation("isAbove");
+			ctx.setOn(getRosNode().getParameters().getString("supervisor/table_name"));
+			disambiReq.setBaseFacts(Arrays.asList(ctx));
+		}
 		disambiReq.setReplan(replan);
 		SymbolTable symbT = rosAgArch.createMessage(SymbolTable._TYPE);
 		symbT.setIndividuals(Arrays.asList(individual));

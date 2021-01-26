@@ -12,31 +12,31 @@ supervisor:
    onto_individual: 
       name: /ontologenius/individual/robot
       type: ontologenius/OntologeniusService
-   disambiguate: 
-      name: /KSP/disambiguate
-      type: knowledge_sharing_planner_msgs/Disambiguation
-   verbalize:
-      name: /KSP/verbalize
-      type: knowledge_sharing_planner_msgs/Verbalization
+#   disambiguate: 
+#      name: /KSP/disambiguate
+#      type: knowledge_sharing_planner_msgs/Disambiguation
+#   verbalize:
+#      name: /KSP/verbalize
+#      type: knowledge_sharing_planner_msgs/Verbalization
    mementar_sub:
       name: /mementar/subscribe/robot
       type: mementar/MementarOccasionSubscription
    mementar_unsub:
       name: /mementar/unsubscribe/robot
       type: mementar/MementarOcassionUnsubscription
-#    head_scan:
+#   head_scan:
 #       name: /dt_head_gestures/head_scan
 #       type: dt_head_gestures/HeadScan
   
   topics:
     mementar_occasions: 
-      name: mementar/occasions/robot
+      name: /mementar/occasions/robot
       type: mementar/MementarOccasion
       function: sub
-    plan:
-      name: /planner/plan_answer
-      type: planner_msgs/Plan
-      function: sub
+#    plan:
+#      name: /planner/plan_answer
+#      type: planner_msgs/Plan
+#      function: sub
     plan_request:
       name: /planner/request_new_plan
       type: planner_msgs/PlanRequest

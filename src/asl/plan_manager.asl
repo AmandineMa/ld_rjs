@@ -9,7 +9,8 @@
 //action(3,"planned","PlaceAction", "human_0", ["box_1", "cube_415", "human_0"], [1]).
 
 //action(2,"planned","Robot_wait_for_human_to_tidy","robot",["cube_BGCB","human_0","throw_box_green"],[]).
-action(12,"planned","robot_tell_human_to_tidy","robot",["cube_BGCB","human_0","box_A1"],[]).
+//action(12,"planned","robot_tell_human_to_tidy","robot",["cube_BGCB","human_0","box_A1"],[]).
+action(3,"planned","human_pick_cube", "human_0", ["cube_BBCG"], [1]).
 
 actionStates(["planned","todo","ongoing","executed"]).
 
