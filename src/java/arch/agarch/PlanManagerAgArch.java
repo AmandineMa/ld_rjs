@@ -3,32 +3,49 @@ package arch.agarch;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.ros.message.MessageListener;
+
 import jason.asSyntax.Literal;
 import mementar.MementarOccasion;
 import rjs.utils.Tools;
-import ros.RosNode;
 
 public class PlanManagerAgArch extends LAASAgArch {
 	
-	String actName;
-	List<String> actParams;
-	String actAgent;
-	Collection<Literal> perceive = new ArrayList<Literal>();
+	private String actName;
+	private List<String> actParams;
+	private String actAgent;
+	private Collection<Literal> perceive = new ArrayList<Literal>();
+	private List<MementarOccasion> perceptions = Collections.synchronizedList(new ArrayList<MementarOccasion>());
 	
 	public PlanManagerAgArch() {
 		super();
+		setMementarListener();
+	}
+	
+
+	public void setMementarListener() {
+		rosnode.setSubListener("mementar_occasions", new MessageListener<MementarOccasion>() {
+			
+			@Override
+			public void onNewMessage(MementarOccasion occasion) {
+				synchronized (perceptions) {
+					perceptions.add(occasion);
+				}
+				
+			}
+		});
 	}
 
 	@Override
 	public Collection<Literal> perceive() {
 		perceive = new ArrayList<Literal>();
 		if(rosnode != null) {
-			List<MementarOccasion> perceptions =((RosNode) rosnode).getPerceptions();
 			Iterator<Literal> monitorBel = get_beliefs_iterator("monitoring(_,_,_,_)");
 			
 			if(monitorBel != null) {

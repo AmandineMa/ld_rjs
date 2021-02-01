@@ -35,7 +35,6 @@ import rjs.arch.actions.GetHATPPlan;
 import rjs.arch.actions.ros.ConfigureNode;
 import rjs.arch.actions.ros.InitServices;
 import rjs.arch.actions.ros.InitSub;
-import rjs.arch.actions.ros.RetryInitServices;
 import rjs.arch.actions.ros.RjsActionClient;
 import rjs.arch.actions.ros.StartParameterLoaderNode;
 import rjs.arch.agarch.AbstractROSAgArch;
@@ -116,9 +115,6 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 				break;
 			case "initServices":
 				action = new InitServices(actionExec, rosAgArch);
-				break;
-			case "retryInitServices":
-				action = new RetryInitServices(actionExec, rosAgArch);
 				break;
 			case "initSub":
 				action = new InitSub(actionExec, rosAgArch);
