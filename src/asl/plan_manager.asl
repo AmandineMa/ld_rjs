@@ -16,11 +16,11 @@ actionStates(["planned","todo","ongoing","executed"]).
 !start.
 
 +!start : true <-
-	rjs.jia.log_beliefs;
+	rjs.jia.log_beliefs.
 //	.verbose(2);
-	!getRobotName;
-	!getHumanName;
-	+goal(0,active,"pile").
+//	!getRobotName;
+//	!getHumanName;
+//	+goal(0,active,"pile").
 	
 +goal(ID, State, Task) : State == active <-
 	?humanName(Human);

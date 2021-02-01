@@ -24,9 +24,9 @@ supervisor:
    mementar_unsub:
       name: /mementar/unsubscribe/robot
       type: mementar/MementarOcassionUnsubscription
-#    head_scan:
-#       name: /dt_head_gestures/head_scan
-#       type: dt_head_gestures/HeadScan
+   head_scan:
+      name: /dt_head_gestures/head_scan
+      type: dt_head_gestures/HeadScan
   
   topics:
     mementar_occasions: 
@@ -45,6 +45,10 @@ supervisor:
       name: say
       type: std_msgs/String
       function: pub
+    insert_action:
+      name: /mementar/insert_action/robot
+      type: mementar/MementarAction
+      function: pub
       
   topic_to_change:
       say: say
@@ -53,6 +57,7 @@ supervisor:
     dialogue: dialogue_as 
     plan_motion: planMotion
     execute_motion: executeMotion
+    strafe: dt_navigation/dt_strafe
      
        
   

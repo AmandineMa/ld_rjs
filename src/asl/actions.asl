@@ -26,10 +26,10 @@
 	
 	
 @move[atomic]
-+!move(Params) : true <-
++!moveArm(Params) : true <-
 	.nth(0, Params,Pose);
-	planMove(Pose);
-	execute("move").
+	planMoveArm(Pose);
+	execute("moveArm").
 
 +!getUnRef(Object, Human): true <-
 	disambiguate(Object,robot, false);
@@ -58,6 +58,10 @@
 
 
 +!robot_wait_for_human_to_tidy(Params): true <- true.
+
++!strafe(Params): true <-
+	strafe("0","obj_1");
+	.print(finish).
 
 
 

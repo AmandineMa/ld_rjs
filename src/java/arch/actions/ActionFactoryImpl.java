@@ -6,17 +6,22 @@ import arch.actions.internal.GetSparqlVerba;
 import arch.actions.internal.MementarSubscribe;
 import arch.actions.internal.MementarUnsubscribe;
 import arch.actions.internal.PR2MotionPlanDrop;
-import arch.actions.internal.PR2MotionPlanMove;
+import arch.actions.internal.PR2MotionPlanMoveArm;
 import arch.actions.internal.PR2MotionPlanPick;
 import arch.actions.internal.PR2MotionPlanPlace;
 import arch.actions.robot.Listen;
 import arch.actions.robot.PR2MotionExecute;
 import arch.actions.robot.Say;
 import arch.actions.robot.ScanTable;
+import arch.actions.robot.Strafe;
 import arch.actions.ros.StartROSNode;
+import arch.agarch.ExecutorAgArch;
 import dialogue_as.dialogue_actionActionFeedback;
 import dialogue_as.dialogue_actionActionGoal;
 import dialogue_as.dialogue_actionActionResult;
+import dt_navigation.MoveActionFeedback;
+import dt_navigation.MoveActionGoal;
+import dt_navigation.MoveActionResult;
 import jason.asSemantics.ActionExec;
 import pr2_motion_tasks_msgs.executeActionFeedback;
 import pr2_motion_tasks_msgs.executeActionGoal;
@@ -38,6 +43,7 @@ import rjs.arch.agarch.AbstractROSAgArch;
 public class ActionFactoryImpl extends AbstractActionFactory {
 	
 	private RjsActionClient<dialogue_actionActionGoal, dialogue_actionActionFeedback, dialogue_actionActionResult> dialogueActionClient;
+	private RjsActionClient<MoveActionGoal, MoveActionFeedback, MoveActionResult> strafeActionClient;
 	private RjsActionClient<planActionGoal, planActionFeedback, planActionResult> pr2MotionPlanActionClient;
 	private RjsActionClient<executeActionGoal, executeActionFeedback, executeActionResult> pr2MotionExecuteActionClient;
 	
@@ -45,7 +51,8 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 		super.setRosVariables();
 		dialogueActionClient = new RjsActionClient<dialogue_actionActionGoal, dialogue_actionActionFeedback, dialogue_actionActionResult>(rosnode.getConnectedNode(), rosnode.getParameters().getString("/supervisor/action_servers/dialogue"), 
 				dialogue_actionActionGoal._TYPE, dialogue_actionActionFeedback._TYPE, dialogue_actionActionResult._TYPE);
-		
+		strafeActionClient = new RjsActionClient<MoveActionGoal, MoveActionFeedback, MoveActionResult>(rosnode.getConnectedNode(), rosnode.getParameters().getString("/supervisor/action_servers/strafe"), 
+				MoveActionGoal._TYPE, MoveActionFeedback._TYPE, MoveActionResult._TYPE);
 		pr2MotionPlanActionClient = new RjsActionClient<planActionGoal, planActionFeedback, planActionResult>(rosnode.getConnectedNode(), 
 				rosnode.getParameters().getString("/supervisor/action_servers/plan_motion"), planActionGoal._TYPE, planActionFeedback._TYPE, planActionResult._TYPE);
 		pr2MotionExecuteActionClient = new RjsActionClient<executeActionGoal, executeActionFeedback, executeActionResult>(rosnode.getConnectedNode(), 
@@ -81,10 +88,13 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 				action = new PR2MotionPlanDrop(actionExec, rosAgArch, pr2MotionPlanActionClient);
 				break;
 			case "planMove":
-				action = new PR2MotionPlanMove(actionExec, rosAgArch, pr2MotionPlanActionClient);
+				action = new PR2MotionPlanMoveArm(actionExec, rosAgArch, pr2MotionPlanActionClient);
 				break;
 			case "execute":
 				action = new PR2MotionExecute(actionExec, rosAgArch, pr2MotionExecuteActionClient);
+				break;
+			case "strafe":
+				action = new Strafe(actionExec, (ExecutorAgArch) rosAgArch, strafeActionClient);
 				break;
 			case "getHatpPlan":
 				action = new GetHATPPlan(actionExec, rosAgArch);

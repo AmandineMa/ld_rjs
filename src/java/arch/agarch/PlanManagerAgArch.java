@@ -13,7 +13,7 @@ import mementar.MementarOccasion;
 import rjs.utils.Tools;
 import ros.RosNode;
 
-public class PlanManagerAgArch extends AgArch {
+public class PlanManagerAgArch extends LAASAgArch {
 	
 	String actName;
 	List<String> actParams;

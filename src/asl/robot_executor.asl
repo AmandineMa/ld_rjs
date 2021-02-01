@@ -14,8 +14,10 @@ robotState(idle).
 +!start : true <-
 	.verbose(2);
 	rjs.jia.log_beliefs;
-	!getRobotName;
-	!getHumanName.
+	.wait(1000);
+	strafe(a).
+//	!getRobotName;
+//	!getHumanName.
 
 +action(ID,Name,Agent,Params) : robotState(idle) & robotName(Agent) <-
 	-action(ID,Name,Agent,Params)[source(_)];
