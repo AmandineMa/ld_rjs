@@ -6,7 +6,7 @@ import java.util.List;
 import org.ros.exception.RemoteException;
 import org.ros.node.service.ServiceResponseListener;
 
-import arch.agarch.AgArch;
+import arch.agarch.LAASAgArch;
 import jason.asSemantics.ActionExec;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.StringTermImpl;
@@ -52,7 +52,7 @@ public class Disambiguate extends AbstractAction {
 		DisambiguationRequest disambiReq = getRosNode().newServiceRequestFromType(Disambiguation._TYPE);
 		disambiReq.setIndividual(individual);
 		disambiReq.setOntology(getRosNode().getParameters().getString("supervisor/ontologies/"+ontology));
-		List<String> ontoRep = ((AgArch) rosAgArch).callOnto("getOn", individual+":isAbove").getValues();
+		List<String> ontoRep = ((LAASAgArch) rosAgArch).callOnto("getOn", individual+":isAbove").getValues();
 		if(!ontoRep.isEmpty()) {
 			Triplet ctx = rosAgArch.createMessage(Triplet._TYPE);
 			ctx.setFrom("?0");
