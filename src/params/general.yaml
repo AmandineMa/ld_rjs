@@ -50,14 +50,12 @@ supervisor:
       type: mementar/MementarAction
       function: pub
       
-  topic_to_change:
-      say: say
     
   action_servers:
     dialogue: dialogue_as 
     plan_motion: planMotion
     execute_motion: executeMotion
-    strafe: dt_navigation/dt_strafe
+    strafe: /dt_navigation/dt_strafe
      
        
   

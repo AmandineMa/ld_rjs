@@ -28,7 +28,7 @@ public class Strafe extends AbstractClientPhysicalAction<MoveActionGoal, MoveAct
 	public MoveActionGoal computeGoal() {
 		MoveActionGoal goal = (MoveActionGoal) newGoalMessage();
 		MoveGoal moveGoal = goal.getGoal();
-		Integer i = Integer.parseInt(actionTerms.get(0).toString());
+		Integer i = Integer.parseInt(Tools.removeQuotes(actionTerms.get(0).toString()));
 		moveGoal.setMoveType(i.byteValue());
 		moveGoal.setFrameId(Tools.removeQuotes(actionTerms.get(1).toString()));
 		return goal;
@@ -46,7 +46,7 @@ public class Strafe extends AbstractClientPhysicalAction<MoveActionGoal, MoveAct
 
 	@Override
 	protected void endFeedbackReceived(MoveActionFeedback fb) {
-		rosAgArch.addBelief(actionName, Arrays.asList("actionFeedback",fb.getFeedback().getDistanceToGoal()));
+		rosAgArch.addBelief(actionName, Arrays.asList("distToGoal",fb.getFeedback().getDistanceToGoal()));
 	}
 
 

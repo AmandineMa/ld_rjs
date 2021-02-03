@@ -3,6 +3,7 @@ lib_not_used
 log
 .project
 .classpath
+src/diagrams
 
 *.class
 *.log

@@ -16,7 +16,7 @@ public class ExecutorAgArch extends LAASAgArch {
 	}
 	
 	public void callInsertAction(String action, Time time, ActionIndicator actionIndicator) {
-		MementarAction memAction = createMessage(std_msgs.String._TYPE);
+		MementarAction memAction = createMessage(MementarAction._TYPE);
 		memAction.setName(action);
 		switch(actionIndicator) {
 		case START:

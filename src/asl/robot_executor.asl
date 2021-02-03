@@ -15,7 +15,7 @@ robotState(idle).
 	.verbose(2);
 	rjs.jia.log_beliefs;
 	.wait(1000);
-	strafe(a).
+	!strafe(a).
 //	!getRobotName;
 //	!getHumanName.
 

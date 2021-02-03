@@ -60,7 +60,11 @@
 +!robot_wait_for_human_to_tidy(Params): true <- true.
 
 +!strafe(Params): true <-
+	strafe("0","obj_2");
+	.wait(1000);
 	strafe("0","obj_1");
+	.wait(1000);
+	strafe("0","obj_2");
 	.print(finish).
 
 
