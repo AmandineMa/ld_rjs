@@ -12,12 +12,10 @@ robotState(idle).
 /* Plans */
 
 +!start : true <-
-	.verbose(2);
-	rjs.jia.log_beliefs;
-	.wait(1000);
-	!strafe(a).
-//	!getRobotName;
-//	!getHumanName.
+//	.verbose(2);
+//	rjs.jia.log_beliefs;
+	!getRobotName;
+	!getHumanName.
 
 +action(ID,Name,Agent,Params) : robotState(idle) & robotName(Agent) <-
 	-action(ID,Name,Agent,Params)[source(_)];
@@ -45,6 +43,6 @@ robotState(idle).
 	-+action(ID,Name,"executed");
 	.send(plan_manager, tell, action(ID,"executed",Name,Agent,Params)).
 	
-+planOver : true <-
-	say("bravo ! we did it !").
+//+planOver : true <-
+//	say("bravo ! we did it !").
 	

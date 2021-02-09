@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import actionlib_msgs.GoalStatusArray;
 import arch.actions.AbstractClientPhysicalAction;
-import arch.agarch.ExecutorAgArch;
+import arch.agarch.LAASAgArch;
 import dt_navigation.MoveActionFeedback;
 import dt_navigation.MoveActionGoal;
 import dt_navigation.MoveActionResult;
@@ -15,7 +15,7 @@ import rjs.utils.Tools;
 
 public class Strafe extends AbstractClientPhysicalAction<MoveActionGoal, MoveActionFeedback, MoveActionResult> {
 
-	public Strafe(ActionExec actionExec, ExecutorAgArch rosAgArch,
+	public Strafe(ActionExec actionExec, LAASAgArch rosAgArch,
 			RjsActionClient<MoveActionGoal, MoveActionFeedback, MoveActionResult> actionClient) {
 		super(actionExec, rosAgArch, actionClient);
 	}

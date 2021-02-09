@@ -4,9 +4,9 @@ plan_manager:
         name: tidy_cubes
         worldstate:
            isInContainer:  
-              cube_BGCB:
+              cube_BGTG:
                  - throw_box_green
-              cube_GBTB:
+              cube_GBTG:
                  - throw_box_green
                  
   actsToMonitor:

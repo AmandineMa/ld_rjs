@@ -40,12 +40,17 @@ public class GetMAHTNPlan extends AbstractAction {
 			public void onNewMessage(Plan plan) {
 				for(Task task : plan.getTasks()) {
 					if(task.getType() == Task.PRIMITIVE_TASK) {
+						// put parameters in alphabetical order to match planned and executed
 						List<String> parameters = task.getParameters();
 						parameters.sort(String::compareToIgnoreCase);
+						
 						ListTerm preds = new ListTermImpl();
 						preds = ListTermImpl.parseList(Tools.arrayToStringArray(task.getPredecessors()));
+						
 						rosAgArch.addBelief("action", Arrays.asList(task.getId(), "planned", task.getName(), 
-								task.getAgent(), Tools.arrayToListTerm(parameters), preds));
+								task.getAgent(), Tools.arrayToListTerm(parameters), preds, task.getDecompositionOf()));
+					}else {
+						rosAgArch.addBelief("abstractTask", Arrays.asList(task.getId(), "planned", task.getName(), task.getDecompositionOf()));
 					}
 				}
 				setActionExecuted(true);

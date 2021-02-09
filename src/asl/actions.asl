@@ -41,31 +41,31 @@
 	say(Vc).
 	
 
-+!robot_tell_human_to_tidy(Params): true <-
-	?humanName(Human);
-	rjs.jia.delete_from_list(Human,Params,ParamsNoH);
-	for(.member(P,ParamsNoH)){
-		!getUnRef(P,Human);
-	}
-	.findall(P,.member(P,ParamsNoH) & jia.isCube(P),CubeL);
-	.findall(P,.member(P,ParamsNoH) & jia.isBox(P),BoxL);
-	.nth(0,CubeL,Cube);
-	.nth(0,BoxL,Box);
-	?verba(Cube,VerbaCube);
-	?verba(Box,VerbaBox);
-	!sayPickPlace(VerbaCube, VerbaBox).
++!robot_tell_human_to_tidy(Params): true <- say("Can you put the cube in the box ?").
+//	?humanName(Human);
+//	rjs.jia.delete_from_list(Human,Params,ParamsNoH);
+//	for(.member(P,ParamsNoH)){
+//		!getUnRef(P,Human);
+//	}
+//	.findall(P,.member(P,ParamsNoH) & jia.isCube(P),CubeL);
+//	.findall(P,.member(P,ParamsNoH) & jia.isBox(P),BoxL);
+//	.nth(0,CubeL,Cube);
+//	.nth(0,BoxL,Box);
+//	?verba(Cube,VerbaCube);
+//	?verba(Box,VerbaBox);
+//	!sayPickPlace(VerbaCube, VerbaBox).
 	
 
 
 +!robot_wait_for_human_to_tidy(Params): true <- true.
 
++!robot_congratulate(Params): true <- say("bravo ! we did it !").
+
+@strafe[atomic]
 +!strafe(Params): true <-
-	strafe("0","obj_2");
-	.wait(1000);
-	strafe("0","obj_1");
-	.wait(1000);
-	strafe("0","obj_2");
-	.print(finish).
+	.nth(0,Params,Type);
+	.nth(1,Params,Object);
+	strafe(Type,Object).
 
 
 

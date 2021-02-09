@@ -15,7 +15,7 @@ import arch.actions.robot.Say;
 import arch.actions.robot.ScanTable;
 import arch.actions.robot.Strafe;
 import arch.actions.ros.StartROSNode;
-import arch.agarch.ExecutorAgArch;
+import arch.agarch.LAASAgArch;
 import dialogue_as.dialogue_actionActionFeedback;
 import dialogue_as.dialogue_actionActionGoal;
 import dialogue_as.dialogue_actionActionResult;
@@ -93,7 +93,7 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 				action = new PR2MotionExecute(actionExec, rosAgArch, pr2MotionExecuteActionClient);
 				break;
 			case "strafe":
-				action = new Strafe(actionExec, (ExecutorAgArch) rosAgArch, strafeActionClient);
+				action = new Strafe(actionExec, (LAASAgArch) rosAgArch, strafeActionClient);
 				break;
 			case "getHatpPlan":
 				action = new GetHATPPlan(actionExec, rosAgArch);

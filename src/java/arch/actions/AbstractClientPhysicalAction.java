@@ -6,8 +6,8 @@ import java.lang.reflect.Method;
 import org.ros.internal.message.Message;
 import org.ros.message.Time;
 
-import arch.agarch.ExecutorAgArch;
-import arch.agarch.ExecutorAgArch.ActionIndicator;
+import arch.agarch.LAASAgArch;
+import arch.agarch.LAASAgArch.ActionIndicator;
 import jason.asSemantics.ActionExec;
 import rjs.arch.actions.AbstractClientAction;
 import rjs.arch.actions.ros.RjsActionClient;
@@ -19,9 +19,9 @@ public abstract class AbstractClientPhysicalAction<T_ACTION_GOAL extends Message
 		protected boolean firstFeedback = true;
 		protected String actionID;
 			
-		public AbstractClientPhysicalAction(ActionExec actionExec, ExecutorAgArch rosAgArch, RjsActionClient<T_ACTION_GOAL, T_ACTION_FEEDBACK, T_ACTION_RESULT> actionClient) {
+		public AbstractClientPhysicalAction(ActionExec actionExec, LAASAgArch rosAgArch, RjsActionClient<T_ACTION_GOAL, T_ACTION_FEEDBACK, T_ACTION_RESULT> actionClient) {
 			super(actionExec, rosAgArch, actionClient);
-			actionID = "_"+Math.round(Math.random()*200);
+			actionID = "_"+Math.round(Math.random()*1000000);
 		}
 
 		@Override
@@ -36,7 +36,7 @@ public abstract class AbstractClientPhysicalAction<T_ACTION_GOAL extends Message
 					getTimeMethod = feedback.getClass().getMethod("getActionStart");
 					getTimeMethod.setAccessible(true);
 					Time startTime  = (Time) getTimeMethod.invoke(feedback);
-					((ExecutorAgArch) rosAgArch).callInsertAction(actionName+actionID, startTime, ActionIndicator.START);
+					((LAASAgArch) rosAgArch).callInsertAction(actionName+actionID, startTime, ActionIndicator.START);
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 					Tools.getStackTrace(e);
 				}
@@ -58,7 +58,7 @@ public abstract class AbstractClientPhysicalAction<T_ACTION_GOAL extends Message
 				getTimeMethod = result.getClass().getMethod("getActionEnd");
 				getTimeMethod.setAccessible(true);
 				Time endTime  = (Time) getTimeMethod.invoke(result);
-				((ExecutorAgArch) rosAgArch).callInsertAction(actionName+actionID, endTime, ActionIndicator.END);
+				((LAASAgArch) rosAgArch).callInsertAction(actionName+actionID, endTime, ActionIndicator.END);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				Tools.getStackTrace(e);
 			}

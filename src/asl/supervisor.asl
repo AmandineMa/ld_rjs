@@ -4,7 +4,7 @@
 
 +!start : true <- 
 	rjs.jia.log_beliefs;
-	.verbose(2);
+//	.verbose(2);
 	configureNode;
 	startParameterLoaderNode("/general.yaml", "/plan_manager.yaml");
 	startROSNode;
@@ -34,4 +34,4 @@
 
 +!create_agents : true <-
 	.create_agent(plan_manager, "src/asl/plan_manager.asl", [agentArchClass("arch.agarch.PlanManagerAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("agent.OntoAgent")]);
-	.create_agent(robot_executor, "src/asl/robot_executor.asl", [agentArchClass("arch.agarch.ExecutorAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("rjs.agent.LimitedAgent")]).
+	.create_agent(robot_executor, "src/asl/robot_executor.asl", [agentArchClass("arch.agarch.LAASAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("rjs.agent.LimitedAgent")]).
