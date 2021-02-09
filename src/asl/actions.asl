@@ -16,17 +16,17 @@
 	
 	
 @drop[atomic]
-+!drop : planPick("armUsed", Arm) <-
++!drop(Params) : planPick("armUsed", Arm) <-
 	planDrop(Arm);
 	execute("drop");
 	-planPick("armUsed", Arm).
 	
--!drop : true <- 
+-!drop(Params) : true <- 
 	.print("no arm to use available").
 	
 	
 @move[atomic]
-+!moveArm(Params) : true <-
++!move_arm(Params) : true <-
 	.nth(0, Params,Pose);
 	planMoveArm(Pose);
 	execute("moveArm").

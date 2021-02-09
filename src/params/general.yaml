@@ -33,10 +33,10 @@ supervisor:
       name: /mementar/occasions/robot
       type: mementar/MementarOccasion
       function: sub
-    plan:
-      name: /planner/plan_answer
-      type: planner_msgs/Plan
-      function: sub
+#    plan:
+#      name: /planner/plan_answer
+#      type: planner_msgs/Plan
+#      function: sub
     plan_request:
       name: /planner/request_new_plan
       type: planner_msgs/PlanRequest
@@ -53,8 +53,8 @@ supervisor:
     
   action_servers:
     dialogue: dialogue_as 
-    plan_motion: planMotion
-    execute_motion: executeMotion
+    plan_motion: /pr2_tasks_node/plan
+    execute_motion: /pr2_tasks_node/execute
     strafe: /dt_navigation/dt_strafe
      
        

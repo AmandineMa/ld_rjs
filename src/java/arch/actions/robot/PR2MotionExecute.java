@@ -1,19 +1,22 @@
 package arch.actions.robot;
 
 import actionlib_msgs.GoalStatusArray;
+import arch.actions.AbstractClientPhysicalAction;
+import arch.agarch.LAASAgArch;
 import jason.asSemantics.ActionExec;
 import pr2_motion_tasks_msgs.executeActionFeedback;
 import pr2_motion_tasks_msgs.executeActionGoal;
 import pr2_motion_tasks_msgs.executeActionResult;
-import rjs.arch.actions.AbstractClientAction;
 import rjs.arch.actions.ros.RjsActionClient;
 import rjs.arch.agarch.AbstractROSAgArch;
+import rjs.utils.Tools;
 
-public class PR2MotionExecute extends AbstractClientAction<executeActionGoal, executeActionFeedback, executeActionResult> {
+public class PR2MotionExecute extends AbstractClientPhysicalAction<executeActionGoal, executeActionFeedback, executeActionResult> {
 
 	public PR2MotionExecute(ActionExec actionExec, AbstractROSAgArch rosAgArch,
 			RjsActionClient<executeActionGoal, executeActionFeedback, executeActionResult> actionClient) {
-		super(actionExec, rosAgArch, actionClient);
+		super(actionExec, (LAASAgArch) rosAgArch, actionClient);
+		actionName =  Tools.removeQuotes(actionTerms.get(0).toString());
 	}
 
 	@Override
@@ -35,5 +38,9 @@ public class PR2MotionExecute extends AbstractClientAction<executeActionGoal, ex
 
 	@Override
 	protected void setResultAborted(executeActionResult result) {}
+
+	@Override
+	protected void endFeedbackReceived(executeActionFeedback fb) {
+	}
 
 }

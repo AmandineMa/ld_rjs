@@ -6,6 +6,7 @@ import pr2_motion_tasks_msgs.planActionGoal;
 import pr2_motion_tasks_msgs.planActionResult;
 import rjs.arch.actions.ros.RjsActionClient;
 import rjs.arch.agarch.AbstractROSAgArch;
+import rjs.utils.Tools;
 
 public class PR2MotionPlanMoveArm extends AbstractPR2MotionPlan {
 
@@ -17,7 +18,7 @@ public class PR2MotionPlanMoveArm extends AbstractPR2MotionPlan {
 	@Override
 	protected void setGoalFields() {
 		goal.setAction("move");
-		goal.setPredefinedPoseId(actionTerms.get(0).toString());
+		goal.setPredefinedPoseId(Tools.removeQuotes(actionTerms.get(0).toString()));
 	}
 	
 }

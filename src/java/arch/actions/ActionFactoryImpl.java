@@ -86,7 +86,7 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 			case "planDrop":
 				action = new PR2MotionPlanDrop(actionExec, rosAgArch, pr2MotionPlanActionClient);
 				break;
-			case "planMove":
+			case "planMoveArm":
 				action = new PR2MotionPlanMoveArm(actionExec, rosAgArch, pr2MotionPlanActionClient);
 				break;
 			case "execute":
