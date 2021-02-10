@@ -19,6 +19,9 @@ import arch.agarch.LAASAgArch;
 import dialogue_as.dialogue_actionActionFeedback;
 import dialogue_as.dialogue_actionActionGoal;
 import dialogue_as.dialogue_actionActionResult;
+import dt_head_gestures.HeadScanActionFeedback;
+import dt_head_gestures.HeadScanActionGoal;
+import dt_head_gestures.HeadScanActionResult;
 import dt_navigation.MoveActionFeedback;
 import dt_navigation.MoveActionGoal;
 import dt_navigation.MoveActionResult;
@@ -45,17 +48,34 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 	private RjsActionClient<MoveActionGoal, MoveActionFeedback, MoveActionResult> strafeActionClient;
 	private RjsActionClient<planActionGoal, planActionFeedback, planActionResult> pr2MotionPlanActionClient;
 	private RjsActionClient<executeActionGoal, executeActionFeedback, executeActionResult> pr2MotionExecuteActionClient;
+	private RjsActionClient<HeadScanActionGoal, HeadScanActionFeedback, HeadScanActionResult> headScanActionClient;
 	
 	public void setRosVariables() {
 		super.setRosVariables();
-		dialogueActionClient = new RjsActionClient<dialogue_actionActionGoal, dialogue_actionActionFeedback, dialogue_actionActionResult>(rosnode.getConnectedNode(), rosnode.getParameters().getString("/supervisor/action_servers/dialogue"), 
+		dialogueActionClient = new RjsActionClient<dialogue_actionActionGoal, dialogue_actionActionFeedback, dialogue_actionActionResult>(
+				rosnode.getConnectedNode(), 
+				rosnode.getParameters().getString("/supervisor/action_servers/dialogue"), 
 				dialogue_actionActionGoal._TYPE, dialogue_actionActionFeedback._TYPE, dialogue_actionActionResult._TYPE);
-		strafeActionClient = new RjsActionClient<MoveActionGoal, MoveActionFeedback, MoveActionResult>(rosnode.getConnectedNode(), rosnode.getParameters().getString("/supervisor/action_servers/strafe"), 
+		
+		strafeActionClient = new RjsActionClient<MoveActionGoal, MoveActionFeedback, MoveActionResult>(
+				rosnode.getConnectedNode(), 
+				rosnode.getParameters().getString("/supervisor/action_servers/strafe"), 
 				MoveActionGoal._TYPE, MoveActionFeedback._TYPE, MoveActionResult._TYPE);
-		pr2MotionPlanActionClient = new RjsActionClient<planActionGoal, planActionFeedback, planActionResult>(rosnode.getConnectedNode(), 
-				rosnode.getParameters().getString("/supervisor/action_servers/plan_motion"), planActionGoal._TYPE, planActionFeedback._TYPE, planActionResult._TYPE);
-		pr2MotionExecuteActionClient = new RjsActionClient<executeActionGoal, executeActionFeedback, executeActionResult>(rosnode.getConnectedNode(), 
-				rosnode.getParameters().getString("/supervisor/action_servers/execute_motion"), executeActionGoal._TYPE, executeActionFeedback._TYPE, executeActionResult._TYPE);
+		
+		pr2MotionPlanActionClient = new RjsActionClient<planActionGoal, planActionFeedback, planActionResult>(
+				rosnode.getConnectedNode(), 
+				rosnode.getParameters().getString("/supervisor/action_servers/plan_motion"), 
+				planActionGoal._TYPE, planActionFeedback._TYPE, planActionResult._TYPE);
+		
+		pr2MotionExecuteActionClient = new RjsActionClient<executeActionGoal, executeActionFeedback, executeActionResult>(
+				rosnode.getConnectedNode(), 
+				rosnode.getParameters().getString("/supervisor/action_servers/execute_motion"), 
+				executeActionGoal._TYPE, executeActionFeedback._TYPE, executeActionResult._TYPE);
+		
+		headScanActionClient = new RjsActionClient<HeadScanActionGoal, HeadScanActionFeedback, HeadScanActionResult>(
+				rosnode.getConnectedNode(), 
+				rosnode.getParameters().getString("/supervisor/action_servers/head_scan"), 
+				HeadScanActionGoal._TYPE, HeadScanActionFeedback._TYPE, HeadScanActionResult._TYPE);
 	}
 	
 	public Action createAction(ActionExec actionExec, AbstractROSAgArch rosAgArch) {
@@ -120,7 +140,7 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 				action = new InitSub(actionExec, rosAgArch);
 				break;
 			case "scanTable":
-				action = new ScanTable(actionExec, rosAgArch);
+				action = new ScanTable(actionExec, (LAASAgArch) rosAgArch, headScanActionClient);
 				break;
 			default:
 				break;

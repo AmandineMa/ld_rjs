@@ -2,47 +2,61 @@ package arch.actions.robot;
 
 import org.ros.message.Duration;
 
-import dt_head_gestures.HeadScan;
-import dt_head_gestures.HeadScanRequest;
-import dt_head_gestures.HeadScanResponse;
+import actionlib_msgs.GoalStatusArray;
+import arch.actions.AbstractClientPhysicalAction;
+import arch.agarch.LAASAgArch;
+import dt_head_gestures.HeadScanActionFeedback;
+import dt_head_gestures.HeadScanActionGoal;
+import dt_head_gestures.HeadScanActionResult;
+import dt_head_gestures.HeadScanGoal;
 import geometry_msgs.Point;
 import geometry_msgs.PointStamped;
 import jason.asSemantics.ActionExec;
-import rjs.arch.actions.AbstractAction;
-import rjs.arch.agarch.AbstractROSAgArch;
+import rjs.arch.actions.ros.RjsActionClient;
 
-public class ScanTable extends AbstractAction {
+public class ScanTable extends AbstractClientPhysicalAction<HeadScanActionGoal, HeadScanActionFeedback, HeadScanActionResult> {
 
-	public ScanTable(ActionExec actionExec, AbstractROSAgArch rosAgArch) {
-		super(actionExec, rosAgArch);
-		setSync(true);
+	public ScanTable(ActionExec actionExec, LAASAgArch rosAgArch,
+			RjsActionClient<HeadScanActionGoal, HeadScanActionFeedback, HeadScanActionResult> actionClient) {
+		super(actionExec, rosAgArch, actionClient);
 	}
 
 	@Override
-	public void execute() {
-		HeadScanRequest req = getRosNode().newServiceRequestFromType(HeadScan._TYPE);
+	public HeadScanActionGoal computeGoal() {
+		HeadScanActionGoal goal = rosAgArch.createMessage(HeadScanActionGoal._TYPE);
+		HeadScanGoal scanGoal = goal.getGoal();
 		PointStamped ps = getRosNode().buildPointStamped("base_footprint");
 		Point point = rosAgArch.createMessage(Point._TYPE);
 		point.setX(1.2);
 		point.setZ(0.4);
 		ps.setPoint(point);
-		req.setCentralPoint(ps);
+		scanGoal.setCentralPoint(ps);
 		std_msgs.Duration duration = rosAgArch.createMessage(std_msgs.Duration._TYPE);
 		Duration durationData = new Duration();
 		durationData.secs = 1;
 		durationData.nsecs = 500000000;
 		duration.setData(durationData);
-		req.setDurationPerPoint(duration);
-		req.setHeight(0.3);
-		req.setWidth(1.5);
-		req.setStepLength(0.2);
-		HeadScanResponse resp = getRosNode().callSyncService("head_scan", req);
-		if(resp != null) {
-			setActionExecuted(resp.getSuccess());
-		} else {
-			setActionExecuted(false);
-		}
-		
+		scanGoal.setDurationPerPoint(duration);
+		scanGoal.setHeight(0.3);
+		scanGoal.setWidth(1.5);
+		scanGoal.setStepLength(0.2);
+		return goal;
+	}
+
+	@Override
+	protected void setResultSucceeded(HeadScanActionResult result) {
+	}
+
+	@Override
+	protected void setResultAborted(HeadScanActionResult result) {
+	}
+
+	@Override
+	public void statusReceived(GoalStatusArray arg0) {
+	}
+
+	@Override
+	protected void endFeedbackReceived(HeadScanActionFeedback fb) {
 	}
 
 }

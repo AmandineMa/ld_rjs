@@ -3,7 +3,7 @@ supervisor:
   robot_name: "robot"
   human_name: "human_0"
   table_name: table_1
-  scan_table: false
+  scan_table: true
   
   ontologies:
     robot: robot
@@ -24,9 +24,6 @@ supervisor:
    mementar_unsub:
       name: /mementar/unsubscribe/robot
       type: mementar/MementarOcassionUnsubscription
-#   head_scan:
-#      name: /dt_head_gestures/head_scan
-#      type: dt_head_gestures/HeadScan
   
   topics:
     mementar_occasions: 
@@ -56,6 +53,7 @@ supervisor:
     plan_motion: /pr2_tasks_node/plan
     execute_motion: /pr2_tasks_node/execute
     strafe: /dt_navigation/dt_strafe
+    head_scan: /dt_head_gestures/head_scan
      
        
   

@@ -11,10 +11,6 @@
 	!init_services;
 	!init_sub;
 	+started;
-	rjs.jia.get_param("supervisor/scan_table", "Boolean", Scan);
-	if(Scan == true){
-		scanTable; 
-	}
 	!create_agents.
 	
 

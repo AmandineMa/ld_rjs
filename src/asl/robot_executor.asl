@@ -12,10 +12,14 @@ robotState(idle).
 /* Plans */
 
 +!start : true <-
-//	.verbose(2);
-//	rjs.jia.log_beliefs;
+	.verbose(2);
+	rjs.jia.log_beliefs;
 	!getRobotName;
-	!getHumanName.
+	!getHumanName;
+	rjs.jia.get_param("supervisor/scan_table", "Boolean", Scan);
+	if(Scan == true){
+		scanTable; 
+	}.
 
 +action(ID,Name,Agent,Params) : robotState(idle) & robotName(Agent) <-
 	-action(ID,Name,Agent,Params)[source(_)];
