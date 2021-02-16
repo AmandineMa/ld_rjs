@@ -22,7 +22,7 @@ public class Say extends AbstractAction {
 		String param = Tools.removeQuotes(actionTerms.get(0).toString());
 		std_msgs.String str = rosAgArch.createMessage(std_msgs.String._TYPE);
 		str.setData(param);
-//		getRosNode().publish("say", str); 
+		getRosNode().publish("say", str); 
 		rosAgArch.addBelief("said(\""+param+"\")");
 		((LAASAgArch) rosAgArch).callInsertAction("speak_"+actionID, AbstractROSAgArch.getRosnode().getConnectedNode().getCurrentTime(), ActionIndicator.START);
 		Tools.sleep(4000);

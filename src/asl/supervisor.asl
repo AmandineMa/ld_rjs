@@ -11,7 +11,8 @@
 	!init_services;
 	!init_sub;
 	+started;
-	!create_agents.
+	!create_agents;
+	jia.createGUI.
 	
 
 +!init_services : true <-
@@ -31,3 +32,13 @@
 +!create_agents : true <-
 	.create_agent(plan_manager, "src/asl/plan_manager.asl", [agentArchClass("arch.agarch.PlanManagerAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("agent.OntoAgent")]);
 	.create_agent(robot_executor, "src/asl/robot_executor.asl", [agentArchClass("arch.agarch.LAASAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("rjs.agent.LimitedAgent")]).
+
+	
++!head_scan : true <-
+	.send(robot_executor, tell, action(_,"head_scan","robot",[])).
+	
++!send_goal(Goal) : true <-
+	.send(plan_manager, tell, goal(Goal,received)).
+	
++!reset : true <-
+	.broadcast(achieve, reset).

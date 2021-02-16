@@ -1,6 +1,6 @@
 MAS director_task {
 
-	infrastructure: Centralised(threaded,1,1,3)
+	infrastructure: Centralised
 	
 	agents:
 		supervisor [verbose=3] agentArchClass arch.agarch.SupervisorAgArch beliefBaseClass rjs.agent.TimeBB;

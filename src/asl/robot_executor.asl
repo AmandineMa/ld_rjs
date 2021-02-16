@@ -3,7 +3,7 @@
 { include("actions.asl")}
 
 /* Initial beliefs and rules */
-robotState(idle).
+robotState(idle)[ground].
 
 /* Initial goals */
 
@@ -12,14 +12,10 @@ robotState(idle).
 /* Plans */
 
 +!start : true <-
-	.verbose(2);
+//	.verbose(2);
 	rjs.jia.log_beliefs;
 	!getRobotName;
-	!getHumanName;
-	rjs.jia.get_param("supervisor/scan_table", "Boolean", Scan);
-	if(Scan == true){
-		scanTable; 
-	}.
+	!getHumanName.
 
 +action(ID,Name,Agent,Params) : robotState(idle) & robotName(Agent) <-
 	-action(ID,Name,Agent,Params)[source(_)];
@@ -32,21 +28,32 @@ robotState(idle).
 +robotState(idle) : true <-
 	if(rjs.jia.believes(action(_,_,"pending"))){
 		?action(ID,Name,"pending");
-		!executeAction(ID,Name,Params)
+		!executeAction(ID,Name,Params);
 	}.
 	
 
 +!executeAction(ID,Name,Agent,Params) : true <-
-	-+robotState(acting);
+	-+robotState(acting)[ground];
 	.lower_case(Name, Action);
 	.send(plan_manager, tell, action(ID,"ongoing",Name,Agent,Params));
 	Act =.. [Action, [Params],[]];
 	+action(ID,Name,"ongoing");
 	!Act;
-	-+robotState(idle);
+	-+robotState(idle)[ground];
 	-+action(ID,Name,"executed");
 	.send(plan_manager, tell, action(ID,"executed",Name,Agent,Params)).
 	
 //+planOver : true <-
 //	say("bravo ! we did it !").
+
++!reset : robotState(idle) <-
+	.drop_all_desires;
+	rjs.jia.abolish_all_except_ground.	
+	
++!reset : robotState(acting) <-
+	.wait(robotState(X) & X == idle);
+	.drop_all_desires;
+	rjs.jia.abolish_all_except_ground.	
+	
+	
 	

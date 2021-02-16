@@ -41,19 +41,19 @@
 	say(Vc).
 	
 
-+!robot_tell_human_to_tidy(Params): true <- say("Can you put the cube in the box ?").
-//	?humanName(Human);
-//	rjs.jia.delete_from_list(Human,Params,ParamsNoH);
-//	for(.member(P,ParamsNoH)){
-//		!getUnRef(P,Human);
-//	}
-//	.findall(P,.member(P,ParamsNoH) & jia.isCube(P),CubeL);
-//	.findall(P,.member(P,ParamsNoH) & jia.isBox(P),BoxL);
-//	.nth(0,CubeL,Cube);
-//	.nth(0,BoxL,Box);
-//	?verba(Cube,VerbaCube);
-//	?verba(Box,VerbaBox);
-//	!sayPickPlace(VerbaCube, VerbaBox).
++!robot_tell_human_to_tidy(Params): true <-
+	?humanName(Human);
+	rjs.jia.delete_from_list(Human,Params,ParamsNoH);
+	for(.member(P,ParamsNoH)){
+		!getUnRef(P,Human);
+	}
+	.findall(P,.member(P,ParamsNoH) & jia.isCube(P),CubeL);
+	.findall(P,.member(P,ParamsNoH) & jia.isBox(P),BoxL);
+	.nth(0,CubeL,Cube);
+	.nth(0,BoxL,Box);
+	?verba(Cube,VerbaCube);
+	?verba(Box,VerbaBox);
+	!sayPickPlace(VerbaCube, VerbaBox).
 	
 
 
@@ -68,7 +68,8 @@
 	strafe(Type,Object).
 
 
-
++!head_scan(Params): true <-
+	scanTable.
 
 
 
