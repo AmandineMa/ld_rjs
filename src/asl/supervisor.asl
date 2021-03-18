@@ -4,14 +4,14 @@
 
 +!start : true <- 
 	rjs.jia.log_beliefs;
-//	.verbose(2);
+	.verbose(2);
 	configureNode;
 	startParameterLoaderNode("/general.yaml", "/plan_manager.yaml");
 	startROSNode;
 	!init_services;
-	!init_sub;
+//	!init_sub;
 	+started;
-	!create_agents;
+//	!create_agents;
 	jia.createGUI.
 	
 

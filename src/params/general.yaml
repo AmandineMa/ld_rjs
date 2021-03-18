@@ -11,19 +11,19 @@ supervisor:
    onto_individual: 
       name: /ontologenius/individual/robot
       type: ontologenius/OntologeniusService
-   disambiguate: 
-      name: /KSP/disambiguate
-      type: knowledge_sharing_planner_msgs/Disambiguation
-   verbalize:
-      name: /KSP/verbalize
-      type: knowledge_sharing_planner_msgs/Verbalization
-   mementar_sub:
-      name: /mementar/subscribe/robot
-      type: mementar/MementarOccasionSubscription
-   mementar_unsub:
-      name: /mementar/unsubscribe/robot
-      type: mementar/MementarOcassionUnsubscription
-  
+#    disambiguate: 
+#       name: /KSP/disambiguate
+#       type: knowledge_sharing_planner_msgs/Disambiguation
+#    verbalize:
+#       name: /KSP/verbalize
+#       type: knowledge_sharing_planner_msgs/Verbalization
+#    mementar_sub:
+#       name: /mementar/subscribe/robot
+#       type: mementar/MementarOccasionSubscription
+#    mementar_unsub:
+#       name: /mementar/unsubscribe/robot
+#       type: mementar/MementarOcassionUnsubscription
+#   
   topics:
     mementar_occasions: 
       name: /mementar/occasions/robot
