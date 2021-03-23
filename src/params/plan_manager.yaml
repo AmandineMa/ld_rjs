@@ -8,6 +8,7 @@ plan_manager:
                  - throw_box_green
               cube_GBTG:
                  - throw_box_green
+     dtRR: robot_receiver
                  
   actsToMonitor:
      - human_pick_cube

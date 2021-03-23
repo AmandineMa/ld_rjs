@@ -1,4 +1,5 @@
 {include("common.asl")}
+{include("receiver.asl")}
 
 actionStates(["planned","todo","ongoing","executed"])[ground].
 
@@ -41,7 +42,7 @@ actionStates(["planned","todo","ongoing","executed"])[ground].
 	!getRobotName;
 	!getHumanName.
 	
-+goal(Name, State) : State == received <-
++goal(Name, State) : State == received & not .substring("dtRR",Name) <-
 	?humanName(Human);
 	.concat("plan_manager/goals/",Name,"/name",GoalName);
 	.concat("plan_manager/goals/",Name,"/worldstate",GoalWS);

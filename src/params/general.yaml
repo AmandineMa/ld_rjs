@@ -17,31 +17,45 @@ supervisor:
    verbalize:
       name: /KSP/verbalize
       type: knowledge_sharing_planner_msgs/Verbalization
-   mementar_sub:
-      name: /mementar/subscribe/robot
-      type: mementar/MementarOccasionSubscription
-   mementar_unsub:
-      name: /mementar/unsubscribe/robot
-      type: mementar/MementarOcassionUnsubscription
+   understand:
+      name: /KSP/understand
+      type: knowledge_sharing_planner_msgs/Understand
+   ksp_merge:
+      name: /KSP/merge
+      type: knowledge_sharing_planner_msgs/Merge
+   sparql:
+      name: /ontologenius/sparql/robot
+      type: ontologenius/OntologeniusSparqlService
+#    mementar_sub:
+#       name: /mementar/subscribe/robot
+#       type: mementar/MementarOccasionSubscription
+#    mementar_unsub:
+#       name: /mementar/unsubscribe/robot
+#       type: mementar/MementarOcassionUnsubscription
+   
   
   topics:
-    mementar_occasions: 
-      name: /mementar/occasions/robot
-      type: mementar/MementarOccasion
+#     mementar_occasions: 
+#       name: /mementar/occasions/robot
+#       type: mementar/MementarOccasion
+#       function: sub
+#     plan:
+#       name: /planner/plan_answer
+#       type: planner_msgs/Plan
+#       function: sub
+   listen:
+      name: /listen
+      type: std_msgs/String
       function: sub
-    plan:
-      name: /planner/plan_answer
-      type: planner_msgs/Plan
-      function: sub
-    plan_request:
+   plan_request:
       name: /planner/request_new_plan
       type: planner_msgs/PlanRequest
       function: pub
-    say:
+   say:
       name: say
       type: std_msgs/String
       function: pub
-    insert_action:
+   insert_action:
       name: /mementar/insert_action/robot
       type: mementar/MementarAction
       function: pub
