@@ -6,7 +6,7 @@ action(place(Human,Pickable,Support),[hasInHand(Human,Pickable)],[handMovingTowa
 
 action(throw(Human,Pickable,Box),[hasInHand(Human,Pickable)],[handMovingToward(Human,BoxList)],[~hasInHand(Human,Pickable)],[isIn(Pickable,Box)]).
 
-action(openContainer(Human,Container),[handEmpty(Human)],[handMovingToward(Human,ContainerList),hasInHand(Human,Container)],[],[isOpen(Container)]).
+action(openContainer(Human,Container),[handEmpty(Human)],[handMovingToward(Human,ContainerList)],[hasInHand(Human,Container)],[isOpen(Container)]).
 
 action(scan(Human,Pickable),[holding(Human,Scanner)],[handMovingToward(Human,PickableList)],[],[isScanned(Pickable)]).
 

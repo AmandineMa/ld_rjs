@@ -23,6 +23,8 @@ import rjs.utils.Tools;
 /**
 
 Based on .member
+To check if the element is in the list and if the terms of the element are of the same types as the desired one. 
+Ex : hasInHand(human_0, red_box) has its terms corresponding to hasInHand(Human,Container) but not hasInHand(human_0, cube_BCBG)
 
 */
 
