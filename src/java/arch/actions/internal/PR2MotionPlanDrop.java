@@ -18,6 +18,8 @@ public class PR2MotionPlanDrop extends AbstractPR2MotionPlan {
 	@Override
 	protected void setGoalFields() {
 		goal.setAction("drop");
+		//TODO à ne pas laisser en dur
+		goal.setBoxId("throw_box_left");
 		goal.setPlanGroup(Tools.removeQuotes(actionTerms.get(0).toString()));
 	}
 	

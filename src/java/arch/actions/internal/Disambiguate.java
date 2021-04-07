@@ -28,7 +28,7 @@ public class Disambiguate extends AbstractAction {
 	@Override
 	public void execute() {
 		String individual = Tools.removeQuotes(actionTerms.get(0).toString());
-		String ontology = Tools.removeQuotes(actionTerms.get(1).toString());
+		String agent = Tools.removeQuotes(actionTerms.get(1).toString());
 		boolean replan = Boolean.parseBoolean(actionTerms.get(2).toString());
 		
 		ServiceResponseListener<DisambiguationResponse> respListener = new ServiceResponseListener<DisambiguationResponse>() {
@@ -51,7 +51,7 @@ public class Disambiguate extends AbstractAction {
 		};
 		DisambiguationRequest disambiReq = getRosNode().newServiceRequestFromType(Disambiguation._TYPE);
 		disambiReq.setIndividual(individual);
-		disambiReq.setOntology(getRosNode().getParameters().getString("supervisor/ontologies/"+ontology));
+		disambiReq.setOntology(agent);
 		List<String> ontoRep = ((LAASAgArch) rosAgArch).callOnto("getOn", individual+":isAbove").getValues();
 		if(!ontoRep.isEmpty()) {
 			Triplet ctx = rosAgArch.createMessage(Triplet._TYPE);

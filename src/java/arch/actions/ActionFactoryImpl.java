@@ -11,6 +11,7 @@ import arch.actions.internal.PR2MotionPlanDrop;
 import arch.actions.internal.PR2MotionPlanMoveArm;
 import arch.actions.internal.PR2MotionPlanPick;
 import arch.actions.internal.PR2MotionPlanPlace;
+import arch.actions.robot.LookAt;
 import arch.actions.robot.PR2MotionExecute;
 import arch.actions.robot.Say;
 import arch.actions.robot.ScanTable;
@@ -136,6 +137,9 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 				break;
 			case "scanTable":
 				action = new ScanTable(actionExec, (LAASAgArch) rosAgArch, headScanActionClient);
+				break;
+			case "lookAt":
+				action = new LookAt(actionExec, rosAgArch);
 				break;
 			default:
 				break;

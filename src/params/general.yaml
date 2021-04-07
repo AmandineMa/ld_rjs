@@ -1,11 +1,8 @@
 
 supervisor:
   robot_name: "robot"
-  human_name: "human_0"
+  human_name: "Helmet_2"
   table_name: table_1
-  
-  ontologies:
-    robot: robot
     
   services:
    onto_individual: 
@@ -23,28 +20,32 @@ supervisor:
    ksp_merge:
       name: /KSP/merge
       type: knowledge_sharing_planner_msgs/Merge
-   sparql:
+   sparql_robot:
       name: /ontologenius/sparql/robot
       type: ontologenius/OntologeniusSparqlService
-#    mementar_sub:
-#       name: /mementar/subscribe/robot
-#       type: mementar/MementarOccasionSubscription
-#    mementar_unsub:
-#       name: /mementar/unsubscribe/robot
-#       type: mementar/MementarOcassionUnsubscription
+   #TODO pas propre, service de l'humain à créer on the fly
+   sparql_human:
+      name: /ontologenius/sparql/Helmet_2
+      type: ontologenius/OntologeniusSparqlService
+   mementar_sub:
+      name: /mementar/subscribe/robot
+      type: mementar/MementarOccasionSubscription
+   mementar_unsub:
+      name: /mementar/unsubscribe/robot
+      type: mementar/MementarOcassionUnsubscription
    
   
   topics:
-#     mementar_occasions: 
-#       name: /mementar/occasions/robot
-#       type: mementar/MementarOccasion
-#       function: sub
+   mementar_occasions: 
+     name: /mementar/occasions/robot
+     type: mementar/MementarOccasion
+     function: sub
 #     plan:
 #       name: /planner/plan_answer
 #       type: planner_msgs/Plan
 #       function: sub
    listen:
-      name: /listen
+      name: /ros_stt/said
       type: std_msgs/String
       function: sub
    plan_request:
@@ -59,10 +60,13 @@ supervisor:
       name: /mementar/insert_action/robot
       type: mementar/MementarAction
       function: pub
+   pr2_head:
+      name: /pr2_head_manager/environment_monitoring/pr2_head_manager_msgs_Point
+      type: pr2_head_manager_msgs/Point
+      function: pub
       
     
   action_servers:
-    dialogue: dialogue_as 
     plan_motion: /pr2_tasks_node/plan
     execute_motion: /pr2_tasks_node/execute
     strafe: /dt_navigation/dt_strafe

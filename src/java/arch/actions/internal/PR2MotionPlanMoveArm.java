@@ -18,7 +18,8 @@ public class PR2MotionPlanMoveArm extends AbstractPR2MotionPlan {
 	@Override
 	protected void setGoalFields() {
 		goal.setAction("move");
-		goal.setPredefinedPoseId(Tools.removeQuotes(actionTerms.get(0).toString()));
+		goal.setPlanGroup(Tools.removeQuotes(actionTerms.get(0).toString()));
+		goal.setPredefinedPoseId(Tools.removeQuotes(actionTerms.get(1).toString()));
 	}
 	
 }

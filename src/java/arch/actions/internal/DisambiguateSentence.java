@@ -7,8 +7,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jason.asSemantics.ActionExec;
-import jason.asSyntax.Atom;
+import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
+import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 import knowledge_sharing_planner_msgs.Disambiguation;
@@ -33,78 +34,96 @@ public class DisambiguateSentence extends AbstractAction {
 		setSync(true);
 	}
 
+	//TODO effacer les beliefs quand ça plante au milieu
 	@Override
 	public void execute() {
-		
+
 		DisambiguationRequest disambiReq = getRosNode().newServiceRequestFromType(Disambiguation._TYPE);
-		disambiReq.setOntology(getRosNode().getParameters().getString("supervisor/ontologies/robot"));
+		disambiReq.setOntology(getRosNode().getParameters().getString("supervisor/human_name"));
 		SymbolTable symbT = rosAgArch.createMessage(SymbolTable._TYPE);
-		Iterator<Literal> matchsIterator = rosAgArch.get_beliefs_iterator("match(_,_,_)");
-		
+		Iterator<Literal> matchsIterator = rosAgArch.get_beliefs_iterator("match(_)");
+
 		String question = new String();
-		
-		while(matchsIterator.hasNext()) {
-			List<String> individuals = Tools.removeQuotes(matchsIterator.next().getTerms());
-			List<String> symbols = new ArrayList<String>();
-			for(int i = 0; i < individuals.size(); i++) {
-				symbols.add(Integer.toString(i));
+		if(matchsIterator != null) {
+			while(matchsIterator.hasNext()) {
+				List<String> individuals = Tools.removeQuotes((ListTermImpl) matchsIterator.next().getTerms().get(0));
+				String individual = individuals.get(0);
+				List<String> symbols = new ArrayList<String>();
+				for(int i = 0; i < individuals.size(); i++) {
+					symbols.add(Integer.toString(i));
+				}
+				symbT.setIndividuals(individuals);
+				symbT.setSymbols(symbols);
+				disambiReq.setSymbolTable(symbT);
+				disambiReq.setIndividual(individual);
+
+				@SuppressWarnings("unchecked")
+				List<String> mergedQuery = Tools.removeQuotes((List<Term>) rosAgArch.findBel("mergedQuery(_)").getTerm(0));
+				List<Triplet> triplets = new ArrayList<Triplet>();
+				for(String query : mergedQuery)
+					triplets.add(getTriplet(query.toString()));
+
+				disambiReq.setBaseFacts(triplets);
+
+				DisambiguationResponse disambiResp = getRosNode().callSyncService("disambiguate", disambiReq);
+
+				if(!disambiResp.getSuccess()) {
+					actionExec.setResult(false);
+					actionExec.setFailureReason(new LiteralImpl("disambiguation_not_found("+individual+")"), "could not find any disambiguation");
+					rosAgArch.removeBelief("mergedQuery(_)");
+					rosAgArch.removeBelief("sparql_input(_)");
+					rosAgArch.removeBelief("match(_)");
+					rosAgArch.removeBelief("sentence(_)"); 
+					rosAgArch.removeBelief("verba(disambi_objects_sentence,_)");
+					return;
+				}
+
+				List<String> matchSparql = new ArrayList<String>();
+				matchSparql = disambiResp.getSparqlResult();
+
+				MergeRequest mergeReq = getRosNode().newServiceRequestFromType(Merge._TYPE);
+				mergeReq.setContextQuery(mergedQuery);
+				mergeReq.setBaseQuery(matchSparql);
+				mergeReq.setPartial(true);
+				MergeResponse mergeResp = getRosNode().callSyncService("ksp_merge", mergeReq);
+
+				if(mergeResp == null || mergeResp.getMergedQuery().isEmpty()) {
+					actionExec.setResult(false);
+					actionExec.setFailureReason(new LiteralImpl("unpossible_merged("+Tools.arrayToStringArray(matchSparql)+")"), "could not merge");
+					rosAgArch.removeBelief("mergedQuery(_)");
+					rosAgArch.removeBelief("sparql_input(_)");
+					rosAgArch.removeBelief("match(_)");
+					rosAgArch.removeBelief("sentence(_)"); 
+					rosAgArch.removeBelief("verba(disambi_objects_sentence,_)");
+					return;
+				}
+
+				matchSparql = mergeResp.getMergedQuery();
+				VerbalizationRequest verbaReq = getRosNode().newServiceRequestFromType(Verbalization._TYPE);
+				verbaReq.setSparqlQuery(matchSparql);
+				VerbalizationResponse verbaResp = getRosNode().callSyncService("verbalize", verbaReq);
+
+				if(verbaResp == null || verbaResp.getVerbalization().isEmpty()) {
+					rosAgArch.removeBelief("mergedQuery(_)");
+					rosAgArch.removeBelief("sparql_input(_)");
+					rosAgArch.removeBelief("match(_)");
+					rosAgArch.removeBelief("sentence(_)"); 
+					rosAgArch.removeBelief("verba(disambi_objects_sentence,_)");
+					actionExec.setResult(false);
+					actionExec.setFailureReason(new LiteralImpl("no_verbalization("+Tools.arrayToStringArray(matchSparql)+")"), "could not find any verbalization");
+					return;
+				}
+				question += ((question.isEmpty()) ? "" : "or ") + verbaResp.getVerbalization();
+
 			}
-			symbT.setIndividuals(individuals);
-			symbT.setSymbols(symbols);
-			disambiReq.setSymbolTable(symbT);
-			disambiReq.setIndividual(individuals.get(0));
-			
-			@SuppressWarnings("unchecked")
-			List<String> mergedQuery = Tools.removeQuotes((List<Term>) rosAgArch.findBel("mergedQuery(_)").getTerm(0));
-			List<Triplet> triplets = new ArrayList<Triplet>();
-			for(String query : mergedQuery)
-				triplets.add(getTriplet(query.toString()));
-			
-			disambiReq.setBaseFacts(triplets);
-			
-			DisambiguationResponse disambiResp = getRosNode().callSyncService("disambiguate", disambiReq);
-			
-			if(!disambiResp.getSuccess()) {
-				actionExec.setResult(false);
-				actionExec.setFailureReason(new Atom("disambiguation_not_found"), "could not find any disambiguation");
-				return;
-			}
-			
-			List<String> matchSparql = new ArrayList<String>();
-			matchSparql = disambiResp.getSparqlResult();
-			
-			MergeRequest mergeReq = getRosNode().newServiceRequestFromType(Merge._TYPE);
-			mergeReq.setContextQuery(mergedQuery);
-			mergeReq.setBaseQuery(matchSparql);
-			mergeReq.setPartial(true);
-			MergeResponse mergeResp = getRosNode().callSyncService("ksp_merge", mergeReq);
-			
-			if(mergeResp == null || mergeResp.getMergedQuery().isEmpty()) {
-				actionExec.setResult(false);
-				actionExec.setFailureReason(new Atom("unpossible_merged"), "could not merge");
-				return;
-			}
-			
-			matchSparql = mergeResp.getMergedQuery();
-			VerbalizationRequest verbaReq = getRosNode().newServiceRequestFromType(Verbalization._TYPE);
-			verbaReq.setSparqlQuery(matchSparql);
-			VerbalizationResponse verbaResp = getRosNode().callSyncService("verbalize", verbaReq);
-			
-			if(verbaResp == null || verbaResp.getVerbalization().isEmpty()) {
-				actionExec.setResult(false);
-				actionExec.setFailureReason(new Atom("no_verbalization"), "could not find any verbalization");
-				return;
-			}
-			question += ((question.isEmpty()) ? "" : "or ") + verbaResp.getVerbalization();
-			
+			rosAgArch.addBelief("verba(disambi_objects_sentence,"+new StringTermImpl(question)+")");
+			actionExec.setResult(true);
+		} else {
+			actionExec.setResult(false);
 		}
-		rosAgArch.addBelief("verba(disambi_objects_sentence,"+new StringTermImpl(question)+")");
-		rosAgArch.removeBelief("match(_,_,_)");
-		rosAgArch.removeBelief("mergedQuery(_)");
-		actionExec.setResult(true);
-	
+
 	}
-	
+
 
 	private Triplet getTriplet(String fact) {
 		Triplet triplet = rosAgArch.createMessage(Triplet._TYPE);
