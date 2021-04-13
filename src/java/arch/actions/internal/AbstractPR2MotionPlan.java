@@ -13,7 +13,7 @@ import rjs.arch.actions.ros.RjsActionClient;
 import rjs.arch.agarch.AbstractROSAgArch;
 
 public abstract class AbstractPR2MotionPlan extends AbstractClientAction<planActionGoal, planActionFeedback, planActionResult> {
-	planGoal goal;
+	protected planGoal goal;
 	planActionGoal actionGoal;
 
 	public AbstractPR2MotionPlan(ActionExec actionExec, AbstractROSAgArch rosAgArch, RjsActionClient<planActionGoal, planActionFeedback, planActionResult> ac) {

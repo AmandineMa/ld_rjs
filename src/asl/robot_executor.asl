@@ -1,10 +1,9 @@
 // Agent robot_decision in project disambi_task
 { include("common.asl")}
-{ include("actions.asl")}
+{ include("robot_actions.asl")}
 
 /* Initial beliefs and rules */
 robotState(idle)[ground].
-
 /* Initial goals */
 
 !start.
@@ -12,7 +11,7 @@ robotState(idle)[ground].
 /* Plans */
 
 +!start : true <-
-//	.verbose(2);
+	.verbose(2);
 	rjs.jia.log_beliefs;
 	!getRobotName;
 	!getHumanName.
@@ -31,7 +30,7 @@ robotState(idle)[ground].
 		!executeAction(ID,Name,Params);
 	}.
 	
-
+//TODO cas quand action not found
 +!executeAction(ID,Name,Agent,Params) : true <-
 	-+robotState(acting)[ground];
 	.lower_case(Name, Action);
@@ -43,8 +42,8 @@ robotState(idle)[ground].
 	-+action(ID,Name,"executed");
 	.send(plan_manager, tell, action(ID,"executed",Name,Agent,Params)).
 	
-//+planOver : true <-
-//	say("bravo ! we did it !").
++planOver : true <-
+	say("bravo ! we did it !").
 
 +!reset : robotState(idle) <-
 	.drop_all_desires;

@@ -1,34 +1,55 @@
+//TODO faire finir les actions auprès du plan_manager quand il y a un fail
+
 @pick[atomic]
 +!pick(Params): true <-
-	.nth(0, Params,Object);
+	.nth(0, Params, Object);
+	lookAt(Object);
+//	.concat("I take ", Object, Sentence);
+	say("I take it");
+	+planPick("armUsed", right_arm);
 	planPick(Object);
 	execute("pick").
+	
++!take(Params): true <-
+	!pick(Params).
+	
++!remove(Params): true <-
+	.nth(0, Params, Object);
+	.nth(1, Params, Container);
+	!pick([Object]);
+	!drop([Container]).
 
 @place[atomic]
 +!place(Params) : planPick("armUsed", Arm) <-
-	.nth(0, Params,Box);
-	planPlace(Box, Arm);
+	.nth(0, Params,Container);
+	planPlace(Container, Arm);
 	execute("place");
 	-planPick("armUsed", Arm).
 
 -!place : true <- 
-	.print("no arm to use available").
+	.print("place failed").
 	
 	
 @drop[atomic]
 +!drop(Params) : planPick("armUsed", Arm) <-
-	planDrop(Arm);
-	execute("drop");
+		Sentence = "I drop it";
+	say(Sentence);
+	.nth(0, Params, Container);
+	planDrop(Arm, Container);
+	execute("drop"); 
+	.concat(Arm,"_home",PoseName);
+	!move_arm([Arm, PoseName]);
 	-planPick("armUsed", Arm).
 	
 -!drop(Params) : true <- 
-	.print("no arm to use available").
+	.print("drop failed").
 	
 	
 @move[atomic]
 +!move_arm(Params) : true <-
-	.nth(0, Params,Pose);
-	planMoveArm(Pose);
+	.nth(0, Params, Arm);
+	.nth(1, Params, Pose);
+	planMoveArm(Arm,Pose);
 	execute("moveArm").
 
 +!getUnRef(Object, Human): true <-

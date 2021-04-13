@@ -1,6 +1,8 @@
 package arch.actions;
 
-import arch.actions.internal.Disambiguate;
+import arch.actions.internal.AnalyzeSentence;
+import arch.actions.internal.DisambiguateEntity;
+import arch.actions.internal.DisambiguateSentence;
 import arch.actions.internal.GetMAHTNPlan;
 import arch.actions.internal.GetSparqlVerba;
 import arch.actions.internal.MementarSubscribe;
@@ -9,16 +11,13 @@ import arch.actions.internal.PR2MotionPlanDrop;
 import arch.actions.internal.PR2MotionPlanMoveArm;
 import arch.actions.internal.PR2MotionPlanPick;
 import arch.actions.internal.PR2MotionPlanPlace;
-import arch.actions.robot.Listen;
+import arch.actions.robot.LookAt;
 import arch.actions.robot.PR2MotionExecute;
 import arch.actions.robot.Say;
 import arch.actions.robot.ScanTable;
 import arch.actions.robot.Strafe;
 import arch.actions.ros.StartROSNode;
 import arch.agarch.LAASAgArch;
-import dialogue_as.dialogue_actionActionFeedback;
-import dialogue_as.dialogue_actionActionGoal;
-import dialogue_as.dialogue_actionActionResult;
 import dt_head_gestures.HeadScanActionFeedback;
 import dt_head_gestures.HeadScanActionGoal;
 import dt_head_gestures.HeadScanActionResult;
@@ -44,7 +43,6 @@ import rjs.arch.agarch.AbstractROSAgArch;
 
 public class ActionFactoryImpl extends AbstractActionFactory {
 	
-	private RjsActionClient<dialogue_actionActionGoal, dialogue_actionActionFeedback, dialogue_actionActionResult> dialogueActionClient;
 	private RjsActionClient<MoveActionGoal, MoveActionFeedback, MoveActionResult> strafeActionClient;
 	private RjsActionClient<planActionGoal, planActionFeedback, planActionResult> pr2MotionPlanActionClient;
 	private RjsActionClient<executeActionGoal, executeActionFeedback, executeActionResult> pr2MotionExecuteActionClient;
@@ -52,11 +50,6 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 	
 	public void setRosVariables() {
 		super.setRosVariables();
-		dialogueActionClient = new RjsActionClient<dialogue_actionActionGoal, dialogue_actionActionFeedback, dialogue_actionActionResult>(
-				rosnode.getConnectedNode(), 
-				rosnode.getParameters().getString("/supervisor/action_servers/dialogue"), 
-				dialogue_actionActionGoal._TYPE, dialogue_actionActionFeedback._TYPE, dialogue_actionActionResult._TYPE);
-		
 		strafeActionClient = new RjsActionClient<MoveActionGoal, MoveActionFeedback, MoveActionResult>(
 				rosnode.getConnectedNode(), 
 				rosnode.getParameters().getString("/supervisor/action_servers/strafe"), 
@@ -83,13 +76,16 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 		Action action = null;
 		switch(actionName) {
 			case "disambiguate":
-				action = new Disambiguate(actionExec, rosAgArch);
+				action = new DisambiguateEntity(actionExec, rosAgArch);
 				break;
 			case "sparqlVerbalization":
 				action = new GetSparqlVerba(actionExec, rosAgArch);
 				break;
-			case "listen":
-				action = new Listen(actionExec, rosAgArch, dialogueActionClient);
+			case "analyzeSentence":
+				action = new AnalyzeSentence(actionExec, rosAgArch);
+				break;
+			case "disambiSentence":
+				action = new DisambiguateSentence(actionExec, rosAgArch);
 				break;
 			case "say":
 				action = new Say(actionExec, rosAgArch);
@@ -141,6 +137,9 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 				break;
 			case "scanTable":
 				action = new ScanTable(actionExec, (LAASAgArch) rosAgArch, headScanActionClient);
+				break;
+			case "lookAt":
+				action = new LookAt(actionExec, rosAgArch);
 				break;
 			default:
 				break;

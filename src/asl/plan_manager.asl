@@ -1,37 +1,50 @@
 {include("common.asl")}
+{include("receiver.asl")}
+// TODO: plan manager is generic but not receiver. should put the receiver somewhere else
 
 actionStates(["planned","todo","ongoing","executed"])[ground].
 
-//abstractTask(0, "planned", "tidy_cubes", 0).
+wantedAction(Name,Agent,Params) :- action(ID,S,Name,Agent,Params,_,_) & (S=="todo" | S=="ongoing").
+
+//abstractTask(0, "planned", "tidy_cubes", (-1)).
 //abstractTask(1, "planned", "tidy_one", 0).
-//action(3, "planned", "robot_congratulate", "robot", ["human_0"], [8], 0).
-//action(4, "planned", "robot_tell_human_to_tidy", "robot", ["cube_GGTB","human_0","throw_box_green"], [], 1).
+//action(3, "planned", "robot_congratulate", "robot", ["Helmet_2"], [8], 0).
+//action(4, "planned", "robot_tell_human_to_tidy", "robot", ["cube_BBCG","Helmet_2","throw_box_green"], [], 1).
 //abstractTask(5, "planned", "wait_for_human", 1).
 //abstractTask(6, "planned", "tidy", 0).
-//action(7, "planned", "human_pick_cube", "human_0", ["cube_GGTB"], [4], 6).
-//action(8, "planned", "human_drop_cube", "human_0", ["throw_box_green"], [9], 6).
+//action(7, "planned", "human_pick_cube", "Helmet_2", ["cube_BBCG"], [4], 6).
+//action(8, "planned", "human_drop_cube", "Helmet_2", ["throw_box_green"], [9], 6).
 //action(9, "planned", "robot_wait_for_human_to_tidy", "robot", [], [7], 5).
-//action(11, "planned", "IDLE", "human_0", [], [3], 0).
+//action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
 
 //abstractTask(0, "planned", "tidy_cubes", (-1)).
 //abstractTask(1, "planned", "tidy_one", 0).
 //abstractTask(2, "planned", "tidy_cubes", 0).
-//action(3, "planned", "robot_congratulate", "robot", ["human_0"], [17], 0).
-//action(4, "planned", "robot_tell_human_to_tidy", "robot", ["cube_GBTB","human_0","throw_box_green"], [], 1).
+//action(3, "planned", "robot_congratulate", "robot", ["Helmet_2"], [17], 0).
+//action(4, "planned", "robot_tell_human_to_tidy", "robot", ["cube_GBTB","Helmet_2","throw_box_green"], [], 1).
 //abstractTask(5, "planned", "wait_for_human", 1).
 //abstractTask(6, "planned", "tidy", 0).
-//action(7, "planned", "human_pick_cube", "human_0", ["cube_GBTB"], [4], 6).
-//action(8, "planned", "human_drop_cube", "human_0", ["throw_box_green"], [9], 6).
+//action(7, "planned", "human_pick_cube", "Helmet_2", ["cube_GBTB"], [4], 6).
+//action(8, "planned", "human_drop_cube", "Helmet_2", ["throw_box_green"], [9], 6).
 //action(9, "planned", "robot_wait_for_human_to_tidy", "robot", [], [7], 5).
 //abstractTask(11, "planned", "tidy_one", 2).
-//action(13, "planned", "robot_tell_human_to_tidy", "robot", ["cube_GGCB","human_0","throw_box_green"], [8], 11).
+//action(13, "planned", "robot_tell_human_to_tidy", "robot", ["cube_GGCB","Helmet_2","throw_box_green"], [8], 11).
 //abstractTask(14, "planned", "wait_for_human", 11).
 //abstractTask(15, "planned", "tidy", 0).
-//action(16, "planned", "human_pick_cube", "human_0", ["cube_GGCB"], [13], 15).
-//action(17, "planned", "human_drop_cube", "human_0", ["throw_box_green"], [18], 15).
+//action(16, "planned", "human_pick_cube", "Helmet_2", ["cube_GGCB"], [13], 15).
+//action(17, "planned", "human_drop_cube", "Helmet_2", ["throw_box_green"], [18], 15).
 //action(18, "planned", "robot_wait_for_human_to_tidy", "robot", [], [16], 14).
-//action(20, "planned", "IDLE", "human_0", [], [3], (-1)).
+//action(20, "planned", "IDLE", "Helmet_2", [], [3], (-1)).
 
+//action(1, "planned", "robot_tell_human_to_tidy", "robot", ["cube_BBCG","Helmet_2","throw_box_green"], [], []).
+//action(2, "planned", "human_pick_cube", "Helmet_2", ["cube_BBCG"], [1], []).
+//action(3, "planned", "human_drop_cube", "Helmet_2", ["throw_box_green"], [2], []).
+//action(4, "planned", "robot_tell_human_to_tidy", "robot", ["cube_GGCB","Helmet_2","throw_box_green"], [3], []).
+//action(5, "planned", "human_pick_cube", "Helmet_2", ["cube_GGCB"], [4], []).
+//action(6, "planned", "human_drop_cube", "Helmet_2", ["throw_box_green"], [5], []).
+//action(7, "planned", "robot_tell_human_to_tidy", "robot", ["cube_GBTB","Helmet_2","throw_box_green"], [6], []).
+//action(8, "planned", "human_pick_cube", "Helmet_2", ["cube_GBTB"], [7], []).
+//action(9, "planned", "human_drop_cube", "Helmet_2", ["throw_box_green"], [8], []).
 
 !start.
 
@@ -41,14 +54,14 @@ actionStates(["planned","todo","ongoing","executed"])[ground].
 	!getRobotName;
 	!getHumanName.
 	
-+goal(Name, State) : State == received <-
++goal(Name, State) : State == received & not .substring("dtRR",Name) <-
 	?humanName(Human);
 	.concat("plan_manager/goals/",Name,"/name",GoalName);
 	.concat("plan_manager/goals/",Name,"/worldstate",GoalWS);
 	rjs.jia.get_param(GoalName, "String", N);
 	rjs.jia.get_param(GoalWS, "Map", G);
 	//[[name_t1,param1_t1,param2_t1],[name_t2, param1_t2]]
-	getPlan([[N,G]], [Human]);
+//	getPlan([[N,G]], [Human]);
 	-goal(Name, received)[source(supervisor)];
 	+goal(Name,active);
 	!setMementarSub;
@@ -95,7 +108,8 @@ actionStates(["planned","todo","ongoing","executed"])[ground].
 	
 +!updatePlanTasksStart(Decompo) : true.
 
-+!updatePlanTasksEnd(Decompo) : .count(action(P,S,_,_,_,_,Decompo) & S \== "executed", C) 	
++!updatePlanTasksEnd(Decompo) : abstractTask(_,_,_,_)
+							  &	.count(action(P,S,_,_,_,_,Decompo) & S \== "executed", C) 	
 							  & .count(abstractTask(PT,S,_,Decompo) & S \== "executed", CT)
 							  & C+CT == 0
 							  & Decompo \== -1<-	
@@ -118,8 +132,6 @@ actionStates(["planned","todo","ongoing","executed"])[ground].
 	-abstractTask(ID,nameX,NameX);
 	jia.insertTaskMementar(ID,NameX,end).
 	
-wantedAction(Name,Agent,Params) :- action(ID,S,Name,Agent,Params,_,_) & (S=="todo" | S=="ongoing").
-
 @evOngoing[atomic]
 +action(_,"ongoing",Name,Agent,Params)[source(_)] : action(ID,"todo",Name,Agent,Params,Preds,Decompo) <-
 	-action(_,"ongoing",Name,Agent,Params)[source(_)];

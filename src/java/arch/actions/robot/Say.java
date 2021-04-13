@@ -9,12 +9,12 @@ import rjs.utils.Tools;
 
 public class Say extends AbstractAction {
 	
-	private String actionID;
+	private double actionID;
 
 	public Say(ActionExec actionExec, AbstractROSAgArch rosAgArch) {
 		super(actionExec, rosAgArch);
 		setSync(true);
-		actionID = "_"+Math.round(Math.random()*1000000);
+		actionID = Math.round(Math.random()*1000000);
 	}
 
 	@Override
@@ -23,7 +23,7 @@ public class Say extends AbstractAction {
 		std_msgs.String str = rosAgArch.createMessage(std_msgs.String._TYPE);
 		str.setData(param);
 		getRosNode().publish("say", str); 
-		rosAgArch.addBelief("said(\""+param+"\")");
+		rosAgArch.addBelief("said(\""+param+"\","+actionID+")");
 		((LAASAgArch) rosAgArch).callInsertAction("speak_"+actionID, AbstractROSAgArch.getRosnode().getConnectedNode().getCurrentTime(), ActionIndicator.START);
 		Tools.sleep(4000);
 		((LAASAgArch) rosAgArch).callInsertAction("speak_"+actionID,AbstractROSAgArch.getRosnode().getConnectedNode().getCurrentTime(), ActionIndicator.END);

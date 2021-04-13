@@ -19,6 +19,7 @@ public class PR2MotionPlanDrop extends AbstractPR2MotionPlan {
 	protected void setGoalFields() {
 		goal.setAction("drop");
 		goal.setPlanGroup(Tools.removeQuotes(actionTerms.get(0).toString()));
+		goal.setBoxId(Tools.removeQuotes(actionTerms.get(1).toString()));
 	}
 	
 }

@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import org.ros.message.MessageListener;
 
 import jason.asSyntax.Literal;
+import jason.asSyntax.StringTermImpl;
 import mementar.MementarOccasion;
 import rjs.utils.Tools;
 
@@ -26,6 +27,7 @@ public class PlanManagerAgArch extends LAASAgArch {
 	public PlanManagerAgArch() {
 		super();
 		setMementarListener();
+		setDialogueListener();
 	}
 	
 
@@ -38,6 +40,16 @@ public class PlanManagerAgArch extends LAASAgArch {
 					perceptions.add(occasion);
 				}
 				
+			}
+		});
+	}
+	
+	public void setDialogueListener() {
+		rosnode.setSubListener("listen", new MessageListener<std_msgs.String>() {
+			
+			@Override
+			public void onNewMessage(std_msgs.String sentence) {
+				addBelief("sentence("+new StringTermImpl(sentence.getData())+")");
 			}
 		});
 	}
