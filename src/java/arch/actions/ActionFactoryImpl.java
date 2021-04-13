@@ -1,7 +1,7 @@
 package arch.actions;
 
 import arch.actions.internal.AnalyzeSentence;
-import arch.actions.internal.Disambiguate;
+import arch.actions.internal.DisambiguateEntity;
 import arch.actions.internal.DisambiguateSentence;
 import arch.actions.internal.GetMAHTNPlan;
 import arch.actions.internal.GetSparqlVerba;
@@ -76,7 +76,7 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 		Action action = null;
 		switch(actionName) {
 			case "disambiguate":
-				action = new Disambiguate(actionExec, rosAgArch);
+				action = new DisambiguateEntity(actionExec, rosAgArch);
 				break;
 			case "sparqlVerbalization":
 				action = new GetSparqlVerba(actionExec, rosAgArch);

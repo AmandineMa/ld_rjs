@@ -1,15 +1,17 @@
 plan_manager:
-  goals:
-     dt1: 
-        name: tidy_cubes
-        worldstate:
-           isInContainer:  
-              cube_BGTG:
-                 - throw_box_green
-              cube_GBTG:
-                 - throw_box_green
-     dtRR: robot_receiver
-                 
-  actsToMonitor:
-     - human_pick_cube
-     - human_drop_cube
+   goals:
+      dt1: 
+         name: tidy_cubes
+         worldstate:
+            isInContainer:  
+               cube_BGTG:
+                  - throw_box_green
+               cube_GBTG:
+                  - throw_box_green
+      dtRR: 
+         name: robot_receiver
+         container: throw_box_green               
+
+   actsToMonitor:
+      - human_pick_cube
+      - human_drop_cube

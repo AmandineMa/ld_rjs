@@ -1,18 +1,18 @@
 {include("common.asl")}
-//TODO plan manager is generic but not receiver. should put the receiver somewhere else
 {include("receiver.asl")}
+// TODO: plan manager is generic but not receiver. should put the receiver somewhere else
 
 actionStates(["planned","todo","ongoing","executed"])[ground].
 
 wantedAction(Name,Agent,Params) :- action(ID,S,Name,Agent,Params,_,_) & (S=="todo" | S=="ongoing").
 
-//abstractTask(0, "planned", "tidy_cubes", 0).
+//abstractTask(0, "planned", "tidy_cubes", (-1)).
 //abstractTask(1, "planned", "tidy_one", 0).
 //action(3, "planned", "robot_congratulate", "robot", ["Helmet_2"], [8], 0).
-//action(4, "planned", "robot_tell_human_to_tidy", "robot", ["cube_GGTB","Helmet_2","throw_box_green"], [], 1).
+//action(4, "planned", "robot_tell_human_to_tidy", "robot", ["cube_BBCG","Helmet_2","throw_box_green"], [], 1).
 //abstractTask(5, "planned", "wait_for_human", 1).
 //abstractTask(6, "planned", "tidy", 0).
-//action(7, "planned", "human_pick_cube", "Helmet_2", ["cube_GGTB"], [4], 6).
+//action(7, "planned", "human_pick_cube", "Helmet_2", ["cube_BBCG"], [4], 6).
 //action(8, "planned", "human_drop_cube", "Helmet_2", ["throw_box_green"], [9], 6).
 //action(9, "planned", "robot_wait_for_human_to_tidy", "robot", [], [7], 5).
 //action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
@@ -108,7 +108,8 @@ wantedAction(Name,Agent,Params) :- action(ID,S,Name,Agent,Params,_,_) & (S=="tod
 	
 +!updatePlanTasksStart(Decompo) : true.
 
-+!updatePlanTasksEnd(Decompo) : .count(action(P,S,_,_,_,_,Decompo) & S \== "executed", C) 	
++!updatePlanTasksEnd(Decompo) : abstractTask(_,_,_,_)
+							  &	.count(action(P,S,_,_,_,_,Decompo) & S \== "executed", C) 	
 							  & .count(abstractTask(PT,S,_,Decompo) & S \== "executed", CT)
 							  & C+CT == 0
 							  & Decompo \== -1<-	

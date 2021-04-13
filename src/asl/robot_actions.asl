@@ -6,6 +6,7 @@
 	lookAt(Object);
 //	.concat("I take ", Object, Sentence);
 	say("I take it");
+	+planPick("armUsed", right_arm);
 	planPick(Object);
 	execute("pick").
 	
@@ -13,37 +14,35 @@
 	!pick(Params).
 	
 +!remove(Params): true <-
-	!pick(Params);
-	!drop(Params).
+	.nth(0, Params, Object);
+	.nth(1, Params, Container);
+	!pick([Object]);
+	!drop([Container]).
 
 @place[atomic]
 +!place(Params) : planPick("armUsed", Arm) <-
-	.nth(0, Params,Box);
-	planPlace(Box, Arm);
+	.nth(0, Params,Container);
+	planPlace(Container, Arm);
 	execute("place");
 	-planPick("armUsed", Arm).
 
 -!place : true <- 
-	.print("no arm to use available").
+	.print("place failed").
 	
 	
 @drop[atomic]
 +!drop(Params) : planPick("armUsed", Arm) <-
-//	if(not .list(Params)) {
 		Sentence = "I drop it";
-//	} else {
-//		.nth(0, Params,Object);
-//	.concat("I drop ", Object, Sentence);
-//	}
 	say(Sentence);
-	planDrop(Arm);
+	.nth(0, Params, Container);
+	planDrop(Arm, Container);
 	execute("drop"); 
 	.concat(Arm,"_home",PoseName);
 	!move_arm([Arm, PoseName]);
 	-planPick("armUsed", Arm).
 	
 -!drop(Params) : true <- 
-	.print("no arm to use available").
+	.print("drop failed").
 	
 	
 @move[atomic]

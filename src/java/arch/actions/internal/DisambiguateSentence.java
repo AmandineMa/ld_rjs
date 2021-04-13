@@ -15,26 +15,22 @@ import jason.asSyntax.Term;
 import knowledge_sharing_planner_msgs.Disambiguation;
 import knowledge_sharing_planner_msgs.DisambiguationRequest;
 import knowledge_sharing_planner_msgs.DisambiguationResponse;
-import knowledge_sharing_planner_msgs.Merge;
-import knowledge_sharing_planner_msgs.MergeRequest;
 import knowledge_sharing_planner_msgs.MergeResponse;
 import knowledge_sharing_planner_msgs.SymbolTable;
 import knowledge_sharing_planner_msgs.Triplet;
 import knowledge_sharing_planner_msgs.Verbalization;
 import knowledge_sharing_planner_msgs.VerbalizationRequest;
 import knowledge_sharing_planner_msgs.VerbalizationResponse;
-import rjs.arch.actions.AbstractAction;
 import rjs.arch.agarch.AbstractROSAgArch;
 import rjs.utils.Tools;
 
-public class DisambiguateSentence extends AbstractAction {
+public class DisambiguateSentence extends AbstractDisambiguationAction {
 
 	public DisambiguateSentence(ActionExec actionExec, AbstractROSAgArch rosAgArch) {
 		super(actionExec, rosAgArch);
 		setSync(true);
 	}
 
-	//TODO effacer les beliefs quand ça plante au milieu
 	@Override
 	public void execute() {
 
@@ -68,33 +64,17 @@ public class DisambiguateSentence extends AbstractAction {
 				DisambiguationResponse disambiResp = getRosNode().callSyncService("disambiguate", disambiReq);
 
 				if(!disambiResp.getSuccess()) {
-					actionExec.setResult(false);
-					actionExec.setFailureReason(new LiteralImpl("disambiguation_not_found("+individual+")"), "could not find any disambiguation");
-					rosAgArch.removeBelief("mergedQuery(_)");
-					rosAgArch.removeBelief("sparql_input(_)");
-					rosAgArch.removeBelief("match(_)");
-					rosAgArch.removeBelief("sentence(_)"); 
-					rosAgArch.removeBelief("verba(disambi_objects_sentence,_)");
+					handleFailure(new LiteralImpl("disambiguation_not_found("+individual+")"));
 					return;
 				}
 
 				List<String> matchSparql = new ArrayList<String>();
 				matchSparql = disambiResp.getSparqlResult();
-
-				MergeRequest mergeReq = getRosNode().newServiceRequestFromType(Merge._TYPE);
-				mergeReq.setContextQuery(mergedQuery);
-				mergeReq.setBaseQuery(matchSparql);
-				mergeReq.setPartial(true);
-				MergeResponse mergeResp = getRosNode().callSyncService("ksp_merge", mergeReq);
+				
+				MergeResponse mergeResp = callMergeService(mergedQuery, matchSparql, true);
 
 				if(mergeResp == null || mergeResp.getMergedQuery().isEmpty()) {
-					actionExec.setResult(false);
-					actionExec.setFailureReason(new LiteralImpl("unpossible_merged("+Tools.arrayToStringArray(matchSparql)+")"), "could not merge");
-					rosAgArch.removeBelief("mergedQuery(_)");
-					rosAgArch.removeBelief("sparql_input(_)");
-					rosAgArch.removeBelief("match(_)");
-					rosAgArch.removeBelief("sentence(_)"); 
-					rosAgArch.removeBelief("verba(disambi_objects_sentence,_)");
+					handleFailure(new LiteralImpl("unpossible_merged("+Tools.arrayToStringArray(matchSparql)+")"));
 					return;
 				}
 
@@ -104,13 +84,7 @@ public class DisambiguateSentence extends AbstractAction {
 				VerbalizationResponse verbaResp = getRosNode().callSyncService("verbalize", verbaReq);
 
 				if(verbaResp == null || verbaResp.getVerbalization().isEmpty()) {
-					rosAgArch.removeBelief("mergedQuery(_)");
-					rosAgArch.removeBelief("sparql_input(_)");
-					rosAgArch.removeBelief("match(_)");
-					rosAgArch.removeBelief("sentence(_)"); 
-					rosAgArch.removeBelief("verba(disambi_objects_sentence,_)");
-					actionExec.setResult(false);
-					actionExec.setFailureReason(new LiteralImpl("no_verbalization("+Tools.arrayToStringArray(matchSparql)+")"), "could not find any verbalization");
+					handleFailure(new LiteralImpl("no_verbalization("+Tools.arrayToStringArray(matchSparql)+")"));
 					return;
 				}
 				question += ((question.isEmpty()) ? "" : "or ") + verbaResp.getVerbalization();
@@ -119,7 +93,7 @@ public class DisambiguateSentence extends AbstractAction {
 			rosAgArch.addBelief("verba(disambi_objects_sentence,"+new StringTermImpl(question)+")");
 			actionExec.setResult(true);
 		} else {
-			actionExec.setResult(false);
+			handleFailure("no_match_found");
 		}
 
 	}
@@ -135,6 +109,26 @@ public class DisambiguateSentence extends AbstractAction {
 			triplet.setOn(m.group(3));
 		}
 		return triplet;
+	}
+
+	@Override
+	protected String setFailure(String failureReason) {
+		String msg = new String();
+		switch(failureReason) {
+		case "disambiguation_not_found":
+			msg = "could not find any disambiguation (srv disambiguate)";
+			break;
+		case "unpossible_merged":
+			msg = "it was not possible to perform the merge (srv ksp_merge)";
+			break;
+		case "no_verbalization":
+			msg = "could not find any verbalization (srv verbalize)";
+			break;
+		case "no_match_found":
+			msg = "ask for disambiguation of sentence but no previous match";
+			break;
+		}
+		return msg;
 	}
 
 }

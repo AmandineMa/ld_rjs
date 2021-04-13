@@ -5,11 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import jason.asSemantics.ActionExec;
-import jason.asSyntax.Atom;
 import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.Term;
-import knowledge_sharing_planner_msgs.Merge;
-import knowledge_sharing_planner_msgs.MergeRequest;
 import knowledge_sharing_planner_msgs.MergeResponse;
 import knowledge_sharing_planner_msgs.Understand;
 import knowledge_sharing_planner_msgs.UnderstandRequest;
@@ -18,11 +15,10 @@ import ontologenius.OntologeniusSparqlResponse;
 import ontologenius.OntologeniusSparqlService;
 import ontologenius.OntologeniusSparqlServiceRequest;
 import ontologenius.OntologeniusSparqlServiceResponse;
-import rjs.arch.actions.AbstractAction;
 import rjs.arch.agarch.AbstractROSAgArch;
 import rjs.utils.Tools;
 
-public class AnalyzeSentence extends AbstractAction {
+public class AnalyzeSentence extends AbstractDisambiguationAction {
 	
 	private String sentence;
 	private String robotName;
@@ -51,18 +47,14 @@ public class AnalyzeSentence extends AbstractAction {
 			}
 			
 			String action = understandResp.getAction().toLowerCase();
-			handleAction(action);
+			handleActionSaid(action);
 
 			rosAgArch.addBelief("sparql_input("+Tools.arrayToStringArray(sparqlInput)+")");
-
-			MergeRequest mergeReq = getRosNode().newServiceRequestFromType(Merge._TYPE);
-			mergeReq.setContextQuery(Tools.removeQuotes((List<Term>) actionTerms.get(1)));
-			mergeReq.setBaseQuery(sparqlInput);
-			mergeReq.setPartial(false);
-			MergeResponse mergeResp = getRosNode().callSyncService("ksp_merge", mergeReq);
+			
+			MergeResponse mergeResp = callMergeService(Tools.removeQuotes((List<Term>) actionTerms.get(1)), sparqlInput, false);
 
 			if(mergeResp == null || mergeResp.getMergedQuery().isEmpty()) {
-				handleFailure("unpossible_merged");
+				handleFailure(new LiteralImpl("unpossible_merged("+Tools.arrayToStringArray(sparqlInput)+")"));
 				return;
 			}
 
@@ -82,17 +74,19 @@ public class AnalyzeSentence extends AbstractAction {
 				}
 				rosAgArch.addBelief("action", Arrays.asList("planned", action, robotName, new ArrayList<String>()));
 			} else {
-				List<String> object =  Arrays.asList(ontoSparqlResp.getResults().get(0).getValues().get(0));
-//				rosAgArch.addBelief("uniqueMatch("+ object +")");
-				//TODO faire un get robot name
+				List<String> params = new ArrayList<String>();
+				params.add(ontoSparqlResp.getResults().get(0).getValues().get(0));
+				if (action.equals("remove")) {
+					params.add(rosAgArch.findBel("container(_)").getTerm(0).toString());
+				}
 				if(!action.isEmpty())
-					rosAgArch.addBelief("action", Arrays.asList("todo", action, robotName, object));
+					rosAgArch.addBelief("action", Arrays.asList("todo", action, robotName, params));
 				else {
 					LiteralImpl actionBel =  (LiteralImpl) rosAgArch.findBel("action(\"planned\",_,\"robot\",_)");
 					if(actionBel != null)
-						rosAgArch.addBelief("action", Arrays.asList("todo", actionBel.getTerm(1), robotName, object));
+						rosAgArch.addBelief("action", Arrays.asList("todo", actionBel.getTerm(1), robotName, params));
 					else {
-						rosAgArch.addBelief("action", Arrays.asList("todo", action, robotName, object));
+						rosAgArch.addBelief("action", Arrays.asList("todo", action, robotName, params));
 					}
 						
 				}
@@ -105,13 +99,13 @@ public class AnalyzeSentence extends AbstractAction {
 		}
 	}
 
-	private void handleAction(String action) {
+	private void handleActionSaid(String action) {
 		if(action.isEmpty() && rosAgArch.findBel("mergedQuery(_)") == null) {
 			handleFailure("no_action");
 			return;
 		} else if(action.equals("drop")) {
 			clearBelief();
-			rosAgArch.addBelief("action", Arrays.asList("todo", action, robotName, "_"));
+			rosAgArch.addBelief("action", Arrays.asList("todo", action, robotName, Arrays.asList(rosAgArch.findBel("container(_)").getTerm(0).toString())));
 			actionExec.setResult(true);
 			return;
 		}
@@ -126,15 +120,7 @@ public class AnalyzeSentence extends AbstractAction {
 
 	}
 	
-	private void clearBelief() {
-		rosAgArch.removeBelief("mergedQuery(_)");
-		rosAgArch.removeBelief("sparql_input(_)");
-		rosAgArch.removeBelief("match(_)");
-		rosAgArch.removeBelief("sentence(_)"); 
-		rosAgArch.removeBelief("verba(disambi_objects_sentence,_)");
-	}
-	
-	private void handleFailure(String failureReason) {
+	protected String setFailure(String failureReason) {
 		String msg = new String();
 		switch(failureReason) {
 		case "not_understood":
@@ -152,9 +138,7 @@ public class AnalyzeSentence extends AbstractAction {
 			msg = "could not find any sparl match (srv sparql_human)";
 			break;
 		}
-		actionExec.setResult(false);
-		actionExec.setFailureReason(new Atom(failureReason), msg);
-		clearBelief();
+		return msg;
 	}
 
 }
