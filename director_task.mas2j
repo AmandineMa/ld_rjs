@@ -4,7 +4,7 @@ MAS director_task {
 	
 	agents:
 		supervisor [verbose=3] agentArchClass arch.agarch.SupervisorAgArch beliefBaseClass rjs.agent.TimeBB;
-		action_monitoring [verbose=2] agentArchClass arch.agarch.LAASAgArch;
+		action_monitoring [verbose=2] agentArchClass arch.agarch.LAASAgArch beliefBaseClass rjs.agent.TimeBB;
 
 	aslSourcePath:
 		"src/asl";

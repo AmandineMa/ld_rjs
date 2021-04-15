@@ -110,19 +110,37 @@ public class member_same_type extends DefaultInternalAction {
                     	if(member.isLiteral()) {
 	                    	List<Term> termsMember = ((LiteralImpl) member).getTerms();
 	                    	for(int i = 0; i < termsMember.size() ; i++) {
-	                    		String term = Tools.removeQuotes(termsMember.get(i).toString());
-	                    		String object = Tools.removeQuotes(((LiteralImpl)listElement).getTerms().get(i).toString());
-	                    		String type;
-	                    		Pattern p = Pattern.compile("[_0-9]+([A-Za-z]+)");
-								Matcher m = p.matcher(object);
-								if(m.find()) {
-									type = m.group(1);
-									List<String> isRightType = ((LAASAgArch) ts.getAgArch()).callOnto("getUp",term+" -s "+type).getValues();
-									if(isRightType == null || isRightType.isEmpty()) {
-										c = null;
-										break;
+	                    		if(termsMember.get(i).isString()) {
+		                    		String term = Tools.removeQuotes(termsMember.get(i).toString());
+		                    		String object = Tools.removeQuotes(((LiteralImpl)listElement).getTerms().get(i).toString());
+		                    		String type;
+		                    		Pattern p = Pattern.compile("[_0-9]+([A-Za-z]+)");
+									Matcher m = p.matcher(object);
+									if(m.find()) {
+										type = m.group(1);
+										List<String> isRightType = ((LAASAgArch) ts.getAgArch()).callOnto("getUp",term+" -s "+type).getValues();
+										if(isRightType == null || isRightType.isEmpty()) {
+											c = null;
+											break;
+										}
 									}
-								}
+	                    		} else if(termsMember.get(i).isList()) {
+	                    			List<Term> listTerm = (List<Term>) termsMember.get(i);
+	                    			String object = Tools.removeQuotes(((LiteralImpl)listElement).getTerms().get(i).toString());
+	                    			String type;
+		                    		Pattern p = Pattern.compile("[_0-9]+([A-Za-z]+)List");
+									Matcher m = p.matcher(object);
+									if(m.find()) {
+										type = m.group(1);
+										for(Term t : listTerm) {
+											String term = Tools.removeQuotes(t.toString());
+											List<String> isRightType = ((LAASAgArch) ts.getAgArch()).callOnto("getUp",term+" -s "+type).getValues();
+											if(isRightType == null || isRightType.isEmpty()) {
+												((ListTerm) c.get(object)).remove(t);
+											}
+										}
+									}
+	                    		}
 	                    	}
 	                    	if(c != null)
 	                    		return; //all elements match
@@ -135,18 +153,6 @@ public class member_same_type extends DefaultInternalAction {
             public void remove() {}
         };
 
-        /* -- old version of the implementation
-         * -- problem: even if the user wants only the first member, if search all
-        List<Unifier> answers = new ArrayList<Unifier>();
-        Unifier newUn = (Unifier)un.clone(); // clone un so as not to change it
-        for (Term t: lt) {
-            if (newUn.unifies(member, t)) {
-                // add this unification to the  answers
-                answers.add(newUn);
-                newUn = (Unifier)un.clone(); // creates a new clone of un
-            }
-        }
-        return answers.iterator();
-        */
+ 
     }
 }

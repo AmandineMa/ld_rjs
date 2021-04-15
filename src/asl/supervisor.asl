@@ -3,6 +3,7 @@
 /* Plans */
 
 +!start : true <- 
+//	rjs.jia.set_displayed_beliefs_to_file;
 //	rjs.jia.log_beliefs;
 //	.verbose(2);
 	configureNode;
@@ -42,3 +43,4 @@
 	
 +!reset : true <-
 	.broadcast(achieve, reset).
+	
