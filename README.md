@@ -1,2 +1,2 @@
 # ld-rjs
-LAAS-Dependt ROS-Jason-Supervisor
+LAAS-Dependent ROS-Jason-Supervisor
