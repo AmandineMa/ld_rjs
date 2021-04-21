@@ -1,0 +1,10 @@
+MAS ld_rjs {
+
+	infrastructure: Centralised
+	
+	agents:
+		supervisor [verbose=3] agentArchClass arch.agarch.SupervisorAgArch beliefBaseClass rjs.agent.TimeBB;
+
+	aslSourcePath:
+		"src/asl";
+}

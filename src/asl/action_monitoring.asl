@@ -10,14 +10,6 @@ isMovementRelatedToActions(Predicate,ActionList) :-
 	)
 	& rjs.function.length_allow_unground(ActionList) > 0.
 
-arePredicatesInListTrue(List) :- 
-	.count(
-		.member(Predicate,List) & 
-		Predicate, 
-		Count
-	) 
-	& rjs.function.length_allow_unground(List) == Count.
-
 isProgressionEffect(Predicate,ActionList) :-
 	.findall(
 		ActPred,
@@ -56,7 +48,7 @@ matchingProgressingActions(Predicate,ActionList,ActionList2) :-
 	)
 	& rjs.function.length_allow_unground(ActionList2) > 0.
 
-!start.
+//!start.
 
 // trigger with an action -> action started
 @startedS[atomic]

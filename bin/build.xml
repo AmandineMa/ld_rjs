@@ -8,12 +8,12 @@
                     August 23, 2019 - 16:51:08
 -->
 
-<project name   ="director_task"
+<project name   ="ld_rjs"
          basedir=".."
          default="run">
 
     <property environment="env"/>
-    <property name="mas2j.project.file" value="director_task.mas2j"/>
+    <property name="mas2j.project.file" value="ld_rjs.mas2j"/>
     <property name="debug" value=""/> <!-- use "-debug" to run in debug mode -->
     <property name="build.dir" value="${basedir}/bin/classes" />
 

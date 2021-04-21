@@ -6,10 +6,10 @@ action(place(Human,Pickable,Support),[hasInHand(Human,Pickable)],[handMovingTowa
 
 action(drop(Human,Pickable,Container),[hasInHand(Human,Pickable)],[handMovingToward(Human,ContainerList)],[~hasInHand(Human,Pickable)],[isIn(Pickable,Container)]).
 
-action(openContainer(Human,Drawer),[handEmpty(Human)],[handMovingToward(Human,DrawerList)],[hasInHand(Human,Drawer)],[isOpen(Drawer)]).
+action(openContainer(Human,Drawer),[handEmpty(Human)],[handMovingToward(Human,DrawerList)],[hasInHand(Human,Drawer)],[isOpen(Drawer,_)]).
 
-action(scan(Human,Pickable),[holding(Human,Scanner)],[handMovingToward(Human,PickableList)],[hasInHand(Human,Pickable)],[isScanned(Pickable)]).
+action(scan(Human,Pickable),[holding(Human,Scanner)],[handMovingToward(Human,PickableList)],[hasInHand(Human,Pickable)],[isScanned(Pickable,_)]).
 
-action(goTo(Human,Place),[],[moving(Human)],[],[]).
+action(goTo(Human,Place),[],[moving(Human,_)],[],[]).
 
-action(leave(Human),[],[moving(Human)],[],[isSeeing(Robot,Human)]).
+action(leave(Human),[],[moving(Human,_)],[],[isSeeing(Robot,Human)]).

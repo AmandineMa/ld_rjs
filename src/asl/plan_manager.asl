@@ -71,17 +71,7 @@ wantedAction(Name,Agent,Params) :- action(ID,S,Name,Agent,Params,_,_) & (S=="tod
 	true.
 	
 +goal(Name,State) : State == succeeded <-
-	for(monitoring(MonID,Act,_,_)){
-		mementarUnsubscribe(MonID,Act);
-	}.
-	
-+!setMementarSub : true <-
-	rjs.jia.get_param("/plan_manager/actsToMonitor", "List", ActsToMonitor);
-	for(.member(Y,ActsToMonitor)){
-//		.count(action(_,"planned",Y,_,_,_,_),C);
-		mementarSubscribe(Y,start,-1);
-		mementarSubscribe(Y,end,-1);
-	}.	
+	true.
 	
 +!updateActionState : true <-
 	for(action(ID,"planned",Name,Agent,Params,Preds,Decompo)){
@@ -164,6 +154,9 @@ wantedAction(Name,Agent,Params) :- action(ID,S,Name,Agent,Params,_,_) & (S=="tod
 	
 +action(ID,"todo",Name,Agent,Params,Preds,Decompo) : robotName(Agent) <-
 	.send(robot_executor, tell, action(ID,Name,Agent,Params)).
+	
++action(ID,"todo",Name,Agent,Params,Preds,Decompo) : humanName(Agent) <-
+	.send(human_management, tell, action(ID,Name,Agent,Params)).
 
 //temporary
 +action(ID,"todo",Name,Agent,Params,Preds,Decompo) : humanName(Agent) & Name == "IDLE" <-

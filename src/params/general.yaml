@@ -8,25 +8,25 @@ supervisor:
    onto_individual: 
       name: /ontologenius/individual/robot
       type: ontologenius/OntologeniusService
-   disambiguate: 
-      name: /KSP/disambiguate
-      type: knowledge_sharing_planner_msgs/Disambiguation
-   verbalize:
-      name: /KSP/verbalize
-      type: knowledge_sharing_planner_msgs/Verbalization
-   understand:
-      name: /KSP/understand
-      type: knowledge_sharing_planner_msgs/Understand
-   ksp_merge:
-      name: /KSP/merge
-      type: knowledge_sharing_planner_msgs/Merge
-   sparql_robot:
-      name: /ontologenius/sparql/robot
-      type: ontologenius/OntologeniusSparqlService
+#    disambiguate: 
+#       name: /KSP/disambiguate
+#       type: knowledge_sharing_planner_msgs/Disambiguation
+#    verbalize:
+#       name: /KSP/verbalize
+#       type: knowledge_sharing_planner_msgs/Verbalization
+#    understand:
+#       name: /KSP/understand
+#       type: knowledge_sharing_planner_msgs/Understand
+#    ksp_merge:
+#       name: /KSP/merge
+#       type: knowledge_sharing_planner_msgs/Merge
+#    sparql_robot:
+#       name: /ontologenius/sparql/robot
+#       type: ontologenius/OntologeniusSparqlService
    #TODO pas propre, service de l'humain à créer on the fly
-   sparql_human:
-      name: /ontologenius/sparql/Helmet_2
-      type: ontologenius/OntologeniusSparqlService
+#    sparql_human:
+#       name: /ontologenius/sparql/Helmet_2
+#       type: ontologenius/OntologeniusSparqlService
    mementar_sub:
       name: /mementar/subscribe/robot
       type: mementar/MementarOccasionSubscription
@@ -44,10 +44,10 @@ supervisor:
 #       name: /planner/plan_answer
 #       type: planner_msgs/Plan
 #       function: sub
-   listen:
-      name: /ros_stt/said
-      type: std_msgs/String
-      function: sub
+#    listen:
+#       name: /ros_stt/said
+#       type: std_msgs/String
+#       function: sub
    plan_request:
       name: /planner/request_new_plan
       type: planner_msgs/PlanRequest

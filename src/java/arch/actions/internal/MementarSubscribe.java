@@ -21,9 +21,11 @@ public class MementarSubscribe extends AbstractAction {
 
 	@Override
 	public void execute() {
-		String action = Tools.removeQuotes(actionTerms.get(0).toString());
-		String type = Tools.removeQuotes(actionTerms.get(1).toString());
-		int count = Integer.parseInt(actionTerms.get(2).toString());
+		String function = Tools.removeQuotes(actionTerms.get(0).toString());
+		String subject = Tools.removeQuotes(actionTerms.get(1).toString());
+		String predicate = Tools.removeQuotes(actionTerms.get(2).toString());
+		String object = Tools.removeQuotes(actionTerms.get(3).toString());
+		int count = Integer.parseInt(actionTerms.get(4).toString());
 		
 		ServiceResponseListener<MementarOccasionSubscriptionResponse> respListener = new ServiceResponseListener<MementarOccasionSubscriptionResponse>() {
 
@@ -34,13 +36,14 @@ public class MementarSubscribe extends AbstractAction {
 
 			@Override
 			public void onSuccess(MementarOccasionSubscriptionResponse resp) {
-				rosAgArch.addBelief("monitoring", Arrays.asList(resp.getId(),action,type,count));
+				rosAgArch.addBelief("monitoring", Arrays.asList(resp.getId(),function,subject,predicate,object,count));
 				setActionExecuted(true);
 			}
 		};
 		
 		MementarOccasionSubscriptionRequest req = getRosNode().newServiceRequestFromType(MementarOccasionSubscription._TYPE);
-		req.setData("[add]"+action+"|_|"+type);
+		String data = "["+function+"]"+subject+"|"+predicate+"|"+object;
+		req.setData(data);
 		req.setCount(count);
 		getRosNode().callAsyncService("mementar_sub", respListener, req);
 	}
