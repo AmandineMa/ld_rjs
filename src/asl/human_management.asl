@@ -5,9 +5,7 @@
 +!start : true <-
 	rjs.jia.log_beliefs;
 	.verbose(2);
-//	++action(1, "pick", "Helmet_2", ["cube_BBCG"]);
-//	.wait(2000);
-//	+possibleFinishedActions([pick("Helmet_2","cube_BBCG")]).
+//	++action(1, "pick", "human_0", ["cube_BBCG"]);
 	!setActionsMementarMonitoring.
 
 +!setActionsMementarMonitoring : true <-
@@ -20,22 +18,23 @@
 
 +!setMementarMonitoring(BelList) : true <-
 	for(.member(B,BelList)){
-		B=..[Pred,[T1,T2],[]];
+		B=..[Prop,[T1,T2],[]];
 		if(rjs.jia.unnamedvar2string(T2,T) & .substring("List",T)){
 			Function="?";
-		}elif(rjs.jia.negated_literal(Pred)){
+			jia.set_predicate_with_list(Prop);
+		}elif(rjs.jia.negated_literal(Prop)){
 			Function="del";
 		}else{
 			Function="add";
 		}
-		.term2string(Pred,PredS);
-		.delete("~",PredS,PredF)
-		if(not rjs.jia.believes(monitoring(_,Function,"?",PredF,"?",_))){
-			mementarSubscribe(Function,"?",PredF,"?",-1);
+		.term2string(Prop,PropS);
+		.delete("~",PropS,PropF)
+		if(not rjs.jia.believes(monitoring(_,Function,"?",PropF,"?",_))){
+			mementarSubscribe(Function,"?",PropF,"?",-1);
 		};
 	}.
 	
 +action(ID,Name,Agent,Params) : true <-
-	.wait(possibleFinishedActions(A) & .member(M,A) & M=..[Pred,[T1,T2],[]] & .term2string(N,Name) & Pred==N & T1==Agent & .nth(0,Params,P) & T2==P);
+	.wait(possibleFinishedActions(A) & .member(M,A) & M=..[Prop,[T1,T2],[]] & .term2string(N,Name) & Prop==N & T1==Agent & .nth(0,Params,P) & T2==P);
 	.print(hey).
 	

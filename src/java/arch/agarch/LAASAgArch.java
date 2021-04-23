@@ -1,5 +1,7 @@
 package arch.agarch;
 
+import java.util.ArrayList;
+
 import org.ros.message.Time;
 
 import mementar.MementarAction;
@@ -9,6 +11,8 @@ import ontologenius.OntologeniusServiceResponse;
 import rjs.arch.agarch.AbstractROSAgArch;
 
 public class LAASAgArch extends AbstractROSAgArch {
+	
+	protected ArrayList<Integer> monitoringIDs = new ArrayList<Integer>();
 
 	public LAASAgArch() {
 		super();
@@ -40,5 +44,12 @@ public class LAASAgArch extends AbstractROSAgArch {
 		rosnode.publish("insert_action", memAction); 
 	}
 	
+	public void addMonitoringID(Integer id) {
+		monitoringIDs.add(id);
+	}
+	
+	public void removeMonitoringID(Integer id) {
+		monitoringIDs.remove(id);
+	}
 
 }

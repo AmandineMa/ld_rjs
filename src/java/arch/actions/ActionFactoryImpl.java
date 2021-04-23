@@ -115,7 +115,7 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 				action = new GetHATPPlan(actionExec, rosAgArch);
 				break;
 			case "mementarSubscribe":
-				action = new MementarSubscribe(actionExec, rosAgArch);
+				action = new MementarSubscribe(actionExec, (LAASAgArch) rosAgArch);
 				break;
 			case "mementarUnsubscribe":
 				action = new MementarUnsubscribe(actionExec, rosAgArch);

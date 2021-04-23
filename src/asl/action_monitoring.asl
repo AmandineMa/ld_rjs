@@ -55,12 +55,12 @@ matchingProgressingActions(Predicate,ActionList,ActionList2) :-
 +NewPredicate[source(percept)] :  isMovementRelatedToActions(NewPredicate,ActionList) <-
 	!addPossibleStartedActions(ActionList).	
 	
-+!addPossibleStartedActions(ActionList) : possibleStartedActions(ActionListPrev) & .intersection(ActionList,ActionListPrev,I) & .length(I)==.length(ActionList) <-
++!addPossibleStartedActions(ActionList) : possibleStartedActions(ActionListPrev) & .intersection(ActionList,ActionListPrev,I) & I > 0 <-
 	-possibleStartedActions(ActionListPrev);
-	+possibleStartedActions(ActionList).
+	++possibleStartedActions(ActionList).
 
 +!addPossibleStartedActions(ActionList) : true <-
-	+possibleStartedActions(ActionList).
+	++possibleStartedActions(ActionList).
 
 // from action started -> action progressing
 @progressS1[atomic]
@@ -87,14 +87,14 @@ matchingProgressingActions(Predicate,ActionList,ActionList2) :-
 	
 // wait for an effect after an observed movement finished
 @unknownS
--NewPredicate[source(percept)] :  isMovementRelatedToActions(NewPredicate,ActionList) 
-								& possibleStartedActions(ActionList) <-
++possibleStartedActions(ActionList) :  true <-
 		.wait(possibleProgressingActions(A) & .intersection(A,ActionList,I) & .length(I)==.length(A)) 
 	||| .wait(possibleFinishedActions(A) & .intersection(A,ActionList,I)  & .length(I)==.length(A))
 	||| !timeoutMovement(ActionList).
 
 +!timeoutMovement(ActionList) : true <-
-	.wait(5000);
+	.wait(100000);
+	.print("timeout movement");
 	-possibleStartedActions(ActionList).
 	
 +possibleProgressingActions(ActionList) : true <-
@@ -117,18 +117,22 @@ matchingProgressingActions(Predicate,ActionList,ActionList2) :-
 //	.verbose(2);
 //	.wait(1000);
 //	+handEmpty("human_0")[source(percept)];
-//	+isOn("cube_GGTB","table_1")[source(percept)];
-//	+isOn("cube_BGTB","table_1")[source(percept)];
-//	+isOn("szszsz","table_1")[source(percept)];
-//	.wait(1000);
-//	++handMovingToward("human_0",["cube_GGTB","obj2","cube_BGTB"])[source(percept)];
+//	+isOnTopOf("cube_GGTB","table_1")[source(percept)];
+//	+isOnTopOf("cube_BGTB","table_1")[source(percept)];
+//	+isOnTopOf("szszsz","table_1")[source(percept)];
 //	.wait(2000);
+//	++handMovingToward("human_0","cube_GGTB")[source(percept)];
+//	++handMovingToward("human_0","obj2")[source(percept)];
+//	++handMovingToward("human_0","cube_BGTB")[source(percept)];
+////	++handMovingToward("human_0",["cube_GGTB","obj2","cube_BGTB"])[source(percept)];
+//	.wait(2000);
+////	++handMovingToward("human_0",["cube_GGTB","obj3"])[source(percept)];
 ////	--handMovingToward("human_0",["cube_GGTB","obj2","cube_BGTB"])[source(percept)];
 ////	.wait(2000);
 //	++hasInHand("human_0","cube_GGTB")[source(percept)];
 //	.wait(2000);
-//	--isOn("cube_GGTB","table_1")[source(percept)];
-//	++~isOn("cube_GGTB","table_1")[source(percept)].
+//	--isOnTopOf("cube_GGTB","table_1")[source(percept)];
+//	++~isOnTopOf("cube_GGTB","table_1")[source(percept)].
 	
 //test place
 //+!start : true <-
@@ -138,16 +142,16 @@ matchingProgressingActions(Predicate,ActionList,ActionList2) :-
 //	+bouh;
 //	+hasInHand("human_0","cube_GGTB")[source(percept)];
 //	+hasInHand("human_0","cube_BBCG")[source(percept)];
-//	.wait(1000);
-//	++handMovingToward("human_0",["table_1","obj2","cube_BGTB"])[source(percept)];
 //	.wait(2000);
-//	++handMovingToward("human_0",["table_1"])[source(percept)];
-//	.wait(1000);
-//	--handMovingToward("human_0",["table_1","obj2","cube_BGTB"])[source(percept)];
+//	++handMovingToward("human_0",["table_1","obj2","cube_BGTB"])[source(percept)];
+////	.wait(2000);
+////	++handMovingToward("human_0",["table_1"])[source(percept)];
+//	.wait(2000);
+////	--handMovingToward("human_0",["table_1","obj2","cube_BGTB"])[source(percept)];
 //	--hasInHand("human_0","cube_BBCG")[source(percept)];
 //	+~hasInHand("human_0","cube_BBCG")[source(percept)];
 //	.wait(2000);
-//	+isOn("cube_BBCG","table_1")[source(percept)].
+//	+isOnTopOf("cube_BBCG","table_1")[source(percept)].
 	
 //test drop
 //+!start : true <-
@@ -157,12 +161,12 @@ matchingProgressingActions(Predicate,ActionList,ActionList2) :-
 //	+bouh;
 //	+hasInHand("human_0","cube_GGTB")[source(percept)];
 //	+hasInHand("human_0","cube_BBCG")[source(percept)];
-//	.wait(1000);
+//	.wait(2000);
 //	++handMovingToward("human_0",["throw_box_green","table_1"])[source(percept)];
 //	.wait(2000);
-//	++handMovingToward("human_0",["throw_box_green"])[source(percept)];
-//	--handMovingToward("human_0",["throw_box_green"])[source(percept)];
-//	.wait(1000);
+////	++handMovingToward("human_0",["throw_box_green"])[source(percept)];
+////	--handMovingToward("human_0",["throw_box_green","table_1"])[source(percept)];
+//	.wait(2000);
 //	--hasInHand("human_0","cube_BBCG")[source(percept)];
 //	+~hasInHand("human_0","cube_BBCG")[source(percept)];
 //	.wait(2000);

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.ros.exception.RemoteException;
 import org.ros.node.service.ServiceResponseListener;
 
+import arch.agarch.LAASAgArch;
 import jason.asSemantics.ActionExec;
 import mementar.MementarOcassionUnsubscription;
 import mementar.MementarOcassionUnsubscriptionRequest;
@@ -34,6 +35,7 @@ public class MementarUnsubscribe extends AbstractAction {
 			@Override
 			public void onSuccess(MementarOcassionUnsubscriptionResponse resp) {
 				rosAgArch.removeBelief("monitoring", Arrays.asList(resp.getId(),action,"_","_"));
+				((LAASAgArch) rosAgArch).addMonitoringID(resp.getId());
 				setActionExecuted(true);
 			}
 		};

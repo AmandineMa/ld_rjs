@@ -1,10 +1,13 @@
 package jia;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import arch.agarch.LAASAgArch;
 import jason.JasonException;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
@@ -13,8 +16,10 @@ import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.LogicalFormula;
+import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 import jason.asSyntax.VarTerm;
+import rjs.utils.Predicate;
 
 /**
 
@@ -55,14 +60,19 @@ public class findall extends DefaultInternalAction {
         ListTerm tail = all;
         Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
         ListTerm newAll = new ListTermImpl();
+        // iteration on actions from the human_actions model
         while (iu.hasNext()) {
         	Unifier u = iu.next();
-        	// found action predicates
         	ListTerm temp = new ListTermImpl();
             tail = tail.append(var.capply(u));
+            // find terms of _NumXList and match them with the unnamed var of type _NumX
             temp = matchListElements(tail, u);
-            temp = attribuateValuesFromPrecond(ts, temp, u);
-            newAll.addAll(checkPrecond(ts, temp, u));
+            try {
+            	//check if the preconditions are in the ontology
+            	newAll.addAll(handlePreconditions(ts, temp, u));
+            } catch(Exception e) {
+            	//no need to do anything
+            }
         }
         return un.unifies(args[2], newAll);
     }
@@ -109,87 +119,100 @@ public class findall extends DefaultInternalAction {
         return newAll;
     }
     
-    private ListTerm attribuateValuesFromPrecond(TransitionSystem ts, ListTerm tail, Unifier u) {
-    	ListTerm newAll = new ListTermImpl();
+    private ListTerm handlePreconditions(TransitionSystem ts, ListTerm tail, Unifier u) throws Exception {
+    	HashSet<Literal> set = new  HashSet<Literal>();
+    	// iterator on the preconditions of the given action
     	Iterator<Term> preconditionIte = ((ListTerm) u.get("Preconditions")).iterator();
     	while(preconditionIte.hasNext()) {
     		Literal precondition = (Literal) preconditionIte.next();
-    		Iterator<Literal> belIte = ts.getAg().getBB().getCandidateBeliefs((Literal) precondition, u);
-    		if(belIte != null) {
-    			
-    			Iterator<Term> tailIte = tail.iterator();
-    			while(tailIte.hasNext()) {
-    				// an action predicate
-    				Literal element = (Literal) tailIte.next();
-    				// terms of the action predicate
-    				List<Term> elementTerms = element.getTerms();
-    				// iteration on the terms
-    				boolean noUnnamedVar = true;
-    				for(int i = 0; i < elementTerms.size(); i++) {
-    					// we check if the term is an unnamed var, if not do not need to do anything
-    					if(elementTerms.get(i).isUnnamedVar()) {
-    						noUnnamedVar = false;
-    						for(int j = 0; j < precondition.getTerms().size(); j++) {
-    							Term precondTerm = precondition.getTerm(j);
-    							if(precondTerm.equals(elementTerms.get(i))){
-    								while(belIte.hasNext()) {
-	    								Literal elementNew = element.copy();
-	            						elementNew.getTerms().remove(i);
-	            						elementNew.getTerms().add(i, belIte.next().getTerm(j));
-	            						newAll.add(elementNew);
-    								}
-    								belIte = ts.getAg().getBB().getCandidateBeliefs((Literal) precondition, u);
-    							}
+    		// list in case there are multiple possible predicates, with different values of an unnamed var
+    		ListTerm preconditionVariations = new ListTermImpl();
+    		// iteration on the subject and object of the precondition (size = 2)
+    		for(int i = 0; i < precondition.getTerms().size(); i++) {
+    			Term t = precondition.getTerm(i);
+    			// all t are unnamed var, we check if they have a value
+				Term res = u.get((VarTerm)t);
+				precondition.setTerm(i, res == null ? t : res);
+				// if t has no value in u, we try to see if it has a value in an unnamed var Xlist
+				if(res == null) {
+					Iterator<VarTerm> varTermIte = u.iterator();
+					// iteration on all the elements of u
+					while(varTermIte.hasNext()) {
+						VarTerm varTerm = varTermIte.next();
+						// only the unnamed elements are of interest and we are not interested in t with no type (of the form _Num_Num,just _ in the human_actions model)
+						if(varTerm.isUnnamedVar() && t.toString().matches("[_0-9]+([A-Za-z]+)")) {
+							// we check if varTerm name (_NumXList) contains t name (_NumY) -> check if X == Y
+    						if(varTerm.toString().contains(t.toString().replaceAll("[_0-9]+",""))) {
+    							// we get the values of the list (should always be a list)
+    							Term termsVarTerm = u.get(varTerm);
+    							// we add the precondition with the possible values in preconditionVariations
+								Iterator<Term> termsVarTermIte = ((ListTerm) termsVarTerm).iterator();
+								while(termsVarTermIte.hasNext()) {
+									precondition.setTerm(i, termsVarTermIte.next());
+									preconditionVariations.add(precondition.copy());
+								}
     						}
-    					}
-    				}
-    				if(noUnnamedVar && !newAll.contains(element)) {
-    					newAll.add(element);
-    				}
+						}
+					}
     			}
+    		}
+    		if(!preconditionVariations.isEmpty()) {
+	    		for(Term t : preconditionVariations) {
+	    			set.addAll(checkPrecondInOnto(ts, tail, (Literal) t));
+	    		}
     		} else {
-    			return new ListTermImpl();
+    			set.addAll(checkPrecondInOnto(ts, tail, precondition));
     		}
     	}
-
+    	ListTerm newAll = new ListTermImpl();
+    	newAll.addAll(set);
     	return newAll;
     }
     
-   private ListTerm checkPrecond(TransitionSystem ts, ListTerm tail, Unifier u) {
-	   ListTerm newAll = new ListTermImpl();
-	   Iterator<Term> preconditionIte = ((ListTerm) u.get("Preconditions")).iterator();
-	   Literal actPred = (Literal) u.get("ActPred");
-	   Iterator<Term> tailIte = tail.iterator();
-		while(tailIte.hasNext()) {
-			// an action predicate
-			Literal element = (Literal) tailIte.next();
-			// terms of the action predicate
-			List<Term> elementTerms = element.getTerms();
-			// iteration on the terms
-			while(preconditionIte.hasNext()) {
-				Literal precond =  (Literal) preconditionIte.next();
-				Literal newPrecond = precond.copy();
-				int j = 0;
-				Iterator<Term> precondTermsIte = precond.getTerms().iterator();
-				while(precondTermsIte.hasNext()) {
-					VarTerm precondTerm = (VarTerm) precondTermsIte.next();
-					for(int i = 0; i < elementTerms.size(); i++) {
-						if(u.get(precondTerm) != null) {
-							newPrecond.setTerm(j, u.get(precondTerm));
-							break;
-						} else if(precondTerm.equals(actPred.getTerm(i))) {
-							newPrecond.setTerm(j, elementTerms.get(i));
-							break;
-						}
-					}
-					if(ts.getAg().believes(newPrecond, u) && !newAll.contains(element)) {
-						newAll.add(element);
-					}
-					j++;
+    private HashSet<Literal> checkPrecondInOnto(TransitionSystem ts, ListTerm tail, Literal precondition) throws Exception {
+    	Predicate predicate = new Predicate(precondition);
+		List<String> isInOnto = new ArrayList<String>();
+		if(!predicate.object.startsWith("_") && !predicate.subject.startsWith("_")) {
+			// should never happen with the written action model for now
+			throw new Exception("not handled case");
+		} else if(predicate.object.startsWith("_") && !predicate.subject.startsWith("_")) {
+			isInOnto = ((LAASAgArch) ts.getAgArch()).callOnto("getOn",predicate.subject+":"+predicate.property).getValues();
+			return addOntoResultsToList(ts, predicate, tail, precondition.getTerm(1), isInOnto);
+		} else if(predicate.subject.startsWith("_") && !predicate.object.startsWith("_")) {
+			isInOnto = ((LAASAgArch) ts.getAgArch()).callOnto("getFrom",predicate.object+":"+predicate.property).getValues();
+			return addOntoResultsToList(ts, predicate, tail, precondition.getTerm(0), isInOnto);
+		} 
+		// should never happen with the written action model for now
+		throw new Exception("not handled case");
+    }
+    
+    private HashSet<Literal> addOntoResultsToList(TransitionSystem ts, Predicate predicate, ListTerm tail, Term varTerm, List<String> isInOnto) throws Exception {
+    	HashSet<Literal> elementsToAdd = new HashSet<Literal>();
+		if(!isInOnto.isEmpty()) {
+			Iterator<Term> tailIte = tail.iterator();
+			while(tailIte.hasNext()) {
+				Literal element = (Literal) tailIte.next();
+				List<Term> elementTerms = element.getTerms();
+				int index = elementTerms.indexOf(varTerm);
+				if(index != -1) {
+    				for(String obj : isInOnto) {
+    					Literal elementNew = element.copy();
+						elementNew.getTerms().set(index, new StringTermImpl(obj));
+						elementsToAdd.add(elementNew);
+    				}
+				} else {
+					elementsToAdd.add(element);
 				}
 			}
-			preconditionIte = ((ListTerm) u.get("Preconditions")).iterator();
+		} else {
+			throw new Exception("one of the precondition is invalid");
 		}
-		return newAll;
-   }
+		return elementsToAdd;
+    }
 }
+
+
+
+
+
+
