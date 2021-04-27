@@ -55,7 +55,7 @@ matchingProgressingActions(Predicate,ActionList,ActionList2) :-
 +NewPredicate[source(percept)] :  isMovementRelatedToActions(NewPredicate,ActionList) <-
 	!addPossibleStartedActions(ActionList).	
 	
-+!addPossibleStartedActions(ActionList) : possibleStartedActions(ActionListPrev) & .intersection(ActionList,ActionListPrev,I) & I > 0 <-
++!addPossibleStartedActions(ActionList) : possibleStartedActions(ActionListPrev) & .intersection(ActionList,ActionListPrev,I) & .length(I) > 0 <-
 	-possibleStartedActions(ActionListPrev);
 	++possibleStartedActions(ActionList).
 
@@ -72,6 +72,8 @@ matchingProgressingActions(Predicate,ActionList,ActionList2) :-
 @overS[atomic]
 +NewPredicate[source(percept)] : isNecessaryEffect(NewPredicate,ActionList) 
 							   & (matchingProgressingActions(Predicate,ActionList,ActionList2) | matchingStartedActions(Predicate,ActionList,ActionList2))<-
+	jia.update_action_list(possibleStartedActions,ActionList2);	
+	jia.update_action_list(possibleProgressingActions,ActionList2);								   
 	++possibleFinishedActions(ActionList2).
 
 // trigger with a progression effect -> action progressing
@@ -83,93 +85,35 @@ matchingProgressingActions(Predicate,ActionList,ActionList2) :-
 // trigger with a necessary effect -> action over
 @overS2[atomic]
 +NewPredicate[source(percept)] : isNecessaryEffect(NewPredicate,ActionList) & jia.exist_possible_agent(ActionList,ActionList2) <-
+	jia.update_action_list(possibleStartedActions,ActionList2);	
+	jia.update_action_list(possibleProgressingActions,ActionList2);
 	++possibleFinishedActions(ActionList2).
 	
 // wait for an effect after an observed movement finished
 @unknownS
 +possibleStartedActions(ActionList) :  true <-
-		.wait(possibleProgressingActions(A) & .intersection(A,ActionList,I) & .length(I)==.length(A)) 
-	||| .wait(possibleFinishedActions(A) & .intersection(A,ActionList,I)  & .length(I)==.length(A))
+		.wait(possibleProgressingActions(A) & .intersection(A,ActionList,I) & .length(I) >0) 
+	||| .wait(possibleFinishedActions(A) & .intersection(A,ActionList,I)  & .length(I) >0)
 	||| !timeoutMovement(ActionList).
 
 +!timeoutMovement(ActionList) : true <-
-	.wait(100000);
-	.print("timeout movement");
-	-possibleStartedActions(ActionList).
+	.wait(20000);
+	// ne fonctionne pas sans le add_time !! pourquoi ?? parce qu'ajouté via code ??
+	-possibleStartedActions(ActionList)[add_time(_)].
 	
 +possibleProgressingActions(ActionList) : true <-
-	.wait(possibleFinishedActions(A) & .sublist(A,ActionList))
+	.wait(possibleFinishedActions(A) & .intersection(A,ActionList,I) & .length(I) >0)
 	||| !timeoutProgressing(ActionList).
 
 // TODO timeout should be action type dependent
 +!timeoutProgressing(ActionList) : true <-
-	.wait(10000);
-	-possibleProgressingActions(ActionList);
-	.findall(possibleStartedActions(L), possibleStartedActions(L) & .intersection(L,ActionList,I) & .length(I)==.length(ActionList),BelList);
-	for(.member(B,BelList)){
-		-B;
+	.wait(20000);
+	-possibleProgressingActions(ActionList)[add_time(_)];
+	.findall(possibleStartedActions(A),possibleStartedActions(A) & .intersection(A,ActionList,I) & .length(I)>0,L);
+	for(.member(M,L)){
+		-M;
+		+M;
 	}.
 	
-	
-//test pick
-//+!start : true <-
-//	rjs.jia.log_beliefs;
-//	.verbose(2);
-//	.wait(1000);
-//	+handEmpty("human_0")[source(percept)];
-//	+isOnTopOf("cube_GGTB","table_1")[source(percept)];
-//	+isOnTopOf("cube_BGTB","table_1")[source(percept)];
-//	+isOnTopOf("szszsz","table_1")[source(percept)];
-//	.wait(2000);
-//	++handMovingToward("human_0","cube_GGTB")[source(percept)];
-//	++handMovingToward("human_0","obj2")[source(percept)];
-//	++handMovingToward("human_0","cube_BGTB")[source(percept)];
-////	++handMovingToward("human_0",["cube_GGTB","obj2","cube_BGTB"])[source(percept)];
-//	.wait(2000);
-////	++handMovingToward("human_0",["cube_GGTB","obj3"])[source(percept)];
-////	--handMovingToward("human_0",["cube_GGTB","obj2","cube_BGTB"])[source(percept)];
-////	.wait(2000);
-//	++hasInHand("human_0","cube_GGTB")[source(percept)];
-//	.wait(2000);
-//	--isOnTopOf("cube_GGTB","table_1")[source(percept)];
-//	++~isOnTopOf("cube_GGTB","table_1")[source(percept)].
-	
-//test place
-//+!start : true <-
-//	rjs.jia.log_beliefs;
-//	.verbose(2);
-//	.wait(1000);
-//	+bouh;
-//	+hasInHand("human_0","cube_GGTB")[source(percept)];
-//	+hasInHand("human_0","cube_BBCG")[source(percept)];
-//	.wait(2000);
-//	++handMovingToward("human_0",["table_1","obj2","cube_BGTB"])[source(percept)];
-////	.wait(2000);
-////	++handMovingToward("human_0",["table_1"])[source(percept)];
-//	.wait(2000);
-////	--handMovingToward("human_0",["table_1","obj2","cube_BGTB"])[source(percept)];
-//	--hasInHand("human_0","cube_BBCG")[source(percept)];
-//	+~hasInHand("human_0","cube_BBCG")[source(percept)];
-//	.wait(2000);
-//	+isOnTopOf("cube_BBCG","table_1")[source(percept)].
-	
-//test drop
-//+!start : true <-
-//	rjs.jia.log_beliefs;
-//	.verbose(2);
-//	.wait(1000);
-//	+bouh;
-//	+hasInHand("human_0","cube_GGTB")[source(percept)];
-//	+hasInHand("human_0","cube_BBCG")[source(percept)];
-//	.wait(2000);
-//	++handMovingToward("human_0",["throw_box_green","table_1"])[source(percept)];
-//	.wait(2000);
-////	++handMovingToward("human_0",["throw_box_green"])[source(percept)];
-////	--handMovingToward("human_0",["throw_box_green","table_1"])[source(percept)];
-//	.wait(2000);
-//	--hasInHand("human_0","cube_BBCG")[source(percept)];
-//	+~hasInHand("human_0","cube_BBCG")[source(percept)];
-//	.wait(2000);
-//	+isIn("cube_BBCG","throw_box_green")[source(percept)].	
 
 	
