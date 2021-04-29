@@ -19,6 +19,7 @@ import jason.asSyntax.LogicalFormula;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
 import jason.asSyntax.VarTerm;
+import jason.util.Pair;
 import rjs.utils.Predicate;
 
 /**
@@ -120,56 +121,50 @@ public class findall extends DefaultInternalAction {
     }
     
     private ListTerm handlePreconditions(TransitionSystem ts, ListTerm tail, Unifier u) throws Exception {
-    	HashSet<Literal> set = new  HashSet<Literal>();
-    	// iterator on the preconditions of the given action
-    	Iterator<Term> preconditionIte = ((ListTerm) u.get("Preconditions")).iterator();
-    	while(preconditionIte.hasNext()) {
-    		Literal precondition = (Literal) preconditionIte.next();
-    		// list in case there are multiple possible predicates, with different values of an unnamed var
-    		ListTerm preconditionVariations = new ListTermImpl();
-    		// iteration on the subject and object of the precondition (size = 2)
-    		for(int i = 0; i < precondition.getTerms().size(); i++) {
-    			Term t = precondition.getTerm(i);
-    			// all t are unnamed var, we check if they have a value
-				Term res = u.get((VarTerm)t);
-				precondition.setTerm(i, res == null ? t : res);
-				// if t has no value in u, we try to see if it has a value in an unnamed var Xlist
-				if(res == null) {
-					Iterator<VarTerm> varTermIte = u.iterator();
-					// iteration on all the elements of u
-					while(varTermIte.hasNext()) {
-						VarTerm varTerm = varTermIte.next();
-						// only the unnamed elements are of interest and we are not interested in t with no type (of the form _Num_Num,just _ in the human_actions model)
-						if(varTerm.isUnnamedVar() && t.toString().matches("[_0-9]+([A-Za-z]+)")) {
-							// we check if varTerm name (_NumXList) contains t name (_NumY) -> check if X == Y
-    						if(varTerm.toString().contains(t.toString().replaceAll("[_0-9]+",""))) {
-    							// we get the values of the list (should always be a list)
-    							Term termsVarTerm = u.get(varTerm);
-    							// we add the precondition with the possible values in preconditionVariations
-								Iterator<Term> termsVarTermIte = ((ListTerm) termsVarTerm).iterator();
-								while(termsVarTermIte.hasNext()) {
-									precondition.setTerm(i, termsVarTermIte.next());
-									preconditionVariations.add(precondition.copy());
-								}
-    						}
-						}
-					}
+    	Iterator<Term> tailIte = tail.iterator();
+    	ArrayList<Pair<Term,ListTerm>> actionsAndPreconds = new ArrayList<Pair<Term,ListTerm>>();
+    	Literal actPred = (Literal) u.get("ActPred");
+    	List<Term> actPreTerms = actPred.getTerms();
+    	while(tailIte.hasNext()) {
+    		Iterator<Term> preconditionIte = ((ListTerm) u.get("Preconditions")).iterator();
+    		Literal action = (Literal) tailIte.next();
+
+    		ListTerm filledPreconditions = new ListTermImpl();
+    		while(preconditionIte.hasNext()) {
+    			Literal precondition = ((Literal) preconditionIte.next()).copy();
+    			// iteration on the subject and object of the precondition (size = 2)
+    			for(int j = 0; j < precondition.getTerms().size(); j++) {
+    				Term t = precondition.getTerm(j);
+    				// all t are unnamed var, we check if they have a value
+    				Term res = u.get((VarTerm)t);
+    				precondition.setTerm(j, res == null ? t : res);
+    				if(res == null && actPreTerms.contains(t)) {
+    					int index = actPreTerms.indexOf(t);
+    					precondition.setTerm(j, action.getTerm(index));
+    				}
     			}
+    			filledPreconditions.add(precondition);
     		}
-    		if(!preconditionVariations.isEmpty()) {
-	    		for(Term t : preconditionVariations) {
-	    			set.addAll(checkPrecondInOnto(ts, tail, (Literal) t));
-	    		}
-    		} else {
-    			set.addAll(checkPrecondInOnto(ts, tail, precondition));
+    		actionsAndPreconds.add(new Pair<Term, ListTerm>(action, filledPreconditions));
+    	}
+    	
+    	ListTerm newAll = new ListTermImpl();
+    	for(Pair<Term,ListTerm> pair : actionsAndPreconds) {
+    		Iterator<Term> preconditionsIte = pair.getSecond().iterator();
+    		boolean allPrecondsOK = true;
+    		while(preconditionsIte.hasNext() && allPrecondsOK) {
+    			if(!checkPrecondInOnto(ts, (Literal) preconditionsIte.next())) 
+    				allPrecondsOK = false;
+
+    		}
+    		if(allPrecondsOK) {
+    			newAll.add(pair.getFirst());
     		}
     	}
-    	ListTerm newAll = new ListTermImpl();
-    	newAll.addAll(set);
     	return newAll;
     }
     
-    private HashSet<Literal> checkPrecondInOnto(TransitionSystem ts, ListTerm tail, Literal precondition) throws Exception {
+    private boolean checkPrecondInOnto(TransitionSystem ts,Literal precondition) throws Exception {
     	Predicate predicate = new Predicate(precondition);
 		List<String> isInOnto = new ArrayList<String>();
 		if(!predicate.object.startsWith("_") && !predicate.subject.startsWith("_")) {
@@ -177,38 +172,14 @@ public class findall extends DefaultInternalAction {
 			throw new Exception("not handled case");
 		} else if(predicate.object.startsWith("_") && !predicate.subject.startsWith("_")) {
 			isInOnto = ((LAASAgArch) ts.getAgArch()).callOnto("getOn",predicate.subject+":"+predicate.property).getValues();
-			return addOntoResultsToList(ts, predicate, tail, precondition.getTerm(1), isInOnto);
 		} else if(predicate.subject.startsWith("_") && !predicate.object.startsWith("_")) {
 			isInOnto = ((LAASAgArch) ts.getAgArch()).callOnto("getFrom",predicate.object+":"+predicate.property).getValues();
-			return addOntoResultsToList(ts, predicate, tail, precondition.getTerm(0), isInOnto);
-		} 
-		// should never happen with the written action model for now
-		throw new Exception("not handled case");
+		} else {
+			throw new Exception("not handled case");
+		}
+		return isInOnto.isEmpty() ? false : true;
     }
     
-    private HashSet<Literal> addOntoResultsToList(TransitionSystem ts, Predicate predicate, ListTerm tail, Term varTerm, List<String> isInOnto) throws Exception {
-    	HashSet<Literal> elementsToAdd = new HashSet<Literal>();
-		if(!isInOnto.isEmpty()) {
-			Iterator<Term> tailIte = tail.iterator();
-			while(tailIte.hasNext()) {
-				Literal element = (Literal) tailIte.next();
-				List<Term> elementTerms = element.getTerms();
-				int index = elementTerms.indexOf(varTerm);
-				if(index != -1) {
-    				for(String obj : isInOnto) {
-    					Literal elementNew = element.copy();
-						elementNew.getTerms().set(index, new StringTermImpl(obj));
-						elementsToAdd.add(elementNew);
-    				}
-				} else {
-					elementsToAdd.add(element);
-				}
-			}
-		} else {
-			throw new Exception("one of the precondition is invalid");
-		}
-		return elementsToAdd;
-    }
 }
 
 

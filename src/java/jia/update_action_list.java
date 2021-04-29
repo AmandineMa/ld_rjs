@@ -1,6 +1,7 @@
 package jia;
 
 import java.util.Iterator;
+import java.util.List;
 
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
@@ -22,7 +23,17 @@ public class update_action_list extends DefaultInternalAction {
 				ts.getAg().delBel(bel);
 				Literal belCopy = bel.copy();
 				ListTerm actionList = (ListTerm) belCopy.getTerm(0);
-				actionList.removeAll((ListTerm) args[1]);
+				Iterator<Term> actionListIte = actionList.iterator();
+				List<Term> termsToRemove = (ListTerm) args[1];
+				for(Term t1 : termsToRemove) {
+					while(actionListIte.hasNext()) {
+						if(un.unifies(t1, actionListIte.next())) {
+							actionListIte.remove();
+							break;
+						}
+					}
+					actionListIte = actionList.iterator();
+				}
 				if(!actionList.isEmpty())
 					ts.getAg().addBel(belCopy);
 			}

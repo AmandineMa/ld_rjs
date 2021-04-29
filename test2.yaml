@@ -1,11 +1,11 @@
 #test pick
-data: "[del]human_0|handMovingToward|cube_GGTB"
----
-data: "[add]human_0|hasInHand|cube_BBCG"
----
-data: "[add]human_0|hasInHand|cube_GGTB"
----
-data: "[del]cube_BBCG|isOnTopOf|table_1"
+# data: "[del]human_0|handMovingToward|cube_GGCB"
+# ---
+# data: "[add]human_0|hasInHand|cube_BBCG"
+# ---
+# data: "[add]human_0|hasInHand|cube_GGTB"
+# ---
+# data: "[del]cube_BBCG|isOnTopOf|table_1"
 # ---
 # data: "[del]human_0|handMovingToward|table_1"
 # ---
@@ -22,6 +22,6 @@ data: "[del]cube_BBCG|isOnTopOf|table_1"
 #test drop
 # data: "[del]human_0|handMovingToward|table_1"
 # ---
-# data: "[del]human_0|hasInHand|cube_GGTB"
-# ---
-# data: "[add]cube_GGTB|isIn|throw_box_green"
+data: "[del]human_0|hasInHand|cube_GGTB"
+---
+data: "[add]cube_GGTB|isIn|throw_box_green"

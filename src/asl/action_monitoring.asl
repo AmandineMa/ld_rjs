@@ -51,65 +51,66 @@ matchingProgressingActions(Predicate,ActionList,ActionList2) :-
 //!start.
 
 // trigger with an action -> action started
+@startedSbis[atomic]
++NewPredicate[source(percept)] :  isMovementRelatedToActions(NewPredicate,ActionList) & possibleStartedActions(ActionList2) 
+								& jia.intersection_literal_list(ActionList,ActionList2,I) & .length(I) >0 <-
+	jia.update_action_list(possibleStartedActions,ActionList);		
+	++possibleStartedActions(ActionList).	
+	
 @startedS[atomic]
 +NewPredicate[source(percept)] :  isMovementRelatedToActions(NewPredicate,ActionList) <-
-	!addPossibleStartedActions(ActionList).	
+	++possibleStartedActions(ActionList).	
 	
-+!addPossibleStartedActions(ActionList) : possibleStartedActions(ActionListPrev) & .intersection(ActionList,ActionListPrev,I) & .length(I) > 0 <-
-	-possibleStartedActions(ActionListPrev);
-	++possibleStartedActions(ActionList).
-
-+!addPossibleStartedActions(ActionList) : true <-
-	++possibleStartedActions(ActionList).
-
 // from action started -> action progressing
 @progressS1[atomic]
 +NewPredicate[source(percept)] :isProgressionEffect(NewPredicate,ActionList) 
 							   & matchingStartedActions(Predicate,ActionList,ActionList2) <-
+	jia.update_action_list(possibleStartedActions,ActionList2);
 	++possibleProgressingActions(ActionList2).
+	
+// trigger with a progression effect -> action progressing
+// no check to see if it exists a possible human agent has all progression effect predicates have a human as object or subject
+@progressS2[atomic]
++NewPredicate[source(percept)] : isProgressionEffect(NewPredicate,ActionList) <-
+	++possibleProgressingActions(ActionList).	
 
 // from action started or action progressing -> action over	
 @overS[atomic]
 +NewPredicate[source(percept)] : isNecessaryEffect(NewPredicate,ActionList) 
 							   & (matchingProgressingActions(Predicate,ActionList,ActionList2) | matchingStartedActions(Predicate,ActionList,ActionList2))<-
-	jia.update_action_list(possibleStartedActions,ActionList2);	
-	jia.update_action_list(possibleProgressingActions,ActionList2);								   
-	++possibleFinishedActions(ActionList2).
-
-// trigger with a progression effect -> action progressing
-// no check to see if it exists a possible human agent has all progression effect predicates have a human as object or subject
-@progressS2[atomic]
-+NewPredicate[source(percept)] : isProgressionEffect(NewPredicate,ActionList) <-
-	++possibleProgressingActions(ActionList).
+	!addFinishedActions(ActionList2).
+	
++!addFinishedActions(ActionList) : true <-
+	jia.update_action_list(possibleStartedActions,ActionList);	
+	jia.update_action_list(possibleProgressingActions,ActionList);
+	++possibleFinishedActions(ActionList).
 
 // trigger with a necessary effect -> action over
 @overS2[atomic]
 +NewPredicate[source(percept)] : isNecessaryEffect(NewPredicate,ActionList) & jia.exist_possible_agent(ActionList,ActionList2) <-
-	jia.update_action_list(possibleStartedActions,ActionList2);	
-	jia.update_action_list(possibleProgressingActions,ActionList2);
 	++possibleFinishedActions(ActionList2).
 	
 // wait for an effect after an observed movement finished
 @unknownS
 +possibleStartedActions(ActionList) :  true <-
-		.wait(possibleProgressingActions(A) & .intersection(A,ActionList,I) & .length(I) >0) 
-	||| .wait(possibleFinishedActions(A) & .intersection(A,ActionList,I)  & .length(I) >0)
+		.wait(possibleProgressingActions(A) & jia.intersection_literal_list(A,ActionList,I) & .length(I) >0) 
+	||| .wait(possibleFinishedActions(A) & jia.intersection_literal_list(A,ActionList,I)  & .length(I) >0)
 	||| !timeoutMovement(ActionList).
 
 +!timeoutMovement(ActionList) : true <-
-	.wait(20000);
+	.wait(10000);
 	// ne fonctionne pas sans le add_time !! pourquoi ?? parce qu'ajouté via code ??
 	-possibleStartedActions(ActionList)[add_time(_)].
 	
 +possibleProgressingActions(ActionList) : true <-
-	.wait(possibleFinishedActions(A) & .intersection(A,ActionList,I) & .length(I) >0)
+	.wait(possibleFinishedActions(A) & jia.intersection_literal_list(A,ActionList,I) & .length(I) >0)
 	||| !timeoutProgressing(ActionList).
 
 // TODO timeout should be action type dependent
 +!timeoutProgressing(ActionList) : true <-
-	.wait(20000);
+	.wait(10000);
 	-possibleProgressingActions(ActionList)[add_time(_)];
-	.findall(possibleStartedActions(A),possibleStartedActions(A) & .intersection(A,ActionList,I) & .length(I)>0,L);
+	.findall(possibleStartedActions(A),possibleStartedActions(A) & jia.intersection_literal_list(A,ActionList,I) & .length(I)>0,L);
 	for(.member(M,L)){
 		-M;
 		+M;

@@ -1,22 +1,31 @@
 #restart setup pick
+# data: "[add]human_0|isA|Human"
+# ---
+# data: "[add]human_0|handEmpty|bool#true"
+# ---
 # data: "[del]human_0|hasInHand|cube_BBCG"
 # ---
 # data: "[del]human_0|hasInHand|cube_GGTB"
 # ---
-# data: "[add]cube_BBCG|isOnTopOf|table_1"
-#test pick
-data: "[add]human_0|handMovingToward|cube_GGTB"
----
-data: "[add]human_0|handMovingToward|cube_GGCB"
----
-data: "[add]human_0|handMovingToward|table_1"
----
-data: "[add]human_0|handMovingToward|cube_BBCG" #cube to pick
+# data: "[del]human_0|hasInHand|cube_GGCB"
 # ---
-# data: "[del]human_0|handMovingToward|box_C4"
+# data: "[add]cube_BBCG|isOnTopOf|table_1"
+# ---
+# data: "[add]cube_GGCB|isOnTopOf|table_1"
+#test pick
+# data: "[add]human_0|handMovingToward|cube_GGTB"
+# ---
+# data: "[add]human_0|handMovingToward|cube_GGCB"
+# ---
+# data: "[add]human_0|handMovingToward|table_1"
+# ---
+# data: "[add]human_0|handMovingToward|cube_BBCG" #cube to pick
 # ---
 # data: "[del]human_0|handMovingToward|cube_GGCB"
-
+#restart setup place
+# data: "[del]cube_GGTB|isOnTopOf|table_1"
+# ---
+# data: "[add]human_0|hasInHand|cube_GGTB"
 #test place
 # data: "[add]human_0|handMovingToward|cube_GGCB"
 # ---
@@ -25,15 +34,18 @@ data: "[add]human_0|handMovingToward|cube_BBCG" #cube to pick
 # data: "[add]human_0|handMovingToward|box_C4"
 # ---
 # data: "[del]human_0|handMovingToward|box_C4"
-
+#restart setup drop
+# data: "[del]cube_GGTB|isOnTopOf|table_1"
+# ---
+# data: "[add]human_0|hasInHand|cube_GGTB"
 #test drop
-# data: "[add]human_0|handMovingToward|table_1"
-# ---
-# data: "[add]human_0|handMovingToward|box_C4"
-# ---
-# data: "[del]human_0|handMovingToward|box_C4"
-# ---
-# data: "[add]human_0|handMovingToward|throw_box_green"
+data: "[add]human_0|handMovingToward|table_1"
+---
+data: "[add]human_0|handMovingToward|box_C4"
+---
+data: "[del]human_0|handMovingToward|box_C4"
+---
+data: "[add]human_0|handMovingToward|throw_box_green"
 
 
 
