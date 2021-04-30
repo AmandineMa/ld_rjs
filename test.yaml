@@ -23,6 +23,8 @@
 # ---
 # data: "[del]human_0|handMovingToward|cube_GGCB"
 #restart setup place
+# data: "[add]human_0|isA|Human"
+# ---
 # data: "[del]cube_GGTB|isOnTopOf|table_1"
 # ---
 # data: "[add]human_0|hasInHand|cube_GGTB"
@@ -35,9 +37,12 @@
 # ---
 # data: "[del]human_0|handMovingToward|box_C4"
 #restart setup drop
+# data: "[add]human_0|isA|Human"
+# ---
 # data: "[del]cube_GGTB|isOnTopOf|table_1"
 # ---
 # data: "[add]human_0|hasInHand|cube_GGTB"
+# ---
 #test drop
 data: "[add]human_0|handMovingToward|table_1"
 ---

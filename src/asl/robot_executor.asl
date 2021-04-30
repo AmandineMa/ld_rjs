@@ -34,13 +34,13 @@ robotState(idle)[ground].
 +!executeAction(ID,Name,Agent,Params) : true <-
 	-+robotState(acting)[ground];
 	.lower_case(Name, Action);
-	.send(plan_manager, tell, action(ID,"ongoing",Name,Agent,Params));
+	.send([plan_manager,human_management], tell, action(ID,"ongoing",Name,Agent,Params));
 	Act =.. [Action, [Params],[]];
 	+action(ID,Name,"ongoing");
 	!Act;
 	-+robotState(idle)[ground];
 	-+action(ID,Name,"executed");
-	.send(plan_manager, tell, action(ID,"executed",Name,Agent,Params)).
+	.send([plan_manager,human_management], tell, action(ID,"executed",Name,Agent,Params)).
 	
 +planOver : true <-
 	say("bravo ! we did it !").

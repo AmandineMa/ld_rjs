@@ -4,7 +4,7 @@
 isMovementRelatedToActions(Predicate,ActionList) :-
 	jia.findall(
 		ActPred,
-		action(ActPred,Preconditions,Movement,ProgressionEffects,NecessaryEffect) &
+		actionModel(ActPred,Preconditions,Movement,ProgressionEffects,NecessaryEffect) &
 		jia.member_same_type(Predicate,Movement),
 		ActionList
 	)
@@ -13,7 +13,7 @@ isMovementRelatedToActions(Predicate,ActionList) :-
 isProgressionEffect(Predicate,ActionList) :-
 	.findall(
 		ActPred,
-		action(ActPred,Preconditions,Movement,ProgressionEffects,NecessaryEffect) &
+		actionModel(ActPred,Preconditions,Movement,ProgressionEffects,NecessaryEffect) &
 		jia.member_same_type(Predicate,ProgressionEffects),
 		ActionList
 	)
@@ -32,7 +32,7 @@ matchingStartedActions(Predicate,ActionList,ActionList2) :-
 isNecessaryEffect(Predicate,ActionList) :-
 	.findall(
 		ActPred,
-		action(ActPred,Preconditions,Movement,ProgressionEffects,NecessaryEffect) &
+		actionModel(ActPred,Preconditions,Movement,ProgressionEffects,NecessaryEffect) &
 		jia.member_same_type(Predicate,NecessaryEffect),
 		ActionList
 	)
@@ -48,7 +48,12 @@ matchingProgressingActions(Predicate,ActionList,ActionList2) :-
 	)
 	& rjs.function.length_allow_unground(ActionList2) > 0.
 
-//!start.
+isPredicateRobotAction(NewPredicate, Params) :-
+	  NewPredicate=..[P,[T1,T2],[]] 
+	& humanName(H) & T1 \== H 
+	& .member(T1,Params) | .member(T2,Params).
+
++NewPredicate[source(percept)] :  action(_,_,_,_,Params)[source(robot_executor)] & isPredicateRobotAction(NewPredicate, Params) <- true.
 
 // trigger with an action -> action started
 @startedSbis[atomic]
