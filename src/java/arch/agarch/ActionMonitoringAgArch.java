@@ -15,12 +15,12 @@ import jason.asSyntax.Literal;
 import mementar.MementarOccasion;
 import rjs.utils.Tools;
 
-public class HumanManagementAgArch extends LAASAgArch {
+public class ActionMonitoringAgArch extends LAASAgArch {
 	
 	private Collection<Literal> perceive = new ArrayList<Literal>();
 	private List<MementarOccasion> perceptions = Collections.synchronizedList(new ArrayList<MementarOccasion>());
 	
-	public HumanManagementAgArch() {
+	public ActionMonitoringAgArch() {
 		super();
 		setMementarListener();
 	}

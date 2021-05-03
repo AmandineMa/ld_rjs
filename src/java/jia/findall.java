@@ -122,7 +122,7 @@ public class findall extends DefaultInternalAction {
     
     private ListTerm handlePreconditions(TransitionSystem ts, ListTerm tail, Unifier u) throws Exception {
     	Iterator<Term> tailIte = tail.iterator();
-    	ArrayList<Pair<Term,ListTerm>> actionsAndPreconds = new ArrayList<Pair<Term,ListTerm>>();
+    	ArrayList<Pair<Literal,ListTerm>> actionsAndPreconds = new ArrayList<Pair<Literal,ListTerm>>();
     	Literal actPred = (Literal) u.get("ActPred");
     	List<Term> actPreTerms = actPred.getTerms();
     	while(tailIte.hasNext()) {
@@ -145,39 +145,65 @@ public class findall extends DefaultInternalAction {
     			}
     			filledPreconditions.add(precondition);
     		}
-    		actionsAndPreconds.add(new Pair<Term, ListTerm>(action, filledPreconditions));
+    		actionsAndPreconds.add(new Pair<Literal, ListTerm>(action, filledPreconditions));
     	}
     	
     	ListTerm newAll = new ListTermImpl();
-    	for(Pair<Term,ListTerm> pair : actionsAndPreconds) {
+    	for(Pair<Literal,ListTerm> pair : actionsAndPreconds) {
+    		List<Literal> alternativeValues = new ArrayList<Literal>();
     		Iterator<Term> preconditionsIte = pair.getSecond().iterator();
     		boolean allPrecondsOK = true;
     		while(preconditionsIte.hasNext() && allPrecondsOK) {
-    			if(!checkPrecondInOnto(ts, (Literal) preconditionsIte.next())) 
+    			Literal precondition = (Literal) preconditionsIte.next();
+    			List<String> precondInOnto = checkPrecondInOnto(ts, precondition);
+    			if(precondInOnto.isEmpty()) 
     				allPrecondsOK = false;
+    			else {
+    				for(Term t : precondition.getTerms()) {
+    					if(t.isUnnamedVar() && pair.getFirst().getTerms().contains(t)) {
+    						if(precondInOnto.size() > 1) {
+    							for(int i = 1; i < precondInOnto.size(); i++) {
+    								Literal newAction = pair.getFirst().copy();
+    								newAction.getTerms().set(newAction.getTerms().indexOf(t), new StringTermImpl(precondInOnto.get(i)));
+    								alternativeValues.add(newAction);
+    							}
+    						}
+    						pair.getFirst().getTerms().set(pair.getFirst().getTerms().indexOf(t), new StringTermImpl(precondInOnto.get(0)));
+    						// there is only one unnamed term in the preconditions as it is now
+    						break;
+    					}
+    				}
+    				
+    				
+    			}
 
     		}
     		if(allPrecondsOK) {
     			newAll.add(pair.getFirst());
+    			if(!alternativeValues.isEmpty()) {
+    				for(Literal l : alternativeValues) {
+    					newAll.add(l);
+    				}
+    			}
     		}
     	}
     	return newAll;
     }
     
-    private boolean checkPrecondInOnto(TransitionSystem ts,Literal precondition) throws Exception {
+    private List<String> checkPrecondInOnto(TransitionSystem ts,Literal precondition) throws Exception {
     	Predicate predicate = new Predicate(precondition);
 		List<String> isInOnto = new ArrayList<String>();
-		if(!predicate.object.startsWith("_") && !predicate.subject.startsWith("_")) {
+		if(!predicate.isObjectUnnamed && !predicate.isSubjectUnnamed) {
 			// should never happen with the written action model for now
 			throw new Exception("not handled case");
-		} else if(predicate.object.startsWith("_") && !predicate.subject.startsWith("_")) {
+		} else if(predicate.isObjectUnnamed && !predicate.isSubjectUnnamed) {
 			isInOnto = ((LAASAgArch) ts.getAgArch()).callOnto("getOn",predicate.subject+":"+predicate.property).getValues();
-		} else if(predicate.subject.startsWith("_") && !predicate.object.startsWith("_")) {
+		} else if(predicate.isSubjectUnnamed && !predicate.isObjectUnnamed) {
 			isInOnto = ((LAASAgArch) ts.getAgArch()).callOnto("getFrom",predicate.object+":"+predicate.property).getValues();
 		} else {
 			throw new Exception("not handled case");
 		}
-		return isInOnto.isEmpty() ? false : true;
+		return isInOnto;
     }
     
 }

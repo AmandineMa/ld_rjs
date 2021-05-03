@@ -31,7 +31,8 @@
 	!init_sub.
 
 +!create_agents : true <-
-	.create_agent(human_management, "src/asl/human_management.asl", [agentArchClass("arch.agarch.HumanManagementAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("agent.OntoAgent")]);
+	.create_agent(action_monitoring, "src/asl/action_monitoring.asl", [agentArchClass("arch.agarch.ActionMonitoringAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("agent.OntoAgent")]);
+	.create_agent(human_management, "src/asl/human_management.asl", [agentArchClass("arch.agarch.LAASAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("agent.OntoAgent")]);
 	.create_agent(plan_manager, "src/asl/plan_manager.asl", [agentArchClass("arch.agarch.PlanManagerAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("agent.OntoAgent")]);
 	.create_agent(robot_executor, "src/asl/robot_executor.asl", [agentArchClass("arch.agarch.LAASAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("rjs.agent.LimitedAgent")]).
 

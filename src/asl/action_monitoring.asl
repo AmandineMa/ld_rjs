@@ -1,5 +1,6 @@
 { include("human_actions.asl")}
 { register_function("rjs.function.length_allow_unground") } 
+{ include("common.asl")}
 
 isMovementRelatedToActions(Predicate,ActionList) :-
 	jia.findall(
@@ -52,6 +53,41 @@ isPredicateRobotAction(NewPredicate, Params) :-
 	  NewPredicate=..[P,[T1,T2],[]] 
 	& humanName(H) & T1 \== H 
 	& .member(T1,Params) | .member(T2,Params).
+	
+!start.
+
++!start : true <-
+    rjs.jia.log_beliefs;
+    .verbose(2);
+    !getRobotName;
+    !getHumanName;
+    !setActionsMementarMonitoring.
+
++!setActionsMementarMonitoring : true <-
+	.findall(X,actionModel(_,_,Y,_,_)[source(self)] & .member(X,Y),L);
+	!setMementarMonitoring(L);
+	.findall(X,actionModel(_,_,_,Z,_)[source(self)] & .member(X,Z),M);
+	!setMementarMonitoring(M);
+	.findall(X,actionModel(_,_,_,_,W)[source(self)] & .member(X,W),N);
+	!setMementarMonitoring(N).
+
++!setMementarMonitoring(BelList) : true <-
+    for(.member(B,BelList)){
+        B=..[Prop,[T1,T2],[]];
+        if(rjs.jia.unnamedvar2string(T2,T) & .substring("List",T)){
+                Function="?";
+                jia.set_predicate_with_list(Prop);
+        }elif(rjs.jia.negated_literal(Prop)){
+                Function="del";
+        }else{
+                Function="add";
+        }
+        .term2string(Prop,PropS);
+        .delete("~",PropS,PropF)
+        if(not rjs.jia.believes(monitoring(_,Function,"?",PropF,"?",_))){
+                mementarSubscribe(Function,"?",PropF,"?",-1);
+        };
+    }.
 
 +NewPredicate[source(percept)] :  action(_,_,_,_,Params)[source(robot_executor)] & isPredicateRobotAction(NewPredicate, Params) <- true.
 
@@ -98,6 +134,7 @@ isPredicateRobotAction(NewPredicate, Params) :-
 // wait for an effect after an observed movement finished
 @unknownS
 +possibleStartedActions(ActionList) :  true <-
+	.send(human_management,tell,possibleStartedActions(ActionList));
 		.wait(possibleProgressingActions(A) & jia.intersection_literal_list(A,ActionList,I) & .length(I) >0) 
 	||| .wait(possibleFinishedActions(A) & jia.intersection_literal_list(A,ActionList,I)  & .length(I) >0)
 	||| !timeoutMovement(ActionList).
@@ -108,8 +145,18 @@ isPredicateRobotAction(NewPredicate, Params) :-
 	-possibleStartedActions(ActionList)[add_time(_)].
 	
 +possibleProgressingActions(ActionList) : true <-
+	.send(human_management,tell,possibleProgressingActions(ActionList));
 	.wait(possibleFinishedActions(A) & jia.intersection_literal_list(A,ActionList,I) & .length(I) >0)
 	||| !timeoutProgressing(ActionList).
+
++possibleFinishedActions(ActionList) : true <-
+	.send(human_management,tell,possibleFinishedActions(ActionList)).
+	
+-possibleStartedActions(ActionList) : true <-
+	.send(human_management,untell,possibleStartedActions(ActionList)).
+
+-possibleProgressingActions(ActionList) : true <-
+	.send(human_management,untell,possibleProgressingActions(ActionList)).
 
 // TODO timeout should be action type dependent
 +!timeoutProgressing(ActionList) : true <-

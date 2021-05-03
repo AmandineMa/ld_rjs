@@ -20,8 +20,7 @@ public class update_action_list extends DefaultInternalAction {
 		if(it != null) {
 			while(it.hasNext()) {
 				Literal bel = it.next();
-				ts.getAg().delBel(bel);
-				Literal belCopy = bel.copy();
+				Literal belCopy = bel.copy().clearAnnots();
 				ListTerm actionList = (ListTerm) belCopy.getTerm(0);
 				Iterator<Term> actionListIte = actionList.iterator();
 				List<Term> termsToRemove = (ListTerm) args[1];
@@ -34,8 +33,11 @@ public class update_action_list extends DefaultInternalAction {
 					}
 					actionListIte = actionList.iterator();
 				}
-				if(!actionList.isEmpty())
+				if(!actionList.isEmpty() && !belCopy.equals(bel.copy().clearAnnots())) {
+					ts.getAg().delBel(bel);
 					ts.getAg().addBel(belCopy);
+				} else if(actionList.isEmpty())
+					ts.getAg().delBel(bel);
 			}
 		}
 		return true;
