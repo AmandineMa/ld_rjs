@@ -68,8 +68,8 @@
 	for(.member(P,ParamsNoH)){
 		!getUnRef(P,Human);
 	}
-	.findall(P,.member(P,ParamsNoH) & jia.isCube(P),CubeL);
-	.findall(P,.member(P,ParamsNoH) & jia.isBox(P),BoxL);
+	.findall(P,.member(P,ParamsNoH) & jia.query_onto_class(P,"Cube"),CubeL);
+	.findall(P,.member(P,ParamsNoH) & jia.query_onto_class(P,"Box"),BoxL);
 	.nth(0,CubeL,Cube);
 	.nth(0,BoxL,Box);
 	?verba(Cube,VerbaCube);

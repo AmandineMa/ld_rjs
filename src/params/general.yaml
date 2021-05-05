@@ -1,7 +1,7 @@
 
 supervisor:
   robot_name: "robot"
-  human_name: "Helmet_2"
+  human_name: "human"
   table_name: table_1
     
   services:
@@ -40,10 +40,10 @@ supervisor:
      name: /mementar/occasions/robot
      type: mementar/MementarOccasion
      function: sub
-#     plan:
-#       name: /planner/plan_answer
-#       type: planner_msgs/Plan
-#       function: sub
+   plan:
+      name: /planner/plan_answer
+      type: planner_msgs/Plan
+      function: sub
 #    listen:
 #       name: /ros_stt/said
 #       type: std_msgs/String

@@ -33,7 +33,7 @@
 +!create_agents : true <-
 	.create_agent(action_monitoring, "src/asl/action_monitoring.asl", [agentArchClass("arch.agarch.ActionMonitoringAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("agent.OntoAgent")]);
 	.create_agent(human_management, "src/asl/human_management.asl", [agentArchClass("arch.agarch.LAASAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("agent.OntoAgent")]);
-	.create_agent(plan_manager, "src/asl/plan_manager.asl", [agentArchClass("arch.agarch.PlanManagerAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("agent.OntoAgent")]);
+	.create_agent(robot_management, "src/asl/robot_management.asl", [agentArchClass("arch.agarch.PlanManagerAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("agent.OntoAgent")]);
 	.create_agent(robot_executor, "src/asl/robot_executor.asl", [agentArchClass("arch.agarch.LAASAgArch"), beliefBaseClass("rjs.agent.TimeBB"), agentClass("rjs.agent.LimitedAgent")]).
 
 	
@@ -41,7 +41,7 @@
 	.send(robot_executor, tell, action(_,"head_scan","robot",[])).
 	
 +!send_goal(Goal) : true <-
-	.send(plan_manager, tell, goal(Goal,received)).
+	.send(robot_management, tell, goal(Goal,received)).
 	
 +!reset : true <-
 	.broadcast(achieve, reset).
