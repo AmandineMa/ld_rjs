@@ -2,7 +2,7 @@
 
 // TODO: plan manager is generic but not receiver. should put the receiver somewhere else
 
-actionStates(["planned","todo","ongoing","executed","unnplanned"])[ground].
+actionStates(["planned","todo","ongoing","executed","unnplanned","not_starting","not_finished","not_seen"])[ground].
 
 wantedAction(Name,Agent,Params) :- action(ID,S,Name,Agent,Params,_,_) & (S=="todo" | S=="ongoing").
 isNotOver(S) :- S\=="executed" & S\=="unplanned".
@@ -25,16 +25,6 @@ isNotOver(S) :- S\=="executed" & S\=="unplanned".
 		}
 	}.
 
-+!updateBelOngoing(Name,Agent,Params,Decompo) : true <-
-	-action(_,"ongoing",Name,Agent,Params)[source(_)];
-	-action(ID,"todo",Name,Agent,Params,Preds,Decompo);
-	+action(ID,"ongoing",Name,Agent,Params,Preds,Decompo).
-	
-+!updateBelExecuted(Name,Agent,Params,Decompo) : true <-	
-	-action(_,"executed",Name,Agent,Params)[source(_)];
-	-action(ID,_,Name,Agent,Params,Preds,Decompo);
-	+action(ID,"executed",Name,Agent,Params,Preds,Decompo).
-	
 +!removeParallelStreams(Agent,Preds) : true <-
 	.findall(action(ID,"todo",Name,Agent,Params,Preds,Decompo), action(ID,"todo",Name,Agent,Params,Preds,Decompo), Actions);
 	!setUnplannedActions(Actions).

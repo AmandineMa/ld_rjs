@@ -45,36 +45,35 @@ abstractTask(0, "planned", "robot_make_coffee",(-1)).
 action(71, "planned", "robot_update_human_inventory", "robot", ["human","kitchen_cupboard"], [], 0).
 action(72, "planned", "IDLE", "human", [], [71],(-1)).
 action(74, "planned", "robot_ask_human_for_help", "robot", ["human"], [72], 0).
-
+//
 abstractTask(73, "planned", "human_help_make_coffee",(-1)).
-abstractTask(14, "planned", "robot_help_make_coffee", 0).
-
+//abstractTask(14, "planned", "robot_help_make_coffee", 0).
+//
 action(84, "planned", "human_get_water", "human", [], [74], 73).
 abstractTask(93, "planned", "robot_get_coffee", 14).
-action(97, "planned", "robot_pick_coffee", "robot", ["pantry_cupboard"], [84], 93).
-action(98, "planned", "human_pour_water_in_machine", "human", [], [97], 73).
-action(99, "planned", "robot_put_coffee_in_machine", "robot", [], [98], 14).
-action(100, "planned", "IDLE", "human", [], [99],(-1)).
-action(101, "planned", "robot_serve_coffee", "robot", [], [100],(-1)).
-action(102, "planned", "IDLE", "human", [], [101],(-1)).
-
+//action(97, "planned", "robot_pick_coffee", "robot", ["pantry_cupboard"], [84], 93).
+//action(98, "planned", "human_pour_water_in_machine", "human", [], [97], 73).
+//action(99, "planned", "robot_put_coffee_in_machine", "robot", [], [98], 14).
+//action(100, "planned", "IDLE", "human", [], [99],(-1)).
+//action(101, "planned", "robot_serve_coffee", "robot", [], [100],(-1)).
+//action(102, "planned", "IDLE", "human", [], [101],(-1)).
+//
 abstractTask(75, "planned", "human_get_coffee", 73).
 action(80, "planned", "human_try_pick_coffee", "human", ["pantry_cupboard"], [74], 75).
-action(87, "planned", "robot_get_water", "robot", [], [80], 14).
-action(88, "planned", "human_put_coffee_in_machine", "human", [], [87], 73).
-action(89, "planned", "robot_pour_water_in_machine", "robot", [], [88], 14).
-action(90, "planned", "IDLE", "human", [], [89],(-1)).
-action(91, "planned", "robot_serve_coffee", "robot", [], [90],(-1)).
-action(92, "planned", "IDLE", "human", [], [91],(-1)).
+//action(87, "planned", "robot_get_water", "robot", [], [80], 14).
+//action(88, "planned", "human_put_coffee_in_machine", "human", [], [87], 73).
+//action(89, "planned", "robot_pour_water_in_machine", "robot", [], [88], 14).
+//action(90, "planned", "IDLE", "human", [], [89],(-1)).
+//action(91, "planned", "robot_serve_coffee", "robot", [], [90],(-1)).
+//action(92, "planned", "IDLE", "human", [], [91],(-1)).
 
 
 !start.
 
 +!start : true <-
 	rjs.jia.log_beliefs;
-	.verbose(2);
-	!getRobotName;
-	!getHumanName.
+//	.verbose(2);
+	!getAgentNames.
 	
 +goal(Name, State) : State == received & not .substring("dtRR",Name) <-
 	?humanName(Human);
@@ -118,13 +117,17 @@ action(92, "planned", "IDLE", "human", [], [91],(-1)).
 
 @evOngoing[atomic]
 +action(_,"ongoing",Name,Agent,Params)[source(_)] : action(ID,"todo",Name,Agent,Params,Preds,Decompo) <-
-	!updateBelOngoing(Name,Agent,Params,Decompo).
+	-action(_,"ongoing",Name,Agent,Params)[source(_)];
+	-action(ID,"todo",Name,Agent,Params,Preds,Decompo);
+	+action(ID,"ongoing",Name,Agent,Params,Preds,Decompo).
 	
 +action(_,"ongoing",Name,Agent,Params)[source(_)] : action(ID,"executed",Name,Agent,Params,Preds,Decompo) <- true.
 
 @evExe[atomic]	
 +action(_,"executed",Name,Agent,Params)[source(_)] : wantedAction(Name,Agent,Params) <-
-	!updateBelExecuted(Name,Agent,Params,Decompo);
+	-action(_,"executed",Name,Agent,Params)[source(_)];
+	-action(ID,_,Name,Agent,Params,Preds,Decompo)[source(_)];
+	+action(ID,"executed",Name,Agent,Params,Preds,Decompo);
 	!removeParallelStreams(Agent,Preds);
 	!updatePlanTasksEnd(Decompo,"executed");
 	!updatePlanActions.
@@ -153,8 +156,6 @@ action(92, "planned", "IDLE", "human", [], [91],(-1)).
 //temporary
 +action(ID,"todo",Name,Agent,Params,Preds,Decompo) : humanName(Agent) & Name == "IDLE" <-
 	+action(ID,"executed",Name,Agent,Params).
-	
-
 	
 +!reset : true <-
 	.drop_all_desires;

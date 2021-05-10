@@ -13,8 +13,7 @@ robotState(idle)[ground].
 +!start : true <-
 //	.verbose(2);
 //	rjs.jia.log_beliefs;
-	!getRobotName;
-	!getHumanName.
+	!getAgentNames.
 
 +action(ID,Name,Agent,Params) : robotState(idle) & robotName(Agent) <-
 	-action(ID,Name,Agent,Params)[source(_)];
@@ -38,7 +37,7 @@ robotState(idle)[ground].
 	Act =.. [Action, [Params],[]];
 	+action(ID,Name,"ongoing");
 //	!Act;
-	.wait(1000);
+	.wait(2000);
 	-+robotState(idle)[ground];
 	-+action(ID,Name,"executed");
 	.send([robot_management,human_management,action_monitoring], tell, action(ID,"executed",Name,Agent,Params)).

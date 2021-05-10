@@ -75,12 +75,8 @@
 	?verba(Cube,VerbaCube);
 	?verba(Box,VerbaBox);
 	!sayPickPlace(VerbaCube, VerbaBox).
-	
-
 
 +!robot_wait_for_human_to_tidy(Params): true <- true.
-
-+!robot_congratulate(Params): true <- say("bravo ! we did it !").
 
 @strafe[atomic]
 +!strafe(Params): true <-
@@ -91,8 +87,6 @@
 
 +!head_scan(Params): true <-
 	scanTable.
-
-
 
 	
 	
