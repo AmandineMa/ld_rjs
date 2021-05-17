@@ -43,7 +43,7 @@ public class createGUI extends DefaultInternalAction {
 		
 		final JButton sendGoal = new JButton("Send goal");
 		
-		Map<?,?> goalsMap = AbstractROSAgArch.getRosnode().getParameters().getMap("plan_manager/goals");
+		Map<?,?> goalsMap = ((AbstractROSAgArch) ts.getAgArch()).getRosnode().getParameters().getMap("plan_manager/goals");
 		final DefaultListModel<String> goalsList = new DefaultListModel<>();  
 		goalsList.addAll((Collection<? extends String>) goalsMap.keySet());
 		final JList<String> list = new JList<>(goalsList);  

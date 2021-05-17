@@ -59,8 +59,8 @@ isPredicateRobotAction(NewPredicate, Params) :-
 +!start : true <-
     rjs.jia.log_beliefs;
     .verbose(2);
-    !getRobotName;
-    !getHumanName;
+	!initRosComponents;
+    !getAgentNames;
     !setActionsMementarMonitoring.
 
 +!setActionsMementarMonitoring : true <-
@@ -89,7 +89,12 @@ isPredicateRobotAction(NewPredicate, Params) :-
         };
     }.
 
-+NewPredicate[source(percept)] :  action(_,_,_,_,Params)[source(robot_executor)] & isPredicateRobotAction(NewPredicate, Params) <- true.
++action(ID,"executed",Name,Agent,Params)[source(robot_executor)] : true <-
+	-action(ID,"ongoing",Name,Agent,Params)[source(robot_executor)];
+	.wait(2000);
+	-action(ID,"executed",Name,Agent,Params)[source(robot_executor)].
+
++NewPredicate[source(percept)] :  action(_,_,Name,_,Params)[source(robot_executor)] & isPredicateRobotAction(NewPredicate, Params) <- true.
 
 // trigger with an action -> action started
 @startedSbis[atomic]
@@ -140,7 +145,7 @@ isPredicateRobotAction(NewPredicate, Params) :-
 	||| !timeoutMovement(ActionList).
 
 +!timeoutMovement(ActionList) : true <-
-	.wait(10000);
+	.wait(30000);
 	// ne fonctionne pas sans le add_time !! pourquoi ?? parce qu'ajouté via code ??
 	-possibleStartedActions(ActionList)[add_time(_)].
 	
@@ -150,7 +155,8 @@ isPredicateRobotAction(NewPredicate, Params) :-
 	||| !timeoutProgressing(ActionList).
 
 +possibleFinishedActions(ActionList) : true <-
-	.send(human_management,tell,possibleFinishedActions(ActionList)).
+	.send(human_management,tell,possibleFinishedActions(ActionList));
+	-possibleFinishedActions(ActionList).
 	
 -possibleStartedActions(ActionList) : true <-
 	.send(human_management,untell,possibleStartedActions(ActionList)).
@@ -160,7 +166,7 @@ isPredicateRobotAction(NewPredicate, Params) :-
 
 // TODO timeout should be action type dependent
 +!timeoutProgressing(ActionList) : true <-
-	.wait(10000);
+	.wait(30000);
 	-possibleProgressingActions(ActionList)[add_time(_)];
 	.findall(possibleStartedActions(A),possibleStartedActions(A) & jia.intersection_literal_list(A,ActionList,I) & .length(I)>0,L);
 	for(.member(M,L)){

@@ -22,11 +22,14 @@ public class ActionMonitoringAgArch extends LAASAgArch {
 	
 	public ActionMonitoringAgArch() {
 		super();
-		setMementarListener();
 	}
 	
-
-	public void setMementarListener() {
+	@Override
+	public void init() {
+		super.init();
+	}
+	
+	public void initListeners() {
 		rosnode.setSubListener("mementar_occasions", new MessageListener<MementarOccasion>() {
 			
 			@Override

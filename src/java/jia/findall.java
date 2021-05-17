@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +34,8 @@ import rjs.utils.Predicate;
 
 @SuppressWarnings("serial")
 public class findall extends DefaultInternalAction {
+	
+	private Logger logger = Logger.getLogger(this.getClass().getName());
 
 	@Override public int getMinArgs() {
         return 3;
@@ -156,9 +159,10 @@ public class findall extends DefaultInternalAction {
     		while(preconditionsIte.hasNext() && allPrecondsOK) {
     			Literal precondition = (Literal) preconditionsIte.next();
     			List<String> precondInOnto = checkPrecondInOnto(ts, precondition);
-    			if(precondInOnto.isEmpty()) 
+    			if(precondInOnto.isEmpty()) {
     				allPrecondsOK = false;
-    			else {
+    				logger.info("precondition "+precondition+" is false");
+    			} else {
     				for(Term t : precondition.getTerms()) {
     					if(t.isUnnamedVar() && pair.getFirst().getTerms().contains(t)) {
     						if(precondInOnto.size() > 1) {
@@ -179,15 +183,24 @@ public class findall extends DefaultInternalAction {
 
     		}
     		if(allPrecondsOK) {
-    			newAll.add(pair.getFirst());
+    			if(verifyAllDifferent(pair.getFirst().getTerms()))
+    				newAll.add(pair.getFirst());
     			if(!alternativeValues.isEmpty()) {
     				for(Literal l : alternativeValues) {
-    					newAll.add(l);
+    					if(verifyAllDifferent(l.getTerms()))
+    						newAll.add(l);
     				}
     			}
     		}
     	}
     	return newAll;
+    }
+    
+    private boolean verifyAllDifferent(List<Term> terms) {
+    	HashSet<Term> set = new HashSet<Term>(terms);
+    	if(set.size() == terms.size())
+    		return true;
+    	return false;
     }
     
     private List<String> checkPrecondInOnto(TransitionSystem ts,Literal precondition) throws Exception {
@@ -197,9 +210,9 @@ public class findall extends DefaultInternalAction {
 			// should never happen with the written action model for now
 			throw new Exception("not handled case");
 		} else if(predicate.isObjectUnnamed && !predicate.isSubjectUnnamed) {
-			isInOnto = ((LAASAgArch) ts.getAgArch()).callOnto("getOn",predicate.subject+":"+predicate.property).getValues();
+			isInOnto = ((LAASAgArch) ts.getAgArch()).callOntoIndiv("getOn",predicate.subject+":"+predicate.property).getValues();
 		} else if(predicate.isSubjectUnnamed && !predicate.isObjectUnnamed) {
-			isInOnto = ((LAASAgArch) ts.getAgArch()).callOnto("getFrom",predicate.object+":"+predicate.property).getValues();
+			isInOnto = ((LAASAgArch) ts.getAgArch()).callOntoIndiv("getFrom",predicate.object+":"+predicate.property).getValues();
 		} else {
 			throw new Exception("not handled case");
 		}

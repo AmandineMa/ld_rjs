@@ -7,21 +7,17 @@ import rjs.ros.AbstractRosNode;
 
 public class RosNode extends AbstractRosNode {
 	
-//	private List<MementarOccasion> perceptions = Collections.synchronizedList(new ArrayList<MementarOccasion>());
-	
 	public RosNode(String name) {
 		super(name);
 	}
 
 	@Override
 	public GraphName getDefaultNodeName() {
-		return GraphName.of("supervisor_director");
+		return GraphName.of(name);
 	}
-	
 
 	public void init() {
 		super.init();
-		
 	}
 
 	@Override

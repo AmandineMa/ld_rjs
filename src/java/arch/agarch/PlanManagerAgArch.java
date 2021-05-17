@@ -9,12 +9,14 @@ public class PlanManagerAgArch extends LAASAgArch {
 	
 	public PlanManagerAgArch() {
 		super();
-		setDialogueListener();
 	}
 	
+	@Override
+	public void init() {
+		super.init();
+	}
 
-	
-	public void setDialogueListener() {
+	public void initListeners() {
 		rosnode.setSubListener("listen", new MessageListener<std_msgs.String>() {
 			
 			@Override

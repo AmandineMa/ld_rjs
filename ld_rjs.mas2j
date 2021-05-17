@@ -3,8 +3,15 @@ MAS ld_rjs {
 	infrastructure: Centralised
 	
 	agents:
-		supervisor [verbose=3] agentArchClass arch.agarch.SupervisorAgArch beliefBaseClass rjs.agent.TimeBB;
+		communication agentArchClass arch.agarch.ActionMonitoringAgArch beliefBaseClass rjs.agent.TimeBB agentClass rjs.agent.LimitedAgent;
+		action_monitoring agentArchClass arch.agarch.ActionMonitoringAgArch beliefBaseClass rjs.agent.TimeBB agentClass agent.OntoAgent;
+	    human_management agentArchClass arch.agarch.ActionMonitoringAgArch beliefBaseClass rjs.agent.TimeBB agentClass agent.OntoAgent;
+		robot_management agentArchClass arch.agarch.PlanManagerAgArch beliefBaseClass rjs.agent.TimeBB agentClass agent.OntoAgent;
+		robot_executor agentArchClass arch.agarch.LAASAgArch beliefBaseClass rjs.agent.TimeBB agentClass rjs.agent.LimitedAgent;
+		
+	directives: hpd=dir.HumanPresenceDir;
 
 	aslSourcePath:
 		"src/asl";
+	
 }

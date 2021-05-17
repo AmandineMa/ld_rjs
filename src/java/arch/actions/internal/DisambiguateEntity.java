@@ -52,7 +52,7 @@ public class DisambiguateEntity extends AbstractAction {
 		DisambiguationRequest disambiReq = getRosNode().newServiceRequestFromType(Disambiguation._TYPE);
 		disambiReq.setIndividual(individual);
 		disambiReq.setOntology(agent);
-		List<String> ontoRep = ((LAASAgArch) rosAgArch).callOnto("getOn", individual+":isAbove").getValues();
+		List<String> ontoRep = ((LAASAgArch) rosAgArch).callOntoIndiv("getOn", individual+":isAbove").getValues();
 		if(!ontoRep.isEmpty()) {
 			Triplet ctx = rosAgArch.createMessage(Triplet._TYPE);
 			ctx.setFrom("?0");

@@ -11,8 +11,9 @@ robotState(idle)[ground].
 /* Plans */
 
 +!start : true <-
-//	.verbose(2);
-//	rjs.jia.log_beliefs;
+	.verbose(2);
+	rjs.jia.log_beliefs;
+	!initRosComponents;
 	!getAgentNames.
 
 +action(ID,Name,Agent,Params) : robotState(idle) & robotName(Agent) <-
@@ -33,18 +34,32 @@ robotState(idle)[ground].
 +!executeAction(ID,Name,Agent,Params) : true <-
 	-+robotState(acting)[ground];
 	.lower_case(Name, Action);
-	.send([robot_management,human_management,action_monitoring], tell, action(ID,"ongoing",Name,Agent,Params));
+	if(jia.is_of_class(class,Name,"PhysicalAction")){
+		.send([robot_management,action_monitoring,human_management], tell, action(ID,"ongoing",Name,Agent,Params));
+		+action(ID,"ongoing",Name,Agent,Params);
+	} elif(jia.is_of_class(class,Name,"CommunicateAction")){
+		.send([communication], tell, action(ID,"todo",Name,Agent,Params));
+		+action(ID,"todo",Name,Agent,Params);
+	}
+	.random(X);
+	Y=math.round(X*1000000);
+	.concat(Name,"_",Y, NameX);
+	jia.insert_task_mementar(NameX,start);
 	Act =.. [Action, [Params],[]];
-	+action(ID,Name,"ongoing");
-//	!Act;
-	.wait(2000);
+	!Act;
+	jia.insert_task_mementar(NameX,end);
 	-+robotState(idle)[ground];
-	-+action(ID,Name,"executed");
-	.send([robot_management,human_management,action_monitoring], tell, action(ID,"executed",Name,Agent,Params)).
+	-action(ID,"ongoing",Name,Agent,Params)[source(_)];
+	+action(ID,Name,"executed");
+	if(jia.is_of_class(class,Name,"PhysicalAction")){
+		.send([robot_management,action_monitoring,human_management], tell, action(ID,"executed",Name,Agent,Params));
+	}else{
+		.send([robot_management,human_management], tell, action(ID,"executed",Name,Agent,Params));	
+	}.
 	
-+planOver : true <-
-	say("bravo ! we did it !").
-
++action(ID,"ongoing",Name,Agent,Params) : true <-
+	-action(ID,"todo",Name,Agent,Params).
+	
 +!reset : robotState(idle) <-
 	.drop_all_desires;
 	rjs.jia.abolish_all_except_ground.	
@@ -53,6 +68,4 @@ robotState(idle)[ground].
 	.wait(robotState(X) & X == idle);
 	.drop_all_desires;
 	rjs.jia.abolish_all_except_ground.	
-	
-	
 	

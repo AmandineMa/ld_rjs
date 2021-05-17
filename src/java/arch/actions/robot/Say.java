@@ -27,11 +27,10 @@ public class Say extends AbstractAction {
 		std_msgs.String str = rosAgArch.createMessage(std_msgs.String._TYPE);
 		str.setData(Tools.removeQuotes(actionTerms.get(2).toString()));
 		getRosNode().publish("say", str); 
-		logger.info("dialogue "+str.getData());
 		rosAgArch.addBelief("comm", Arrays.asList("r2h",commType,commParams));
-		((LAASAgArch) rosAgArch).callInsertAction("speak_"+actionID, AbstractROSAgArch.getRosnode().getConnectedNode().getCurrentTime(), ActionIndicator.START);
-		Tools.sleep(1000);
-		((LAASAgArch) rosAgArch).callInsertAction("speak_"+actionID,AbstractROSAgArch.getRosnode().getConnectedNode().getCurrentTime(), ActionIndicator.END);
+//		((LAASAgArch) rosAgArch).callInsertAction("speak_"+actionID, rosAgArch.getRosnode().getConnectedNode().getCurrentTime(), ActionIndicator.START);
+		Tools.sleep(5000);
+//		((LAASAgArch) rosAgArch).callInsertAction("speak_"+actionID,rosAgArch.getRosnode().getConnectedNode().getCurrentTime(), ActionIndicator.END);
 		actionExec.setResult(true);
 	}
 

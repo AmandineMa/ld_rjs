@@ -29,7 +29,7 @@ public class exist_possible_agent extends DefaultInternalAction {
 		while(it.hasNext()) {
 			Literal action = (Literal) it.next();
 			// object always element 1
-			List<String> isReachableBy = ((LAASAgArch) ts.getAgArch()).callOnto("getOn", 
+			List<String> isReachableBy = ((LAASAgArch) ts.getAgArch()).callOntoIndiv("getOn", 
 					Tools.removeQuotes(action.getTerm(1).toString())+":isReachableBy -s Human").getValues();
 			if(isReachableBy != null && !isReachableBy.isEmpty()) {
 				if(isReachableBy.size() == 1)

@@ -36,7 +36,7 @@ public abstract class AbstractClientPhysicalAction<T_ACTION_GOAL extends Message
 					getTimeMethod = feedback.getClass().getMethod("getActionStart");
 					getTimeMethod.setAccessible(true);
 					Time startTime  = (Time) getTimeMethod.invoke(feedback);
-					((LAASAgArch) rosAgArch).callInsertAction(actionName+actionID, startTime, ActionIndicator.START);
+//					((LAASAgArch) rosAgArch).callInsertAction(actionName+actionID, startTime, ActionIndicator.START);
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 					Tools.getStackTrace(e);
 				}
@@ -58,7 +58,7 @@ public abstract class AbstractClientPhysicalAction<T_ACTION_GOAL extends Message
 				getTimeMethod = result.getClass().getMethod("getActionEnd");
 				getTimeMethod.setAccessible(true);
 				Time endTime  = (Time) getTimeMethod.invoke(result);
-				((LAASAgArch) rosAgArch).callInsertAction(actionName+actionID, endTime, ActionIndicator.END);
+//				((LAASAgArch) rosAgArch).callInsertAction(actionName+actionID, endTime, ActionIndicator.END);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				Tools.getStackTrace(e);
 			}

@@ -1,16 +1,16 @@
 {include("plan_manager.asl")}
 {include("receiver.asl")}
 
-//abstractTask(0, "planned", "tidy_cubes", (-1)).
-//abstractTask(1, "planned", "tidy_one", 0).
-//action(3, "planned", "robot_congratulate", "robot", ["Helmet_2"], [8], 0).
-//action(4, "planned", "robot_tell_human_to_tidy", "robot", ["cube_BBCG","Helmet_2","throw_box_green"], [], 1).
-//abstractTask(5, "planned", "wait_for_human", 1).
-//abstractTask(6, "planned", "tidy", 0).
-//action(7, "planned", "human_pick_cube", "Helmet_2", ["cube_BBCG"], [4], 6).
-//action(8, "planned", "human_drop_cube", "Helmet_2", ["throw_box_green"], [9], 6).
-//action(9, "planned", "robot_wait_for_human_to_tidy", "robot", [], [7], 5).
-//action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
+abstractTask(0, "planned", "tidy_cubes", (-1)).
+abstractTask(1, "planned", "tidy_one", 0).
+action(3, "planned", "robot_congratulate", "robot", ["Helmet_2"], [8], 0).
+action(4, "planned", "robot_tell_human_to_tidy", "robot", ["cube_BBCG","Helmet_2","throw_box_green"], [], 1).
+abstractTask(5, "planned", "wait_for_human", 1).
+abstractTask(6, "planned", "tidy", 0).
+action(7, "planned", "human_pick_cube", "Helmet_2", ["cube_BBCG"], [4], 6).
+action(8, "planned", "human_drop_cube", "Helmet_2", ["throw_box_green"], [9], 6).
+action(9, "planned", "robot_wait_for_human_to_tidy", "robot", [], [7], 5).
+action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
 
 //abstractTask(0, "planned", "tidy_cubes", (-1)).
 //abstractTask(1, "planned", "tidy_one", 0).
@@ -41,16 +41,16 @@
 //action(8, "planned", "human_pick_cube", "Helmet_2", ["cube_GBTB"], [7], []).
 //action(9, "planned", "human_drop_cube", "Helmet_2", ["throw_box_green"], [8], []).
 
-abstractTask(0, "planned", "robot_make_coffee",(-1)).
-action(71, "planned", "robot_update_human_inventory", "robot", ["human","kitchen_cupboard"], [], 0).
-action(72, "planned", "IDLE", "human", [], [71],(-1)).
-action(74, "planned", "robot_ask_human_for_help", "robot", ["human"], [72], 0).
-//
-abstractTask(73, "planned", "human_help_make_coffee",(-1)).
+//abstractTask(0, "planned", "robot_make_coffee",(-1)).
+//action(71, "planned", "robot_update_human_inventory", "robot", ["human","kitchen_cupboard"], [], 0).
+//action(72, "planned", "IDLE", "human", [], [71],(-1)).
+//action(74, "planned", "robot_ask_human_for_help", "robot", ["human"], [72], 0).
+////
+//abstractTask(73, "planned", "human_help_make_coffee",(-1)).
 //abstractTask(14, "planned", "robot_help_make_coffee", 0).
 //
-action(84, "planned", "human_get_water", "human", [], [74], 73).
-abstractTask(93, "planned", "robot_get_coffee", 14).
+//action(84, "planned", "human_get_water", "human", [], [74], 73).
+//abstractTask(93, "planned", "robot_get_coffee", 14).
 //action(97, "planned", "robot_pick_coffee", "robot", ["pantry_cupboard"], [84], 93).
 //action(98, "planned", "human_pour_water_in_machine", "human", [], [97], 73).
 //action(99, "planned", "robot_put_coffee_in_machine", "robot", [], [98], 14).
@@ -58,8 +58,8 @@ abstractTask(93, "planned", "robot_get_coffee", 14).
 //action(101, "planned", "robot_serve_coffee", "robot", [], [100],(-1)).
 //action(102, "planned", "IDLE", "human", [], [101],(-1)).
 //
-abstractTask(75, "planned", "human_get_coffee", 73).
-action(80, "planned", "human_try_pick_coffee", "human", ["pantry_cupboard"], [74], 75).
+//abstractTask(75, "planned", "human_get_coffee", 73).
+//action(80, "planned", "human_try_pick_coffee", "human", ["pantry_cupboard"], [74], 75).
 //action(87, "planned", "robot_get_water", "robot", [], [80], 14).
 //action(88, "planned", "human_put_coffee_in_machine", "human", [], [87], 73).
 //action(89, "planned", "robot_pour_water_in_machine", "robot", [], [88], 14).
@@ -67,12 +67,13 @@ action(80, "planned", "human_try_pick_coffee", "human", ["pantry_cupboard"], [74
 //action(91, "planned", "robot_serve_coffee", "robot", [], [90],(-1)).
 //action(92, "planned", "IDLE", "human", [], [91],(-1)).
 
-
 !start.
 
 +!start : true <-
 	rjs.jia.log_beliefs;
-//	.verbose(2);
+	.verbose(2);
+	!initRosComponents;
+	jia.createGUI;
 	!getAgentNames.
 	
 +goal(Name, State) : State == received & not .substring("dtRR",Name) <-
@@ -89,6 +90,7 @@ action(80, "planned", "human_try_pick_coffee", "human", ["pantry_cupboard"], [74
 	}
 	-goal(Name, received)[source(supervisor)];
 	+goal(Name,active);
+	.send(human_management,tell,goal(Name,active));
 	!updatePlanActions.
 	
 +goal(Name, State) : State == preempted | State == aborted <-	
@@ -104,6 +106,7 @@ action(80, "planned", "human_try_pick_coffee", "human", ["pantry_cupboard"], [74
 	
 +!updatePlanTasksStart(Decompo) : true.
 
+@upte[atomic]
 +!updatePlanTasksEnd(Decompo,State) : abstractTask(_,_,_,_)
 							  &	.count(action(P,S,_,_,_,_,Decompo) & isNotOver(S), C) 	
 							  & .count(abstractTask(PT,S,_,Decompo) & isNotOver(S), CT)
@@ -123,7 +126,13 @@ action(80, "planned", "human_try_pick_coffee", "human", ["pantry_cupboard"], [74
 	
 +action(_,"ongoing",Name,Agent,Params)[source(_)] : action(ID,"executed",Name,Agent,Params,Preds,Decompo) <- true.
 
-@evExe[atomic]	
+@evTodo[atomic]
++action(_,"todo",Name,Agent,Params)[source(_)] : action(ID,"ongoing",Name,Agent,Params,Preds,Decompo) <-
+	-action(_,"todo",Name,Agent,Params)[source(_)];
+	-action(ID,"ongoing",Name,Agent,Params,Preds,Decompo);
+	+action(ID,"todo",Name,Agent,Params,Preds,Decompo).
+
+@evExe[atomic]
 +action(_,"executed",Name,Agent,Params)[source(_)] : wantedAction(Name,Agent,Params) <-
 	-action(_,"executed",Name,Agent,Params)[source(_)];
 	-action(ID,_,Name,Agent,Params,Preds,Decompo)[source(_)];
@@ -141,7 +150,7 @@ action(80, "planned", "human_try_pick_coffee", "human", ["pantry_cupboard"], [74
 	
 +abstractTask(ID,"executed",Name,Decompo) : true <-
 	?abstractTask(ID,nameX,NameX);
-	jia.insert_task_mementar(ID,NameX);
+	jia.insert_abstract_task_mementar(ID,NameX);
 	-abstractTask(ID,nameX,NameX).
 
 +abstractTask(ID,"unplanned",Name,Decompo) : true <-
@@ -153,9 +162,7 @@ action(80, "planned", "human_try_pick_coffee", "human", ["pantry_cupboard"], [74
 +action(ID,"todo",Name,Agent,Params,Preds,Decompo) : robotName(Agent) <-
 	.send(robot_executor, tell, action(ID,Name,Agent,Params)).
 	
-//temporary
-+action(ID,"todo",Name,Agent,Params,Preds,Decompo) : humanName(Agent) & Name == "IDLE" <-
-	+action(ID,"executed",Name,Agent,Params).
+//TODO idle human not removed
 	
 +!reset : true <-
 	.drop_all_desires;

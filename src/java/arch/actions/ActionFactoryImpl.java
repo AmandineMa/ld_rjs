@@ -16,7 +16,6 @@ import arch.actions.robot.PR2MotionExecute;
 import arch.actions.robot.Say;
 import arch.actions.robot.ScanTable;
 import arch.actions.robot.Strafe;
-import arch.actions.ros.StartROSNode;
 import arch.agarch.LAASAgArch;
 import dt_head_gestures.HeadScanActionFeedback;
 import dt_head_gestures.HeadScanActionGoal;
@@ -34,12 +33,11 @@ import pr2_motion_tasks_msgs.planActionResult;
 import rjs.arch.actions.AbstractActionFactory;
 import rjs.arch.actions.Action;
 import rjs.arch.actions.GetHATPPlan;
-import rjs.arch.actions.ros.ConfigureNode;
 import rjs.arch.actions.ros.InitServices;
 import rjs.arch.actions.ros.InitSub;
 import rjs.arch.actions.ros.RjsActionClient;
-import rjs.arch.actions.ros.StartParameterLoaderNode;
 import rjs.arch.agarch.AbstractROSAgArch;
+import rjs.ros.AbstractRosNode;
 
 public class ActionFactoryImpl extends AbstractActionFactory {
 	
@@ -48,8 +46,8 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 	private RjsActionClient<executeActionGoal, executeActionFeedback, executeActionResult> pr2MotionExecuteActionClient;
 	private RjsActionClient<HeadScanActionGoal, HeadScanActionFeedback, HeadScanActionResult> headScanActionClient;
 	
-	public void setRosVariables() {
-		super.setRosVariables();
+	public void setRosVariables(AbstractRosNode rosnode) {
+		super.setRosVariables(rosnode);
 		strafeActionClient = new RjsActionClient<MoveActionGoal, MoveActionFeedback, MoveActionResult>(
 				rosnode.getConnectedNode(), 
 				rosnode.getParameters().getString("/supervisor/action_servers/strafe"), 
@@ -119,15 +117,6 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 				break;
 			case "mementarUnsubscribe":
 				action = new MementarUnsubscribe(actionExec, rosAgArch);
-				break;
-			case "configureNode":
-				action = new ConfigureNode(actionExec, rosAgArch);
-				break;
-			case "startParameterLoaderNode":
-				action = new StartParameterLoaderNode(actionExec, rosAgArch);
-				break;
-			case "startROSNode":
-				action = new StartROSNode(actionExec, rosAgArch);
 				break;
 			case "initServices":
 				action = new InitServices(actionExec, rosAgArch);

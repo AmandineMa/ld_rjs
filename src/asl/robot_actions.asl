@@ -64,17 +64,10 @@
 
 +!robot_tell_human_to_tidy(Params): true <-
 	?humanName(Human);
-	rjs.jia.delete_from_list(Human,Params,ParamsNoH);
-	for(.member(P,ParamsNoH)){
-		!getUnRef(P,Human);
-	}
-	.findall(P,.member(P,ParamsNoH) & jia.query_onto_class(P,"Cube"),CubeL);
-	.findall(P,.member(P,ParamsNoH) & jia.query_onto_class(P,"Box"),BoxL);
-	.nth(0,CubeL,Cube);
-	.nth(0,BoxL,Box);
-	?verba(Cube,VerbaCube);
-	?verba(Box,VerbaBox);
-	!sayPickPlace(VerbaCube, VerbaBox).
+	.findall(P,.member(P,Params) & jia.is_of_class(individual,P,"Cube"),CubeL);
+	.findall(P,.member(P,Params) & jia.is_of_class(individual,P,"Box"),BoxL);
+	?action(ID,_,Name,_,Params);
+	.send(communication,askOne,askActionsTodo([action(ID,"PickAction",CubeL),action(ID,"DropAction",BoxL)],and),Answer).
 
 +!robot_wait_for_human_to_tidy(Params): true <- true.
 
@@ -88,5 +81,6 @@
 +!head_scan(Params): true <-
 	scanTable.
 
-	
++!robot_congratulate(Params): true <-
+	.send(communication,askOne,talk("Bravo, we did it !"),Answer).
 	
