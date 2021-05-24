@@ -26,6 +26,9 @@
 	
 +!dispatchAction : true.	
 
++!drop(G) : true <-
+	!reset.
+
 //plans with directive hdp which adds the plan @whls at the beginning of each inner plan
 {begin hpd}
 @iae[atomic]
@@ -54,6 +57,12 @@
 	say(ask,["todo",ActionList,Operator],Sentence);
 	.send(ASLAgent,tell,asked(todo,ActionList));
 	-action(ID,"ongoing",Name,Agent,Params).
+
+@as[atomic]	
++?askStop(Answer)[source(ASLAgent)] : true <-
+	say(ask,[stop_task],"You're not acting, should we stop the task ?");
+	.wait(sentence(Answer));
+	.send(ASLAgent,tell,asked(stop)).
 	
 @talk[atomic]	
 +?talk(Sentence)[source(ASLAgent)]: true <- 
@@ -61,3 +70,7 @@
 	.send(ASLAgent,tell,informed(Sentence)).
 {end}
 
++sentence(Sentence) : .substring("cannot",Sentence) <-
+	.send(human_management,tell,said(cannot_do)).
+	
+	

@@ -99,6 +99,12 @@ action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
 +goal(Name,State) : State == succeeded <-
 	true.
 	
+//TODO to implement	
++replan(Name)[source(human_management)] : true.
+//TODO is it enough ?
++drop(Name)[source(human_management)] : true <-
+	!reset.
+	
 +!updatePlanTasksStart(Decompo) : abstractTask(Decompo,S,_,_) & S == "planned" <-	
 	-abstractTask(Decompo,"planned",Name,Decompo2);
 	++abstractTask(Decompo,"ongoing",Name,Decompo2);
@@ -118,8 +124,43 @@ action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
 	
 +!updatePlanTasksEnd(Decompo,State) : true.
 
++action(ID,"todo",Name,Agent,Params,Preds,Decompo) : humanName(Agent) & jia.is_of_class(class,Name,"PhysicalAction") <-
+	!chooseParamToMonitor(Name,Params,P);
+	setHMAtemp(P,environment_monitoring,urgent);
+//	setHMBuff([environment_monitoring,prioritize]);
+	!waitParamSeenOrActionStateChange(ID,Name,Agent,Params,Preds,Decompo,P).
+	
++!waitParamSeenOrActionStateChange(ID,Name,Agent,Params,Preds,Decompo,P) : true <-
+	!waitParamSeen(P) ||| !waitActionStateChange(ID,Name,Agent,Params,Preds,Decompo,P).
+	
++!waitParamSeen(Name,P) : true <-
+	.wait(isPerceiving(P),100000).
+
+-!waitParamSeen(Name,P) : true <-
+	!lookForObject(Name,P).
+
++!lookForObject(Name,P) : true <-
+	!scanTable(P) ||| !waitToPerceive(P).
+	
++!scanTable(P) : true <-
+	.send(robot_executor,askOne,scanTable,A).
+	
++!waitToPerceive(P) : true <-
+	.wait(isPerceiving(P));
+	.send(robot_executor,tell,cancel(scanTable)).
+	
++!waitActionStateChange(ID,Name,Agent,Params,Preds,Decompo,P) : true <-
+	.wait(action(ID,"ongoing",Name,Agent,Params,Preds,Decompo) | action(ID,"executed",Name,Agent,Params,Preds,Decompo));
+	if(.intend(scanTable(P))){
+		.send(robot_executor,tell,cancel(scanTable));
+	}.
+	
+//TODO refine with another way to choose the param to monitor if there are several 	
++!chooseParamToMonitor(Name,Params,P) : true <-
+	.nth(0,Params,P).
+
 @evOngoing[atomic]
-+action(_,"ongoing",Name,Agent,Params)[source(_)] : action(ID,"todo",Name,Agent,Params,Preds,Decompo) <-
++action(_,"ongoing",Name,Agent,Params)[source(human_management)] : action(ID,"todo",Name,Agent,Params,Preds,Decompo) <-
 	-action(_,"ongoing",Name,Agent,Params)[source(_)];
 	-action(ID,"todo",Name,Agent,Params,Preds,Decompo);
 	+action(ID,"ongoing",Name,Agent,Params,Preds,Decompo).
@@ -127,13 +168,15 @@ action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
 +action(_,"ongoing",Name,Agent,Params)[source(_)] : action(ID,"executed",Name,Agent,Params,Preds,Decompo) <- true.
 
 @evTodo[atomic]
-+action(_,"todo",Name,Agent,Params)[source(_)] : action(ID,"ongoing",Name,Agent,Params,Preds,Decompo) <-
++action(_,"todo",Name,Agent,Params)[source(human_management)] : action(ID,"ongoing",Name,Agent,Params,Preds,Decompo) <-
 	-action(_,"todo",Name,Agent,Params)[source(_)];
 	-action(ID,"ongoing",Name,Agent,Params,Preds,Decompo);
 	+action(ID,"todo",Name,Agent,Params,Preds,Decompo).
-
+	
 @evExe[atomic]
-+action(_,"executed",Name,Agent,Params)[source(_)] : wantedAction(Name,Agent,Params) <-
++action(_,"executed",Name,Agent,Params)[source(human_management)] : wantedAction(Name,Agent,Params) <-
+	!chooseParamToMonitor(Name,Params,P);
+	setHMAtemp(P,environment_monitoring,void);
 	-action(_,"executed",Name,Agent,Params)[source(_)];
 	-action(ID,_,Name,Agent,Params,Preds,Decompo)[source(_)];
 	+action(ID,"executed",Name,Agent,Params,Preds,Decompo);
@@ -162,9 +205,5 @@ action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
 +action(ID,"todo",Name,Agent,Params,Preds,Decompo) : robotName(Agent) <-
 	.send(robot_executor, tell, action(ID,Name,Agent,Params)).
 	
-//TODO idle human not removed
-	
-+!reset : true <-
-	.drop_all_desires;
-	rjs.jia.abolish_all_except_ground.
+
 

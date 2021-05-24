@@ -1,6 +1,5 @@
 package arch.actions.robot;
 
-import actionlib_msgs.GoalStatusArray;
 import arch.actions.AbstractClientPhysicalAction;
 import arch.agarch.LAASAgArch;
 import jason.asSemantics.ActionExec;
@@ -21,10 +20,6 @@ public class PR2MotionExecute extends AbstractClientPhysicalAction<executeAction
 
 	@Override
 	public void feedbackReceived(executeActionFeedback feedback) {
-	}
-
-	@Override
-	public void statusReceived(GoalStatusArray status) {
 	}
 
 	@Override

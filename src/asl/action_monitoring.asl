@@ -84,9 +84,7 @@ isPredicateRobotAction(NewPredicate, Params) :-
         }
         .term2string(Prop,PropS);
         .delete("~",PropS,PropF)
-        if(not rjs.jia.believes(monitoring(_,Function,"?",PropF,"?",_))){
-                mementarSubscribe(Function,"?",PropF,"?",-1);
-        };
+        mementarSubscribe(Function,"?",PropF,"?",-1);
     }.
 
 +action(ID,"executed",Name,Agent,Params)[source(robot_executor)] : true <-
@@ -174,5 +172,7 @@ isPredicateRobotAction(NewPredicate, Params) :-
 		+M;
 	}.
 	
++!drop(G) : true <-
+	!reset.
 
 	

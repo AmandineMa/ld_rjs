@@ -2,6 +2,7 @@ package arch.actions.internal;
 
 import java.util.Arrays;
 
+import arch.actions.AbstractPR2MotionPlan;
 import jason.asSemantics.ActionExec;
 import pr2_motion_tasks_msgs.planActionFeedback;
 import pr2_motion_tasks_msgs.planActionGoal;

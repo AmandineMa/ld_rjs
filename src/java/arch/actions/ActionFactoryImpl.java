@@ -11,7 +11,8 @@ import arch.actions.internal.PR2MotionPlanDrop;
 import arch.actions.internal.PR2MotionPlanMoveArm;
 import arch.actions.internal.PR2MotionPlanPick;
 import arch.actions.internal.PR2MotionPlanPlace;
-import arch.actions.robot.LookAt;
+import arch.actions.robot.SetHeadManagerAtemporalInput;
+import arch.actions.robot.SetHeadManagerInputBufferPriorities;
 import arch.actions.robot.PR2MotionExecute;
 import arch.actions.robot.Say;
 import arch.actions.robot.ScanTable;
@@ -127,8 +128,11 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 			case "scanTable":
 				action = new ScanTable(actionExec, (LAASAgArch) rosAgArch, headScanActionClient);
 				break;
-			case "lookAt":
-				action = new LookAt(actionExec, rosAgArch);
+			case "setHMAtemp":
+				action = new SetHeadManagerAtemporalInput(actionExec, rosAgArch);
+				break;
+			case "setHMBuff":
+				action = new SetHeadManagerInputBufferPriorities(actionExec, rosAgArch);
 				break;
 			default:
 				break;

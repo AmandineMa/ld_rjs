@@ -2,7 +2,6 @@ package arch.actions.robot;
 
 import org.ros.message.Duration;
 
-import actionlib_msgs.GoalStatusArray;
 import arch.actions.AbstractClientPhysicalAction;
 import arch.agarch.LAASAgArch;
 import dt_head_gestures.HeadScanActionFeedback;
@@ -49,10 +48,6 @@ public class ScanTable extends AbstractClientPhysicalAction<HeadScanActionGoal, 
 
 	@Override
 	protected void setResultAborted(HeadScanActionResult result) {
-	}
-
-	@Override
-	public void statusReceived(GoalStatusArray arg0) {
 	}
 
 	@Override

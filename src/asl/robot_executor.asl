@@ -57,8 +57,16 @@ robotState(idle)[ground].
 		.send([robot_management,human_management], tell, action(ID,"executed",Name,Agent,Params));	
 	}.
 	
++?scanTable : true <-
+	scanTable.
+	
+-?scanTable : true.
+
 +action(ID,"ongoing",Name,Agent,Params) : true <-
 	-action(ID,"todo",Name,Agent,Params).
+	
++!drop(G) : true <-
+	!reset.
 	
 +!reset : robotState(idle) <-
 	.drop_all_desires;

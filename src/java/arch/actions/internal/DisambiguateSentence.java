@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import arch.actions.AbstractDisambiguationAction;
 import jason.asSemantics.ActionExec;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;

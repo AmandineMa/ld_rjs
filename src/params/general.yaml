@@ -26,7 +26,7 @@ supervisor:
    sparql_robot:
       name: /ontologenius/sparql/robot
       type: ontologenius/OntologeniusSparqlService
-   #TODO pas propre, service de l'humain à créer on the fly
+ #  TODO pas propre, service de l'humain à créer on the fly
    sparql_human:
       name: /ontologenius/sparql/Helmet_2
       type: ontologenius/OntologeniusSparqlService
@@ -43,14 +43,14 @@ supervisor:
      name: /mementar/occasions/robot
      type: mementar/MementarOccasion
      function: sub
-#    plan:
-#       name: /planner/plan_answer
-#       type: planner_msgs/Plan
-#       function: sub
-#    listen:
-#       name: /ros_stt/said
-#       type: std_msgs/String
-#       function: sub
+   plan:
+      name: /planner/plan_answer
+      type: planner_msgs/Plan
+      function: sub
+   listen:
+      name: /ros_stt/said
+      type: std_msgs/String
+      function: sub
    plan_request:
       name: /planner/request_new_plan
       type: planner_msgs/PlanRequest
@@ -63,17 +63,29 @@ supervisor:
       name: /mementar/insert_action/robot
       type: mementar/MementarAction
       function: pub
-   pr2_head:
+   pr2_head_environment_monitoring:
       name: /pr2_head_manager/environment_monitoring/pr2_head_manager_msgs_Point
       type: pr2_head_manager_msgs/Point
       function: pub
-      
+   pr2_head_human_monitoring:
+      name: /pr2_head_manager/human_monitoring/pr2_head_manager_msgs_Point
+      type: pr2_head_manager_msgs/Point
+      function: pub
+   pr2_head_human_hand_monitoring:
+      name: /pr2_head_manager/human_hand_monitoring/pr2_head_manager_msgs_Point
+      type: pr2_head_manager_msgs/Point
+      function: pub     
+   pr2_head_prio:
+      name: /pr2_head_manager/set_priorities
+      type: resource_management_msgs/PrioritiesSetter
+      function: pub    
     
   action_servers:
     plan_motion: /pr2_tasks_node/plan
     execute_motion: /pr2_tasks_node/execute
     strafe: /dt_navigation/dt_strafe
     head_scan: /dt_head_gestures/head_scan
+    dialogue: /dialogue_as
      
        
   

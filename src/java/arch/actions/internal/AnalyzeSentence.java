@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import arch.actions.AbstractDisambiguationAction;
 import jason.asSemantics.ActionExec;
 import jason.asSyntax.LiteralImpl;
 import jason.asSyntax.Term;

@@ -2,7 +2,6 @@ package arch.actions.robot;
 
 import java.util.Arrays;
 
-import actionlib_msgs.GoalStatusArray;
 import arch.actions.AbstractClientPhysicalAction;
 import arch.agarch.LAASAgArch;
 import dt_navigation.MoveActionFeedback;
@@ -20,9 +19,6 @@ public class Strafe extends AbstractClientPhysicalAction<MoveActionGoal, MoveAct
 		super(actionExec, rosAgArch, actionClient);
 	}
 
-
-	@Override
-	public void statusReceived(GoalStatusArray arg0) {}
 
 	@Override
 	public MoveActionGoal computeGoal() {

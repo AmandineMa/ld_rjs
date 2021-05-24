@@ -9,29 +9,48 @@ isActionMatching(Name,Agent,Params,Type) :-
     )
     & jia.is_same_action_type(Prop,Name) & T1==Agent.
     
-!start.
+isMonitoredActionInPlan(Type,PlanActions) :-
+	Type & Type=..[T,[A],[]] & .member(M,A)
+    & (   M=..[Prop,[T1],[]] 
+    	| M=..[Prop,[T1,T2],[]] 
+    	| M=..[Prop,[T1,T2,T3],[]]
+    )
+    & .findall(action(ID,State,Name,Agent,Params,Preds,Decompo),
+    	action(ID,State,Name,Agent,Params,Preds,Decompo)[source(_)] & T1==Agent & jia.is_same_action_type(Prop,Name) 
+    			  & (.empty(Params) & not .ground(T2) | .member(T2,Params) & not .ground(T3) | .ground(T3) & .member(T3,Params)),
+    	PlanActions
+    ).
 
+notAlreadyAsked(ID) :- 
+	.findall(action(I), 
+		asked(todo,ActionList)[source(communication)] 
+		& .member(A,ActionList) 
+		& A=..[Pred,[I,N,P],[]]
+		& I==ID,
+		L
+	) & .empty(L) 
+	| not asked(todo,ActionList)[source(communication)].
+	
+!start.
+	
 +!start : true <-
     rjs.jia.log_beliefs;
     .verbose(2);
-	!initRosComponents;
-    !getAgentNames;
     !initRosComponents;
+    !getAgentNames;
     ?humanName(HName);
     ?robotName(Robot);
     mementarSubscribe("?",HName,isInFoV,Robot,-1);
     mementarSubscribe("?",HName,isLookingAt,Robot,-1);
     mementarSubscribe("?",Robot,isPerceiving,HName,-1).
-//    .wait(5000);
-//    +possibleStartedActions([human_get_water("human")])[source(action_monitoring)];
-//    .wait(10000);
-//    +possibleFinishedActions([human_get_water("human")])[source(action_monitoring)].
  
 +!updatePlanTasksStart(Decompo) : true.
 
 +!updatePlanTasksEnd(Decompo,State) : true. 
-    
-////////////////// Action to perform by human //////////////////    
+
+//////////////////////////////////////////////////////////////////	 
+////////////////// Action to perform by human ////////////////////    
+//////////////////////////////////////////////////////////////////	
 
 +action(ID,"todo",Name,Agent,Params,Preds,Decompo) : humanName(Agent) & Name == "IDLE" <-
 	-action(ID,"todo",Name,Agent,Params,Preds,Decompo);
@@ -88,17 +107,30 @@ isActionMatching(Name,Agent,Params,Type) :-
 	jia.insert_task_mementar(NameX,end);
 	-action(ID,nameX,NameX).
 
-+action(ID,"not_starting",Name,Agent,Params,Preds,Decompo) : 
-	.findall(action(N,P), 
-		asked(todo,ActionList)[source(communication)] 
-		& .member(A,ActionList) 
-		& A=..[Pred,[I,N,P],[]]
-		& N==Name,
-		L
-	) & .empty(L)
-	| not asked(todo,ActionList)[source(communication)] 
-	<-
++action(ID,"not_starting",Name,Agent,Params,Preds,Decompo) : notAlreadyAsked(ID) <-
 	!handleNotStarting(ID,"not_starting",Name,Agent,Params,Preds,Decompo).
+
++action(ID,"not_starting",Name,Agent,Params,Preds,Decompo) : true <-
+	!askStop.
+
++action(ID,"not_finished",Name,Agent,Params,Preds,Decompo) : notAlreadyAsked(ID) <-
+ 	.send(communication,askOne,askActionsTodo([action(ID,Name,Params)],_),Answer);
+ 	.send(communication,askOne,talk("I think you started to do it but did not finish it."),Answer2);
+ 	-action(ID,_,Name,Agent,Params,Preds,Decompo);
+	++action(ID,"todo",Name,Agent,Params,Preds,Decompo).
+
++action(ID,"not_finished",Name,Agent,Params,Preds,Decompo) : true <-
+	!askStop.
+	
++!askStop(ID,_,Name,Agent,Params,Preds,Decompo) : true <-
+	.send(communication,askOne,askStop(Answer),A);
+	if(A=..[askStop,["yes"],[S]]){
+		?goal(GName,GState)[source(_)];
+		.broadcast(tell,drop(GName));
+		!reset;
+	}else{
+		.send(communication,askOne,askActionsTodo([action(ID,Name,Params)],_),Answer);
+	}.
 
 //only one plan as this one at a time
 +!handleNotStarting(ID,"not_starting",Name,Agent,Params,Preds,Decompo) : not .intend(handleNotStarting(_,_,_,_,_,_,_)) <-
@@ -114,11 +146,42 @@ isActionMatching(Name,Agent,Params,Type) :-
 //everything is handled with the plan above	
 +!handleNotStarting(ID,"not_starting",Name,Agent,Params,Preds,Decompo) : true.
 	
-+action(ID,"not_starting",Name,Agent,Params,Preds,Decompo) : true <-
-	//TODO to define-
-	.print("nothing to do").
-	  
++possibleFinishedActions(A)[source(action_monitoring)] : isMonitoredActionInPlan(possibleFinishedActions(A),PlanActions)  & goal(GName,GState)[source(_)]<-
+	for(.member(A,ActionList)){
+		A =.. [P,[ID,State,Name,Agent,Params,Preds,Decompo],[]];
+		if(State=="todo"){
+			.drop_desire(waitForActionToStart(ID,Name,Agent,Params,Preds,Decompo));
+			!suspendActionsWithSamePreds(Preds);
+    		!waitForActionToFinish(ID,Name,Agent,Params,Preds,Decompo);
+		}elif(State=="planned"){
+			?robotName(Robot);
+			if(action(IDX,"ongoing",NameX,Robot,ParamsX,PredsX,DecompoX) & .member(IDX,Preds)){
+				.send(communication,askOne,talk("You are fast ! I was supposed to finish before you"),Answer);
+				!waitForActionToFinish(ID,Name,Agent,Params,Preds,Decompo);
+			}else{
+				.send(robot_management,tell,replan(GName));
+				.send(communication,askOne,talk("I replan"),Answer);
+			}
+		}elif(State=="unplanned"){
+			.send(robot_management,tell,replan(GName));
+			.send(communication,askOne,talk("I replan"),Answer);
+		}elif(State=="not_starting" | State=="not_finished"){
+			!waitForActionToFinish(ID,Name,Agent,Params,Preds,Decompo);
+		}
+	}.
+	
++possibleFinishedActions(A)[source(action_monitoring)] : true <-
+	.send(communication,askOne,talk("I think you made a mistake, it was not part of the plan"),Answer).
+	
++said(cannot_do)[source(communication)] : action(ID,State,Name,Robot,Params,Preds,Decompo)  
+	& (State == "not_finished" | State == "not_starting" | State == "todo") & goal(GName,GState)[source(_)] <-
+	.drop_all_intentions;
+	.send(robot_management,tell,replan(GName)).
+
+//////////////////////////////////////////////////////////////////	  
 //////////////////// Action being performed by robot ///////////// 
+//////////////////////////////////////////////////////////////////	
+
 +action(ID,"ongoing",Name,Robot,Params)[source(_)] : jia.is_of_class(class,Name,"CommunicateAction") <-	
 	-action(_,"ongoing",Name,Robot,Params)[source(_)];
 	-action(ID,_,Name,Robot,Params,Preds,Decompo)[source(_)];
