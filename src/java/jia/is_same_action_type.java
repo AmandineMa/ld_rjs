@@ -12,23 +12,26 @@ import rjs.utils.Tools;
 public class is_same_action_type extends DefaultInternalAction {
 	
 	@Override public int getMinArgs() {
-        return 3;
+        return 2;
     }
     @Override public int getMaxArgs() {
-        return 3;
+        return 2;
     }
 
 	@Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
-		String recognizedAction = Tools.removeQuotes(args[0].toString());
-		recognizedAction = recognizedAction.substring(0, 1).toUpperCase() + recognizedAction.substring(1) + "Action";
-		String planAction =  Tools.removeQuotes(args[1].toString());
-		List<String> ontoClass = ((LAASAgArch) ts.getAgArch()).callOnto("class","getUp", planAction+" -s "+recognizedAction).getValues();
-		if(ontoClass != null && !ontoClass.isEmpty()) {
-			return true;
-		}else {
-			return false;
-		}
+			String recognizedAction = supervisorNameToOntoName(Tools.removeQuotes(args[0].toString()));
+			String planAction =  Tools.removeQuotes(args[1].toString());
+			List<String> ontoClass = ((LAASAgArch) ts.getAgArch()).callOnto("class","getUp", planAction+" -s "+recognizedAction).getValues();
+			if(ontoClass != null && !ontoClass.isEmpty()) {
+				return true;
+			}else {
+				return false;
+			}
+	}
+	
+	protected String supervisorNameToOntoName(String supName) {
+		return supName.substring(0, 1).toUpperCase() + supName.substring(1) + "Action";
 	}
 
 

@@ -90,7 +90,7 @@ public class action_verbalization extends DefaultInternalAction {
 			if(regexGroups.size() == params.size()) {
 				for(String param : params) {
 					for(String className : regexGroups) {
-						List<String> sameClass = ((LAASAgArch) ts.getAgArch()).callOntoIndiv("getUp",param+" -s "+className).getValues();
+						List<String> sameClass = ((LAASAgArch) ts.getAgArch()).callOntoIndivRobot("getUp",param+" -s "+className).getValues();
 						if(!sameClass.isEmpty()) {
 							if(actionVerba.isBlank())
 								actionVerba = actionVerbaList.get(i);

@@ -1,5 +1,6 @@
 { include("common.asl")}
 { include("plan_manager.asl")}
+{ register_function("rjs.function.length_allow_unground") } 
 
 isActionMatching(Name,Agent,Params,Type) :-
     Type & Type=..[T,[A],[Source]] & .member(M,A)
@@ -30,6 +31,14 @@ notAlreadyAsked(ID) :-
 		L
 	) & .empty(L) 
 	| not asked(todo,ActionList)[source(communication)].
+	
+actionEffectsVisible(Name,Params) :- 
+	jia.get_action_type(Name,Action,robot) 
+	& Action =..[ActMod,[ActPred,Effects],S] 
+	& ActPred =..[ActModName,[Agent,ParamsAction],[]]
+	& jia.members_same_type(Params,ParamsAction)
+	& .count(.member(M,Effects) & M=..[Pred,[P1,P2],[]] & jia.is_relation_in_onto(P1,Pred,P2,false,human),C)
+	& rjs.function.length_allow_unground(Effects)==C.
 	
 !start.
 	
@@ -235,11 +244,13 @@ notAlreadyAsked(ID) :-
 		+isPerceiving(Robot,HName);
 	};
 	.wait(isPerceiving(Robot,HName));
-	.send(communication,askOne,informActionExecuted(Name,Params),Answer);
+	!checkActionEffects(Name,Params);
 	-action(ID,"not_seen",Name,Robot,Params,Preds,Decompo);
 	+action(ID,"executed",Name,Robot,Params,Preds,Decompo);
 	!updatePlanActions.
 	
++!checkActionEffects(Name,Params) : not actionEffectsVisible(Name,Params) <-
+	.send(communication,askOne,informActionExecuted(Name,Params),Answer);.
 	
-	
++!checkActionEffects(Name,Params) : true.
 	

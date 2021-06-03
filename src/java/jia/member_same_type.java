@@ -117,7 +117,7 @@ public class member_same_type extends DefaultInternalAction {
 									Matcher m = p.matcher(object);
 									if(m.find()) {
 										type = m.group(1);
-										List<String> isRightType = ((LAASAgArch) ts.getAgArch()).callOntoIndiv("getUp",term+" -s "+type).getValues();
+										List<String> isRightType = ((LAASAgArch) ts.getAgArch()).callOntoIndivRobot("getUp",term+" -s "+type).getValues();
 										if(isRightType == null || isRightType.isEmpty()) {
 											c = null;
 											break;
@@ -133,7 +133,7 @@ public class member_same_type extends DefaultInternalAction {
 										type = m.group(1);
 										for(Term t : listTerm) {
 											String term = Tools.removeQuotes(t.toString());
-											List<String> isRightType = ((LAASAgArch) ts.getAgArch()).callOntoIndiv("getUp",term+" -s "+type).getValues();
+											List<String> isRightType = ((LAASAgArch) ts.getAgArch()).callOntoIndivRobot("getUp",term+" -s "+type).getValues();
 											if(isRightType == null || isRightType.isEmpty()) {
 												((ListTerm) c.get(object)).remove(t);
 											}

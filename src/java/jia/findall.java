@@ -64,7 +64,7 @@ public class findall extends DefaultInternalAction {
         ListTerm tail = all;
         Iterator<Unifier> iu = logExpr.logicalConsequence(ts.getAg(), un);
         ListTerm newAll = new ListTermImpl();
-        // iteration on actions from the human_actions model
+        // iteration on actions from the action models
         while (iu.hasNext()) {
         	Unifier u = iu.next();
         	ListTerm temp = new ListTermImpl();
@@ -210,9 +210,9 @@ public class findall extends DefaultInternalAction {
 			// should never happen with the written action model for now
 			throw new Exception("not handled case");
 		} else if(predicate.isObjectUnnamed && !predicate.isSubjectUnnamed) {
-			isInOnto = ((LAASAgArch) ts.getAgArch()).callOntoIndiv("getOn",predicate.subject+":"+predicate.property).getValues();
+			isInOnto = ((LAASAgArch) ts.getAgArch()).callOntoIndivRobot("getOn",predicate.subject+":"+predicate.property).getValues();
 		} else if(predicate.isSubjectUnnamed && !predicate.isObjectUnnamed) {
-			isInOnto = ((LAASAgArch) ts.getAgArch()).callOntoIndiv("getFrom",predicate.object+":"+predicate.property).getValues();
+			isInOnto = ((LAASAgArch) ts.getAgArch()).callOntoIndivRobot("getFrom",predicate.object+":"+predicate.property).getValues();
 		} else {
 			throw new Exception("not handled case");
 		}
