@@ -11,4 +11,7 @@ plan_manager:
       dtRR: 
          name: robot_receiver
          container: throw_box_green    
+         
+      stack:
+         name: Build
                                  

@@ -1,13 +1,11 @@
 package jia;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import arch.agarch.LAASAgArch;
-import jason.asSemantics.ActionExec;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
@@ -15,8 +13,6 @@ import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.StringTermImpl;
 import jason.asSyntax.Term;
-import rjs.arch.actions.AbstractAction;
-import rjs.arch.agarch.AbstractROSAgArch;
 import rjs.utils.Tools;
 
 public class action_verbalization extends DefaultInternalAction {

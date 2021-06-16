@@ -4,6 +4,10 @@ actionModel(pick(Human,Pickable),[handEmpty(Human,_),isOnTopOf(Pickable,Support)
 
 actionModel(place(Human,Pickable,Support),[hasInHand(Human,Pickable)],[handMovingToward(Human,SupportList)],[~hasInHand(Human,Pickable)],[isOnTopOf(Pickable,Support)]).
 
+actionModel(pickAndPlace(Human,Pickable,Support),[handEmpty(Human,_),isOnTopOf(Pickable,Support)],[handMovingToward(Human,SupportList)],[~hasInHand(Human,Pickable)],[isOnTopOf(Pickable,Support)]).
+
+actionModel(pickAndPlaceStick(Human,Pickable,Support1,Support2),[handEmpty(Human,_),isOnTopOf(Pickable,Support)],[handMovingToward(Human,SupportList)],[~hasInHand(Human,Pickable)],[isOnTopOf(Pickable,Support1),isOnTopOf(Pickable,Support2)]).
+
 actionModel(drop(Human,Pickable,Container),[hasInHand(Human,Pickable)],[handMovingToward(Human,ContainerList)],[~hasInHand(Human,Pickable)],[isIn(Pickable,Container)]).
 
 actionModel(openContainer(Human,Drawer),[handEmpty(Human,_)],[handMovingToward(Human,DrawerList)],[hasInHand(Human,Drawer)],[isOpen(Drawer,_)]).

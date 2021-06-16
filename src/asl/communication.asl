@@ -4,7 +4,7 @@
 
 +!start : true <-
 	.verbose(2);
-	rjs.jia.log_beliefs;
+//	rjs.jia.log_beliefs;
 	!initRosComponents;
 	!getAgentNames.
 	
@@ -12,7 +12,7 @@
 +!waitHumanListeningState : true <-
 	!wait.	
 	
-+!wait : humanName(HName) & robotName(Robot) & not jia.is_relation_in_onto(Robot,isPerceiving,HName,false) <-
++!wait : humanName(HName) & robotName(Robot) & not jia.is_relation_in_onto(Robot,isPerceiving,HName,false,robot) <-
 	mementarSubscribe("?",Robot,isPerceiving,HName,-1);
 	.wait(isPerceiving(Robot,HName));
 	!dispatchAction.

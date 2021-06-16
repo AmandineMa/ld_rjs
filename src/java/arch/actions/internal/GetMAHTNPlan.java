@@ -27,6 +27,8 @@ public class GetMAHTNPlan extends AbstractAction {
 		super(actionExec, rosAgArch);
 		
 	}
+	
+	// request asl : getMAHTNPlan([[name_t1,param1_t1,param2_t1],[name_t2, param1_t2]],[Human1,Human2]);
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -42,7 +44,7 @@ public class GetMAHTNPlan extends AbstractAction {
 					if(task.getType() == Task.PRIMITIVE_TASK) {
 						// put parameters in alphabetical order to match planned and executed
 						List<String> parameters = task.getParameters();
-						parameters.sort(String::compareToIgnoreCase);
+//						parameters.sort(String::compareToIgnoreCase);
 						
 						ListTerm preds = new ListTermImpl();
 						preds = ListTermImpl.parseList(Tools.arrayToStringArray(task.getPredecessors()));

@@ -1,16 +1,24 @@
 {include("plan_manager.asl")}
 {include("receiver.asl")}
+{ register_function("rjs.function.length_allow_unground") } 
 
-abstractTask(0, "planned", "tidy_cubes", (-1)).
-abstractTask(1, "planned", "tidy_one", 0).
-action(3, "planned", "robot_congratulate", "robot", ["Helmet_2"], [8], 0).
-action(4, "planned", "robot_tell_human_to_tidy", "robot", ["cube_BBCG","Helmet_2","throw_box_green"], [], 1).
-abstractTask(5, "planned", "wait_for_human", 1).
-abstractTask(6, "planned", "tidy", 0).
-action(7, "planned", "human_pick_cube", "Helmet_2", ["cube_BBCG"], [4], 6).
-action(8, "planned", "human_drop_cube", "Helmet_2", ["throw_box_green"], [9], 6).
-action(9, "planned", "robot_wait_for_human_to_tidy", "robot", [], [7], 5).
-action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
+//action(2503, "planned", "PickAndPlace", "AGENTX", ["?0 isA Cube. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }","?0 isA Spot NOT EXISTS { ?0 isUnder ?2. ?2 isA Cube }"], [], 2501).
+//action(2508, "planned", "PickAndPlace", "AGENTX", ["?0 isA Cube. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }","?0 isA Spot NOT EXISTS { ?0 isUnder ?2. ?2 isA Cube }"], [], 2505).
+//action(2521, "planned", "PickAndPlaceStick", "HERAKLES_HUMAN1", ["?0 isA Stick. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }","RED_CUBE1","RED_CUBE2"], [2508,2503], 2499).
+//action(2525, "planned", "PickAndPlace", "AGENTX", ["?0 isA Cube. ?0 hasColor blue. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }","STICK1"], [2503,2521], 2522).
+//action(2527, "planned", "PickAndPlace", "PR2_ROBOT", ["?0 isA Cube. ?0 hasColor green. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }","BLUE_CUBE1"], [2525], 2523).
+//action(2528, "planned", "PickAndPlace", "AGENTX", ["?0 isA Cube. ?0 hasColor blue. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }","GREEN_CUBE1"], [2525,2527], 2524).
+
+//abstractTask(0, "planned", "tidy_cubes", (-1)).
+//abstractTask(1, "planned", "tidy_one", 0).
+//action(3, "planned", "robot_congratulate", "robot", ["Helmet_2"], [8], 0).
+//action(4, "planned", "robot_tell_human_to_tidy", "robot", ["cube_BBCG","Helmet_2","throw_box_green"], [], 1).
+//abstractTask(5, "planned", "wait_for_human", 1).
+//abstractTask(6, "planned", "tidy", 0).
+//action(7, "planned", "human_pick_cube", "Helmet_2", ["cube_BBCG"], [4], 6).
+//action(8, "planned", "human_drop_cube", "Helmet_2", ["throw_box_green"], [9], 6).
+//action(9, "planned", "robot_wait_for_human_to_tidy", "robot", [], [7], 5).
+//action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
 
 //abstractTask(0, "planned", "tidy_cubes", (-1)).
 //abstractTask(1, "planned", "tidy_one", 0).
@@ -67,6 +75,8 @@ action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
 //action(91, "planned", "robot_serve_coffee", "robot", [], [90],(-1)).
 //action(92, "planned", "IDLE", "human", [], [91],(-1)).
 
+isBusy(Human) :- action(ID,"ongoing",Name,Human,Params,Preds,Decompo) | (robotName(Robot) & not jia.is_relation_in_onto(Human,isLookingAt,Robot,false,robot)).
+
 !start.
 
 +!start : true <-
@@ -76,14 +86,16 @@ action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
 	jia.createGUI;
 	!getAgentNames.
 	
+    
 +goal(Name, State) : State == received & not .substring("dtRR",Name) <-
 	?humanName(Human);
 	.concat("plan_manager/goals/",Name,"/name",GoalName);
-	.concat("plan_manager/goals/",Name,"/worldstate",GoalWS);
+//	.concat("plan_manager/goals/",Name,"/worldstate",GoalWS);
 	rjs.jia.get_param(GoalName, "String", N);
-	rjs.jia.get_param(GoalWS, "Map", G);
+//	rjs.jia.get_param(GoalWS, "Map", G);
 	//[[name_t1,param1_t1,param2_t1],[name_t2, param1_t2]]
-//	getPlan([[N,G]], [Human]);
+//	getMATHNPlan([[N,G]], [Human]);
+	getHATPPlan(N);
 	.findall(action(AID,AState,AName,AAgent,AParams,Preds,Decompo),action(AID,AState,AName,AAgent,AParams,Preds,Decompo),Actions);
 	for(.member(A,Actions)){
 		.send(human_management,tell,A);
@@ -100,9 +112,9 @@ action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
 	true.
 	
 //TODO to implement	
-+replan(Name)[source(human_management)] : true.
++replan(Name)[source(_)] : true.
 //TODO is it enough ?
-+drop(Name)[source(human_management)] : true <-
++drop(Name)[source(_)] : true <-
 	!reset.
 	
 +!updatePlanTasksStart(Decompo) : abstractTask(Decompo,S,_,_) & S == "planned" <-	
@@ -160,26 +172,30 @@ action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
 	.nth(0,Params,P).
 
 @evOngoing[atomic]
-+action(_,"ongoing",Name,Agent,Params)[source(human_management)] : action(ID,"todo",Name,Agent,Params,Preds,Decompo) <-
-	-action(_,"ongoing",Name,Agent,Params)[source(_)];
-	-action(ID,"todo",Name,Agent,Params,Preds,Decompo);
++action(ID,"ongoing",Name,Agent,Params)[source(_)] : action(ID,"todo",Name,_,_,Preds,Decompo) <-
+	-action(ID,"ongoing",Name,_,_)[source(_)];
+	-action(ID,"todo",Name,_,_,Preds,Decompo);
 	+action(ID,"ongoing",Name,Agent,Params,Preds,Decompo).
 	
 +action(_,"ongoing",Name,Agent,Params)[source(_)] : action(ID,"executed",Name,Agent,Params,Preds,Decompo) <- true.
 
 @evTodo[atomic]
-+action(_,"todo",Name,Agent,Params)[source(human_management)] : action(ID,"ongoing",Name,Agent,Params,Preds,Decompo) <-
-	-action(_,"todo",Name,Agent,Params)[source(_)];
++action(ID,"todo",Name,Agent,Params)[source(_)] : action(ID,"ongoing",Name,Agent,Params,Preds,Decompo) <-
+	-action(ID,"todo",Name,Agent,Params)[source(_)];
 	-action(ID,"ongoing",Name,Agent,Params,Preds,Decompo);
 	+action(ID,"todo",Name,Agent,Params,Preds,Decompo).
 	
 @evExe[atomic]
-+action(_,"executed",Name,Agent,Params)[source(human_management)] : wantedAction(Name,Agent,Params) <-
++action(ID,"executed",Name,Agent,Params)[source(S)] : wantedAction(ID) & humanName(Human) & robotName(Robot)<-
 	!chooseParamToMonitor(Name,Params,P);
 	setHMAtemp(P,environment_monitoring,void);
-	-action(_,"executed",Name,Agent,Params)[source(_)];
-	-action(ID,_,Name,Agent,Params,Preds,Decompo)[source(_)];
-	+action(ID,"executed",Name,Agent,Params,Preds,Decompo);
+	-action(ID,"executed",Name,Agent,Params)[source(S)];
+	-action(ID,_,Name,_,_,Preds,Decompo)[source(_)];
+	if(.substring(human,S)){
+		+action(ID,"executed",Name,Human,Params,Preds,Decompo);
+	}elif(.substring(robot,S)){
+		+action(ID,"executed",Name,Robot,Params,Preds,Decompo);
+	}
 	!removeParallelStreams(Agent,Preds);
 	!updatePlanTasksEnd(Decompo,"executed");
 	!updatePlanActions.
@@ -200,10 +216,107 @@ action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
 	?abstractTask(ID,nameX,NameX);
 	-abstractTask(ID,nameX,NameX).
 
-+action(ID,"executed",Name,Agent,Params) :  not wantedAction(Name,Params) <- true.
++action(ID,"executed",Name,Agent,Params) :  isExecutedActionInPlan(Name,Agent,Params) <- true.
+
++action(ID,"todo",Name,Agent,Params,Preds,Decompo) : robotName(Agent) & .count(.member(P,Params) & .substring("?",P), C) & C > 0<-
+	!allocateParams(ID,"todo",Name,Agent,Params,Preds,Decompo);
+	-newParams(NewParams);
+	!allocateActionToRobot(ID,"todo",Name,Agent,NewParams,Preds,Decompo).
 	
 +action(ID,"todo",Name,Agent,Params,Preds,Decompo) : robotName(Agent) <-
 	.send(robot_executor, tell, action(ID,Name,Agent,Params)).
 	
++action(ID,"todo",Name,Agent,Params,Preds,Decompo) : agentXName(Agent) <-
+	!allocateParamsAgentXAction(ID,"todo",Name,Agent,Params,Preds,Decompo).
+	
++!allocateParams(ID,"todo",Name,Agent,Params,Preds,Decompo) : true <-
+	for(.member(P,Params)){
+		//test if P is a sparql request
+		if(.substring("?",P)){
+			jia.get_indiv_from_sparql(P,objectsAndAgents,SparqlRes);
+			//multiple possible entities which does not depend on an agent  OR one possible entity
+			if(not .substring("?1",P)){
+				.nth(0,SparqlRes,FirstRes);
+				.nth(0,FirstRes,NewParam);
+			}// multiple or one possible entities which depend on an agent
+			else{
+				.findall(Ag,.member(Res,SparqlRes) & .nth(1,Res,Ag),Agents);
+				.union(Agents,Agents,InvolvedAg);
+				//only one agent is possible for this parameter
+				if(.length(InvolvedAg)==1){
+					.nth(0,InvolvedAg,Ag);
+					+shouldBeAgentX(Ag);
+					.nth(0,SparqlRes,FirstRes);
+					.nth(0,FirstRes,NewParam);
+				}else{
+					NewParam=SparqlRes;
+				}
+			}
+		}else{
+			NewParam=P;
+		}
+		if(rjs.jia.believes(newParams(List))){
+			-newParams(List);
+		}else{
+			List=[];
+		}
+		.concat(List,[NewParam],NewParams);
+		+newParams(NewParams);
+	}.
+	
++!allocateParamsAgentXAction(ID,"todo",Name,Agent,Params,Preds,Decompo) 
+: not .intend(allocateParamsAgentXAction(_,"todo",Name,Agent,Params,_,_)) & humanName(Human) & robotName(Robot)
+<- !allocateParams(ID,"todo",Name,Agent,Params,Preds,Decompo);
+	-newParams(NewParams);
+	if(.length(NewParams)>0){
+		!allocateAgentXAction(ID,"todo",Name,Agent,NewParams,Preds,Decompo);
+	}else{
+		?goal(GoalName,active);
+		+replan(GoalName);
+	}.
 
++!allocateParamsAgentXAction(ID,"todo",Name,Agent,Params,Preds,Decompo) : .intend(allocateParamsAgentXAction(_,"todo",Name,Agent,Params,_,_)) <-
+	true.
+	
++!allocateAgentXAction(ID,"todo",Name,Agent,NewParams,Preds,Decompo) 
+: action(ID,"todo",Name,Agent,Params,Preds,Decompo) & action(ID2,"todo",Name,Agent,Params,Preds2,Decompo2) & ID2 \== ID & humanName(Human)
+<- 	!allocateActionToRobot(ID,"todo",Name,Agent,NewParams,Preds,Decompo);
+	-action(ID2,"todo",Name,Agent,Params,Preds2,Decompo2);
+	+action(ID2,"todo",Name,Human,Params,Preds2,Decompo2).
+	
++!allocateAgentXAction(ID,"todo",Name,Agent,NewParams,Preds,Decompo) : shouldBeAgentX(Ag) <-
+	-shouldBeAgentX(Ag);
+	-action(ID,"todo",Name,Agent,_,Preds,Decompo);
+	+action(ID,"todo",Name,Ag,NewParams,Preds,Decompo).
+	
++!allocateAgentXAction(ID,"todo",Name,Agent,NewParams,Preds,Decompo) : humanName(Human) & isBusy(Human) <-
+	!allocateActionToRobot(ID,"todo",Name,Agent,NewParams,Preds,Decompo).
+	
++!allocateAgentXAction(ID,"todo",Name,Agent,NewParams,Preds,Decompo) : humanName(Human) <-
+	.wait(action(ID,State,Name,Human,_,Preds,Decompo) & (State=="ongoing" | State=="executed"), 25000).
 
+-!allocateAgentXAction(ID,"todo",Name,Agent,NewParams,Preds,Decompo)[Failure, code(Code),code_line(_),code_src(_),error(Error),error_msg(_)] 
+: .substring(wait,Error) & robotName(Robot)<-
+	!allocateActionToRobot(ID,"todo",Name,Agent,NewParams,Preds,Decompo).
+	
++!allocateActionToRobot(ID,"todo",Name,Agent,NewParams,Preds,Decompo) : robotName(Robot) & humanName(Human) <-
+	-shouldBeAgentX(Ag);
+	for(.member(NP,NewParams)){
+		if(.list(NP) & .length(NP)>1){
+			.findall(P,.member(P,NP) & .member(A,P) & A==Robot,ToKeep);
+			.nth(0,ToKeep,KeepFirst);
+			.nth(0,KeepFirst,NewParam);
+		}else{
+			NewParam=NP;
+		}
+		if(rjs.jia.believes(newParams(List))){
+			-newParams(List);
+		}else{
+			List=[];
+		}
+		.concat(List,[NewParam],NewParams2);
+		+newParams(NewParams2);
+	}
+	-newParams(NewParams2);
+	-action(ID,"todo",Name,Agent,_,Preds,Decompo);
+	+action(ID,"todo",Name,Robot,NewParams2,Preds,Decompo).

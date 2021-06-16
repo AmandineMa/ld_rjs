@@ -12,9 +12,11 @@ rmBuffPrio(secondary,1)[ground].
 rmBuffPrio(background,0)[ground].
 rmBuffPrio(inhibit,-1)[ground].
 
+
 +!getAgentNames : true <-
 	!getRobotName;
-	!getHumanName.
+	!getHumanName;
+	!getAgentXName.
 
 +!getRobotName : true <- 
 	rjs.jia.get_param("/supervisor/robot_name", "String", Name);
@@ -23,6 +25,10 @@ rmBuffPrio(inhibit,-1)[ground].
 +!getHumanName : true <-
 	rjs.jia.get_param("/supervisor/human_name", "String", Name);
 	+humanName(Name)[ground].
+	
++!getAgentXName : true <-
+	rjs.jia.get_param("/supervisor/agentX_name", "String", Name);
+	+agentXName(Name)[ground].
 
 +!initRosComponents : true <- 
 	!init_services;

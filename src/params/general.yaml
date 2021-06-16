@@ -1,7 +1,8 @@
 
 supervisor:
-  robot_name: "robot"
-  human_name: "Helmet_2"
+  robot_name: "PR2_ROBOT"
+  human_name: "HERAKLES_HUMAN1"
+  agentX_name: "AGENTX"
   table_name: table_1
     
   services:
@@ -28,7 +29,7 @@ supervisor:
       type: ontologenius/OntologeniusSparqlService
  #  TODO pas propre, service de l'humain à créer on the fly
    sparql_human:
-      name: /ontologenius/sparql/Helmet_2
+      name: /ontologenius/sparql/HERAKLES_HUMAN1
       type: ontologenius/OntologeniusSparqlService
    mementar_sub:
       name: /mementar/subscribe/robot
@@ -36,6 +37,9 @@ supervisor:
    mementar_unsub:
       name: /mementar/unsubscribe/robot
       type: mementar/MementarOcassionUnsubscription
+   hatp_planner:
+      name: /hatp/planner
+      type: hatp_msgs/PlanningRequest
    
   
   topics:

@@ -6,7 +6,7 @@ isMovementRelatedToActions(Predicate,ActionList) :-
 	jia.findall(
 		ActPred,
 		actionModel(ActPred,Preconditions,Movement,ProgressionEffects,NecessaryEffect) &
-		jia.member_same_type(Predicate,Movement),
+		jia.member_same_class(Predicate,Movement),
 		ActionList
 	)
 	& rjs.function.length_allow_unground(ActionList) > 0.
@@ -15,7 +15,7 @@ isProgressionEffect(Predicate,ActionList) :-
 	.findall(
 		ActPred,
 		actionModel(ActPred,Preconditions,Movement,ProgressionEffects,NecessaryEffect) &
-		jia.member_same_type(Predicate,ProgressionEffects),
+		jia.member_same_class(Predicate,ProgressionEffects),
 		ActionList
 	)
 	& rjs.function.length_allow_unground(ActionList) > 0.
@@ -34,7 +34,7 @@ isNecessaryEffect(Predicate,ActionList) :-
 	.findall(
 		ActPred,
 		actionModel(ActPred,Preconditions,Movement,ProgressionEffects,NecessaryEffect) &
-		jia.member_same_type(Predicate,NecessaryEffect),
+		jia.member_same_class(Predicate,NecessaryEffect),
 		ActionList
 	)
 	& rjs.function.length_allow_unground(ActionList) > 0.		
@@ -58,7 +58,7 @@ isPredicateRobotAction(NewPredicate, Params) :-
 
 +!start : true <-
     rjs.jia.log_beliefs;
-    .verbose(2);
+//    .verbose(2);
 	!initRosComponents;
     !getAgentNames;
     !setActionsMementarMonitoring.

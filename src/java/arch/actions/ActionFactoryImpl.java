@@ -3,6 +3,7 @@ package arch.actions;
 import arch.actions.internal.AnalyzeSentence;
 import arch.actions.internal.DisambiguateEntity;
 import arch.actions.internal.DisambiguateSentence;
+import arch.actions.internal.GetHATPPlan;
 import arch.actions.internal.GetMAHTNPlan;
 import arch.actions.internal.GetSparqlVerba;
 import arch.actions.internal.MementarSubscribe;
@@ -33,7 +34,6 @@ import pr2_motion_tasks_msgs.planActionGoal;
 import pr2_motion_tasks_msgs.planActionResult;
 import rjs.arch.actions.AbstractActionFactory;
 import rjs.arch.actions.Action;
-import rjs.arch.actions.GetHATPPlan;
 import rjs.arch.actions.ros.InitServices;
 import rjs.arch.actions.ros.InitSub;
 import rjs.arch.actions.ros.RjsActionClient;
@@ -89,7 +89,7 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 			case "say":
 				action = new Say(actionExec, rosAgArch);
 				break;
-			case "getPlan":
+			case "getMAHTNPlan":
 				action = new GetMAHTNPlan(actionExec, rosAgArch);
 				break;
 			case "planPick":
@@ -110,7 +110,7 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 			case "strafe":
 				action = new Strafe(actionExec, (LAASAgArch) rosAgArch, strafeActionClient);
 				break;
-			case "getHatpPlan":
+			case "getHATPPlan":
 				action = new GetHATPPlan(actionExec, rosAgArch);
 				break;
 			case "mementarSubscribe":

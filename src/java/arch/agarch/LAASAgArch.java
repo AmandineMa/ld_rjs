@@ -22,6 +22,10 @@ import mementar.MementarAction;
 import ontologenius.OntologeniusService;
 import ontologenius.OntologeniusServiceRequest;
 import ontologenius.OntologeniusServiceResponse;
+import ontologenius.OntologeniusSparqlResponse;
+import ontologenius.OntologeniusSparqlService;
+import ontologenius.OntologeniusSparqlServiceRequest;
+import ontologenius.OntologeniusSparqlServiceResponse;
 import rjs.arch.agarch.AbstractROSAgArch;
 import rjs.utils.Tools;
 import ros.RosNode;
@@ -120,6 +124,17 @@ public class LAASAgArch extends AbstractROSAgArch {
 		verbaReq.setSparqlQuery(sparql);
 		verbaReq.setReceiverId(receiverID);
 		return ((VerbalizationResponse) rosnode.callSyncService("verbalize", verbaReq)).getVerbalization();
+	}
+	
+	public List<List<String>> sparqlToEntity(String sparql) {
+		List<List<String>> sparqlRespList = new ArrayList<List<String>>();
+		OntologeniusSparqlServiceRequest sparqlReq = rosnode.newServiceRequestFromType(OntologeniusSparqlService._TYPE);
+		sparqlReq.setQuery(sparql);
+		List<OntologeniusSparqlResponse> respList = ((OntologeniusSparqlServiceResponse) rosnode.callSyncService("sparql_robot", sparqlReq)).getResults();
+		for(OntologeniusSparqlResponse resp : respList) {
+			sparqlRespList.add(resp.getValues());
+		}
+		return sparqlRespList;
 	}
 	
 	public enum ActionIndicator {

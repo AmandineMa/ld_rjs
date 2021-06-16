@@ -4,7 +4,7 @@
 
 actionStates(["planned","todo","ongoing","executed","unnplanned","not_starting","not_finished","not_seen","suspended"])[ground].
 
-wantedAction(Name,Agent,Params) :- action(ID,S,Name,Agent,Params,_,_) & (S=="todo" | S=="ongoing").
+wantedAction(ID) :-  action(ID,S,_,_,_,_,_) & (S=="todo" | S=="ongoing").
 isNotOver(S) :- S\=="executed" & S\=="unplanned".
 
 @uas[atomic]

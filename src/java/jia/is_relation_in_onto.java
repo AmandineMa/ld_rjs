@@ -16,8 +16,15 @@ public class is_relation_in_onto extends DefaultInternalAction {
 	@Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		String subject = Tools.removeQuotes(args[0].toString());
-		LiteralImpl propertyL = (LiteralImpl) args[1];
-		String property = Tools.removeQuotes(propertyL.getFunctor().toString());
+		String property = "";
+		LiteralImpl propertyL;
+		if(args[1].isAtom()) {
+			property = args[1].toString();
+			propertyL = new LiteralImpl(property);
+		} else {
+			propertyL = (LiteralImpl) args[1];
+			property = Tools.removeQuotes(propertyL.getFunctor().toString());
+		}
 		String object = Tools.removeQuotes(args[2].toString());
 		boolean addBelToBB = Boolean.parseBoolean(args[3].toString());
 		String agent = Tools.removeQuotes(args[4].toString());
