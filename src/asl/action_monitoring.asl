@@ -58,7 +58,7 @@ isPredicateRobotAction(NewPredicate, Params) :-
 
 +!start : true <-
     rjs.jia.log_beliefs;
-//    .verbose(2);
+    .verbose(2);
 	!initRosComponents;
     !getAgentNames;
     !setActionsMementarMonitoring.
@@ -77,10 +77,12 @@ isPredicateRobotAction(NewPredicate, Params) :-
         if(rjs.jia.unnamedvar2string(T2,T) & .substring("List",T)){
                 Function="?";
                 jia.set_predicate_with_list(Prop);
-        }elif(rjs.jia.negated_literal(Prop)){
-                Function="del";
+//        }
+//        elif(rjs.jia.negated_literal(Prop)){
+//                Function="del";
         }else{
-                Function="add";
+//                Function="add";
+                Function="?";
         }
         .term2string(Prop,PropS);
         .delete("~",PropS,PropF)
@@ -130,8 +132,11 @@ isPredicateRobotAction(NewPredicate, Params) :-
 	++possibleFinishedActions(ActionList).
 
 // trigger with a necessary effect -> action over
+// TODO ask to have the isReachableBy for exist_possible_agent
 @overS2[atomic]
-+NewPredicate[source(percept)] : isNecessaryEffect(NewPredicate,ActionList) & jia.exist_possible_agent(ActionList,ActionList2) <-
++NewPredicate[source(percept)] : 
+isNecessaryEffect(NewPredicate,ActionList2) <-
+//isNecessaryEffect(NewPredicate,ActionList) & jia.exist_possible_agent(ActionList,ActionList2) <-
 	++possibleFinishedActions(ActionList2).
 	
 // wait for an effect after an observed movement finished
@@ -143,7 +148,7 @@ isPredicateRobotAction(NewPredicate, Params) :-
 	||| !timeoutMovement(ActionList).
 
 +!timeoutMovement(ActionList) : true <-
-	.wait(30000);
+	.wait(50000);
 	// ne fonctionne pas sans le add_time !! pourquoi ?? parce qu'ajouté via code ??
 	-possibleStartedActions(ActionList)[add_time(_)].
 	

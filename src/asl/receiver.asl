@@ -11,8 +11,12 @@ actionCounter(0).
 +goal(Name, State) : State == received & .substring("dtRR",Name) <- 
 	.concat("plan_manager/goals/",Name,"/container",Container);
 	rjs.jia.get_param(Container, "String", C);
+	setHMBuff([environment_monitoring,human_monitoring],[normal,normal]);
+	setHMAtemp("",environment_monitoring,void);
 	+container(C);
-	+receiver.
+	+receiver;
+	.send(robot_executor, tell, container(C));
+	.send(communication, tell, receiver).
 	
 +sentence(Sentence) : receiver <-
 	!analyzeSentence(Sentence);
@@ -28,12 +32,12 @@ actionCounter(0).
 	
 +verba(disambi_objects_sentence, DisambiSentence): true <-
 	.concat("Do you mean ", DisambiSentence, "?", Sentence);
-	say(Sentence).
+	 .send(communication,askOne,talk(Sentence),Answer).
 	
 	
 +verba(not_understood, NUSentence) : true <-
 	.concat("I did not understand ", NUSentence, Sentence);
-	say(Sentence).
+	.send(communication,askOne,talk(Sentence),Answer).
 	
 +action("todo",Name,Agent,Params) : robotName(Agent) & .length(Name) > 0 <-
 	?actionCounter(I);
@@ -43,4 +47,4 @@ actionCounter(0).
 +action("todo",Name,Agent,Params) : .length(Name) == 0 <-
 	.nth(0, Params, Object);
 	.concat("I don't know what to do with ", Object, Sentence);
-	say(Sentence).
+	.send(communication,askOne,talk(Sentence),Answer).

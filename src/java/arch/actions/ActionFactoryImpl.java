@@ -1,22 +1,21 @@
 package arch.actions;
 
 import arch.actions.internal.AnalyzeSentence;
-import arch.actions.internal.DisambiguateEntity;
 import arch.actions.internal.DisambiguateSentence;
 import arch.actions.internal.GetHATPPlan;
 import arch.actions.internal.GetMAHTNPlan;
-import arch.actions.internal.GetSparqlVerba;
 import arch.actions.internal.MementarSubscribe;
 import arch.actions.internal.MementarUnsubscribe;
 import arch.actions.internal.PR2MotionPlanDrop;
 import arch.actions.internal.PR2MotionPlanMoveArm;
 import arch.actions.internal.PR2MotionPlanPick;
 import arch.actions.internal.PR2MotionPlanPlace;
-import arch.actions.robot.SetHeadManagerAtemporalInput;
-import arch.actions.robot.SetHeadManagerInputBufferPriorities;
 import arch.actions.robot.PR2MotionExecute;
 import arch.actions.robot.Say;
 import arch.actions.robot.ScanTable;
+import arch.actions.robot.ScanZone;
+import arch.actions.robot.SetHeadManagerAtemporalInput;
+import arch.actions.robot.SetHeadManagerInputBufferPriorities;
 import arch.actions.robot.Strafe;
 import arch.agarch.LAASAgArch;
 import dt_head_gestures.HeadScanActionFeedback;
@@ -74,12 +73,6 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 		String actionName = actionExec.getActionTerm().getFunctor();
 		Action action = null;
 		switch(actionName) {
-			case "disambiguate":
-				action = new DisambiguateEntity(actionExec, rosAgArch);
-				break;
-			case "sparqlVerbalization":
-				action = new GetSparqlVerba(actionExec, rosAgArch);
-				break;
 			case "analyzeSentence":
 				action = new AnalyzeSentence(actionExec, rosAgArch);
 				break;
@@ -127,6 +120,9 @@ public class ActionFactoryImpl extends AbstractActionFactory {
 				break;
 			case "scanTable":
 				action = new ScanTable(actionExec, (LAASAgArch) rosAgArch, headScanActionClient);
+				break;
+			case "scanZone":
+				action = new ScanZone(actionExec, (LAASAgArch) rosAgArch, headScanActionClient);
 				break;
 			case "setHMAtemp":
 				action = new SetHeadManagerAtemporalInput(actionExec, rosAgArch);

@@ -20,24 +20,24 @@
 //action(9, "planned", "robot_wait_for_human_to_tidy", "robot", [], [7], 5).
 //action(11, "planned", "IDLE", "Helmet_2", [], [3], 0).
 
-//abstractTask(0, "planned", "tidy_cubes", (-1)).
-//abstractTask(1, "planned", "tidy_one", 0).
-//abstractTask(2, "planned", "tidy_cubes", 0).
-//action(3, "planned", "robot_congratulate", "robot", ["Helmet_2"], [17], 0).
-//action(4, "planned", "robot_tell_human_to_tidy", "robot", ["cube_GBTB","Helmet_2","throw_box_green"], [], 1).
-//abstractTask(5, "planned", "wait_for_human", 1).
-//abstractTask(6, "planned", "tidy", 0).
-//action(7, "planned", "human_pick_cube", "Helmet_2", ["cube_GBTB"], [4], 6).
-//action(8, "planned", "human_drop_cube", "Helmet_2", ["throw_box_green"], [9], 6).
-//action(9, "planned", "robot_wait_for_human_to_tidy", "robot", [], [7], 5).
-//abstractTask(11, "planned", "tidy_one", 2).
-//action(13, "planned", "robot_tell_human_to_tidy", "robot", ["cube_GGCB","Helmet_2","throw_box_green"], [8], 11).
-//abstractTask(14, "planned", "wait_for_human", 11).
-//abstractTask(15, "planned", "tidy", 0).
-//action(16, "planned", "human_pick_cube", "Helmet_2", ["cube_GGCB"], [13], 15).
-//action(17, "planned", "human_drop_cube", "Helmet_2", ["throw_box_green"], [18], 15).
-//action(18, "planned", "robot_wait_for_human_to_tidy", "robot", [], [16], 14).
-//action(20, "planned", "IDLE", "Helmet_2", [], [3], (-1)).
+abstractTask(0, "planned", "tidy_cubes", (-1)).
+abstractTask(1, "planned", "tidy_one", 0).
+abstractTask(2, "planned", "tidy_cubes", 0).
+action(3, "planned", "robot_congratulate", "robot", ["Helmet_2"], [17], 0).
+action(4, "planned", "robot_tell_human_to_tidy", "robot", ["Helmet_2","cube_BGTG","table_2"], [], 1).
+abstractTask(5, "planned", "wait_for_human", 1).
+abstractTask(6, "planned", "tidy", 0).
+action(7, "planned", "human_pick_cube", "Helmet_2", ["cube_BGTG"], [4], 6).
+action(8, "planned", "human_place_cube", "Helmet_2", ["cube_BGTG","table_2"], [9], 6).
+action(9, "planned", "robot_wait_for_human_to_tidy", "robot", [], [7], 5).
+abstractTask(11, "planned", "tidy_one", 2).
+action(13, "planned", "robot_tell_human_to_tidy", "robot", ["Helmet_2","cube_BBCG","table_2"], [8], 11).
+abstractTask(14, "planned", "wait_for_human", 11).
+abstractTask(15, "planned", "tidy", 0).
+action(16, "planned", "human_pick_cube", "Helmet_2", ["cube_BBCG"], [13], 15).
+action(17, "planned", "human_place_cube", "Helmet_2", ["cube_BBCG","table_2"], [18], 15).
+action(18, "planned", "robot_wait_for_human_to_tidy", "robot", [], [16], 14).
+action(20, "planned", "IDLE", "Helmet_2", [], [3], (-1)).
 
 //action(1, "planned", "robot_tell_human_to_tidy", "robot", ["cube_BBCG","Helmet_2","throw_box_green"], [], []).
 //action(2, "planned", "human_pick_cube", "Helmet_2", ["cube_BBCG"], [1], []).
@@ -95,7 +95,7 @@ isBusy(Human) :- action(ID,"ongoing",Name,Human,Params,Preds,Decompo) | (robotNa
 //	rjs.jia.get_param(GoalWS, "Map", G);
 	//[[name_t1,param1_t1,param2_t1],[name_t2, param1_t2]]
 //	getMATHNPlan([[N,G]], [Human]);
-	getHATPPlan(N);
+//	getHATPPlan(N);
 	.findall(action(AID,AState,AName,AAgent,AParams,Preds,Decompo),action(AID,AState,AName,AAgent,AParams,Preds,Decompo),Actions);
 	for(.member(A,Actions)){
 		.send(human_management,tell,A);
@@ -103,6 +103,8 @@ isBusy(Human) :- action(ID,"ongoing",Name,Human,Params,Preds,Decompo) | (robotNa
 	-goal(Name, received)[source(supervisor)];
 	+goal(Name,active);
 	.send(human_management,tell,goal(Name,active));
+	setHMBuff([environment_monitoring,human_monitoring],[normal,normal]);
+	setHMAtemp("",environment_monitoring,void);
 	!updatePlanActions.
 	
 +goal(Name, State) : State == preempted | State == aborted <-	
@@ -139,7 +141,7 @@ isBusy(Human) :- action(ID,"ongoing",Name,Human,Params,Preds,Decompo) | (robotNa
 +action(ID,"todo",Name,Agent,Params,Preds,Decompo) : humanName(Agent) & jia.is_of_class(class,Name,"PhysicalAction") <-
 	!chooseParamToMonitor(Name,Params,P);
 	setHMAtemp(P,environment_monitoring,urgent);
-//	setHMBuff([environment_monitoring,prioritize]);
+	setHMBuff([environment_monitoring,prioritize]);
 	!waitParamSeenOrActionStateChange(ID,Name,Agent,Params,Preds,Decompo,P).
 	
 +!waitParamSeenOrActionStateChange(ID,Name,Agent,Params,Preds,Decompo,P) : true <-
@@ -168,8 +170,14 @@ isBusy(Human) :- action(ID,"ongoing",Name,Human,Params,Preds,Decompo) | (robotNa
 	}.
 	
 //TODO refine with another way to choose the param to monitor if there are several 	
-+!chooseParamToMonitor(Name,Params,P) : true <-
-	.nth(0,Params,P).
++!chooseParamToMonitor(Name,Params,P) : .length(Params) > 0 <-
+	if(.substring(pick,Name)){
+		.nth(0,Params,P);
+	}elif(.substring(place,Name)){
+		.nth(1,Params,P);
+	}.
+	
++!chooseParamToMonitor(Name,Params,P) : true.
 
 @evOngoing[atomic]
 +action(ID,"ongoing",Name,Agent,Params)[source(_)] : action(ID,"todo",Name,_,_,Preds,Decompo) <-
@@ -189,6 +197,7 @@ isBusy(Human) :- action(ID,"ongoing",Name,Human,Params,Preds,Decompo) | (robotNa
 +action(ID,"executed",Name,Agent,Params)[source(S)] : wantedAction(ID) & humanName(Human) & robotName(Robot)<-
 	!chooseParamToMonitor(Name,Params,P);
 	setHMAtemp(P,environment_monitoring,void);
+	setHMBuff([environment_monitoring,normal]);
 	-action(ID,"executed",Name,Agent,Params)[source(S)];
 	-action(ID,_,Name,_,_,Preds,Decompo)[source(_)];
 	if(.substring(human,S)){
@@ -216,6 +225,7 @@ isBusy(Human) :- action(ID,"ongoing",Name,Human,Params,Preds,Decompo) | (robotNa
 	?abstractTask(ID,nameX,NameX);
 	-abstractTask(ID,nameX,NameX).
 
+//TODO write isExecutedActionInPlan rule
 +action(ID,"executed",Name,Agent,Params) :  isExecutedActionInPlan(Name,Agent,Params) <- true.
 
 +action(ID,"todo",Name,Agent,Params,Preds,Decompo) : robotName(Agent) & .count(.member(P,Params) & .substring("?",P), C) & C > 0<-

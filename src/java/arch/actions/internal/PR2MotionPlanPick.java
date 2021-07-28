@@ -22,6 +22,7 @@ public class PR2MotionPlanPick extends AbstractPR2MotionPlan {
 	protected void setGoalFields() {
 		goal.setObjId(Tools.removeQuotes(actionTerms.get(0).toString()));
 		goal.setAction("pick");
+		goal.setPlanGroup("right_arm");
 	}
 
 	@Override

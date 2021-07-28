@@ -48,17 +48,26 @@ public class AnalyzeSentence extends AbstractDisambiguationAction {
 			}
 			
 			String action = understandResp.getAction().toLowerCase();
-			handleActionSaid(action);
+			
+			if(action.isEmpty() && rosAgArch.findBel("mergedQuery(_)") == null) {
+				handleFailure("no_action");
+				return;
+			} else if(action.equals("drop")) {
+				clearBelief();
+				rosAgArch.addBelief("action", Arrays.asList("todo", action, robotName, Arrays.asList(rosAgArch.findBel("container(_)").getTerm(0).toString())));
+				actionExec.setResult(true);
+				return;
+			}
 
 			rosAgArch.addBelief("sparql_input("+Tools.arrayToStringArray(sparqlInput)+")");
 			
 			MergeResponse mergeResp = callMergeService(Tools.removeQuotes((List<Term>) actionTerms.get(1)), sparqlInput, false);
-
+			
 			if(mergeResp == null || mergeResp.getMergedQuery().isEmpty()) {
 				handleFailure(new LiteralImpl("unpossible_merged("+Tools.arrayToStringArray(sparqlInput)+")"));
 				return;
 			}
-
+			
 			OntologeniusSparqlServiceRequest ontoSparqlReq = getRosNode().newServiceRequestFromType(OntologeniusSparqlService._TYPE);
 			ontoSparqlReq.setQuery(mergedQueryToString(mergeResp));
 			OntologeniusSparqlServiceResponse ontoSparqlResp = getRosNode().callSyncService("sparql_human", ontoSparqlReq);
@@ -97,18 +106,6 @@ public class AnalyzeSentence extends AbstractDisambiguationAction {
 			actionExec.setResult(true);
 		} else {
 			handleFailure("not_understood");
-		}
-	}
-
-	private void handleActionSaid(String action) {
-		if(action.isEmpty() && rosAgArch.findBel("mergedQuery(_)") == null) {
-			handleFailure("no_action");
-			return;
-		} else if(action.equals("drop")) {
-			clearBelief();
-			rosAgArch.addBelief("action", Arrays.asList("todo", action, robotName, Arrays.asList(rosAgArch.findBel("container(_)").getTerm(0).toString())));
-			actionExec.setResult(true);
-			return;
 		}
 	}
 

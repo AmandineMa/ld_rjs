@@ -4,19 +4,21 @@
 
 +!start : true <-
 	.verbose(2);
-//	rjs.jia.log_beliefs;
+	rjs.jia.log_beliefs;
 	!initRosComponents;
-	!getAgentNames.
-	
+	!getAgentNames;
+	mementarSubscribe("?",Robot,isPerceiving,HName,-1).
+
+// Plan added at the beginning of each plan of hpd	
 @whls
 +!waitHumanListeningState : true <-
 	!wait.	
 	
-+!wait : humanName(HName) & robotName(Robot) & not jia.is_relation_in_onto(Robot,isPerceiving,HName,false,robot) <-
-	mementarSubscribe("?",Robot,isPerceiving,HName,-1);
-	.wait(isPerceiving(Robot,HName));
++!wait : humanName(HName) & robotName(Robot)  <-
+//	.wait(isPerceiving(Robot,HName));
+	setHMBuff([human_monitoring,prioritize]);
 	!dispatchAction.
-	
+
 +!wait : true <- !dispatchAction.
 
 +!dispatchAction : action(ID,"todo",Name,Agent,Params)[source(_)] <-
@@ -29,7 +31,7 @@
 +!drop(G) : true <-
 	!reset.
 
-//plans with directive hdp which adds the plan @whls at the beginning of each inner plan
+//plans with directive hdp which adds the plan @whls at the beginning of each inner plan and also lower human_monitoring at the end
 {begin hpd}
 @iae[atomic]
 +?informActionExecuted(Name,Params)[source(ASLAgent)] : robotName(Robot) <-
@@ -69,6 +71,10 @@
 	say(inform,[],Sentence);
 	.send(ASLAgent,tell,informed(Sentence)).
 {end}
+
++sentence(Sentence) : receiver[source(_)] <-
+	-sentence(_);
+	.send(robot_management,tell,sentence(Sentence)).
 
 +sentence(Sentence) : .substring("cannot",Sentence) <-
 	.send(human_management,tell,said(cannot_do)).

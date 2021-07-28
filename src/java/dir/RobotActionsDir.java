@@ -23,17 +23,27 @@ public class RobotActionsDir extends DefaultDirective implements Directive {
             newAg.initAg();
             for (Plan p: innerContent.getPL()) {
             	//TODO for now always first argument of Params but it might change, be careful
-            	Literal nth = Literal.parseLiteral(".nth(0, Params, O)");
+            	// Add at the beginning
+            	Literal nth = Literal.parseLiteral(".nth(0, Params, Obj)");
                 PlanBody b1 = new PlanBodyImpl(BodyType.internalAction, nth);
                 p.getBody().add(0,b1);
                 
-                Literal setHead = Literal.parseLiteral("setHMAtemp(O,environment_monitoring,urgent)");
+                Literal setHead = Literal.parseLiteral("setHMAtemp(Obj,environment_monitoring,urgent)");
                 PlanBody b1bis = new PlanBodyImpl(BodyType.action, setHead);
                 p.getBody().add(1,b1bis);
-
-                Literal unsetHead = Literal.parseLiteral("setHMAtemp(O,environment_monitoring,void)");
+                
+                Literal setHeadBuff = Literal.parseLiteral("setHMBuff([environment_monitoring,prioritize]);");
+                PlanBody b1ter = new PlanBodyImpl(BodyType.action, setHeadBuff);
+                p.getBody().add(2,b1ter);
+                
+                // Add at the end
+                Literal unsetHead = Literal.parseLiteral("setHMAtemp(Obj,environment_monitoring,void)");
                 PlanBody b2 = new PlanBodyImpl(BodyType.action, unsetHead);
                 p.getBody().add(b2);
+                
+                Literal unsetHeadBuff = Literal.parseLiteral("setHMBuff([environment_monitoring,normal])");
+                PlanBody b2bis = new PlanBodyImpl(BodyType.action, unsetHeadBuff);
+                p.getBody().add(b2bis);
 
                 newAg.getPL().add(p);
             }

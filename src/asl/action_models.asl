@@ -1,22 +1,23 @@
 //action(ActPred,Preconditions,Movement,ProgressionEffects,NecessaryEffect).
+// TODO add ~hasInRightHand(Human,_)
+actionModel(pick(Human,Pickable),[isInContainer(Pickable,Container)],[rightHandMovingTowards(Human,PickableList)],[],[hasInRightHand(Human,Pickable)]).
+//actionModel(pick(Human,Pickable),[isInContainer(Pickable,Container)],[rightHandMovingTowards(Human,PickableList)],[hasInRightHand(Human,Pickable)],[~isInContainer(Pickable,Container)]).
 
-actionModel(pick(Human,Pickable),[handEmpty(Human,_),isOnTopOf(Pickable,Support)],[handMovingToward(Human,PickableList)],[hasInHand(Human,Pickable)],[~isOnTopOf(Pickable,Support)]).
+actionModel(place(Human,Pickable,Support),[hasInRightHand(Human,Pickable)],[rightHandMovingTowards(Human,SupportList)],[~hasInRightHand(Human,Pickable)],[isOnTopOf(Pickable,Support)]).
 
-actionModel(place(Human,Pickable,Support),[hasInHand(Human,Pickable)],[handMovingToward(Human,SupportList)],[~hasInHand(Human,Pickable)],[isOnTopOf(Pickable,Support)]).
-
-actionModel(pickAndPlace(Human,Pickable,Support),[handEmpty(Human,_),isOnTopOf(Pickable,Support)],[handMovingToward(Human,SupportList)],[~hasInHand(Human,Pickable)],[isOnTopOf(Pickable,Support)]).
-
-actionModel(pickAndPlaceStick(Human,Pickable,Support1,Support2),[handEmpty(Human,_),isOnTopOf(Pickable,Support)],[handMovingToward(Human,SupportList)],[~hasInHand(Human,Pickable)],[isOnTopOf(Pickable,Support1),isOnTopOf(Pickable,Support2)]).
-
-actionModel(drop(Human,Pickable,Container),[hasInHand(Human,Pickable)],[handMovingToward(Human,ContainerList)],[~hasInHand(Human,Pickable)],[isIn(Pickable,Container)]).
-
-actionModel(openContainer(Human,Drawer),[handEmpty(Human,_)],[handMovingToward(Human,DrawerList)],[hasInHand(Human,Drawer)],[isOpen(Drawer,_)]).
-
-actionModel(scan(Human,Pickable),[holding(Human,Scanner)],[handMovingToward(Human,PickableList)],[hasInHand(Human,Pickable)],[isScanned(Pickable,_)]).
-
-actionModel(goTo(Human,Place),[],[moving(Human,_)],[],[]).
-
-actionModel(leave(Human),[],[moving(Human,_)],[],[isSeeing(Robot,Human)]).
+//actionModel(pickAndPlace(Human,Pickable,Support),[isOnTopOf(Pickable,Support)],[rightHandMovingTowards(Human,SupportList)],[~hasInRightHand(Human,Pickable)],[isOnTopOf(Pickable,Support)]).
+//
+//actionModel(pickAndPlaceStick(Human,Pickable,Support1,Support2),[isOnTopOf(Pickable,Support)],[rightHandMovingTowards(Human,SupportList)],[~hasInRightHand(Human,Pickable)],[isOnTopOf(Pickable,Support1),isOnTopOf(Pickable,Support2)]).
+//
+//actionModel(drop(Human,Pickable,Container),[hasInRightHand(Human,Pickable)],[rightHandMovingTowards(Human,ContainerList)],[~hasInRightHand(Human,Pickable)],[isIn(Pickable,Container)]).
+//
+//actionModel(openContainer(Human,Drawer),[],[rightHandMovingTowards(Human,DrawerList)],[hasInRightHand(Human,Drawer)],[isOpen(Drawer,_)]).
+//
+//actionModel(scan(Human,Pickable),[holding(Human,Scanner)],[rightHandMovingTowards(Human,PickableList)],[hasInRightHand(Human,Pickable)],[isScanned(Pickable,_)]).
+//
+//actionModel(goTo(Human,Place),[],[moving(Human,_)],[],[]).
+//
+//actionModel(leave(Human),[],[moving(Human,_)],[],[isSeeing(Robot,Human)]).
 
 //actionModel(ActPred,Effects)).
 actionModel(pick(Robot,[Pickable]),[isHolding(Robot,Pickable), ~isOnTopOf(Pickable,Support)])[robot].

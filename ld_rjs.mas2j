@@ -4,8 +4,8 @@ MAS ld_rjs {
 	
 	agents:
 		communication agentArchClass arch.agarch.CommManagerAgArch beliefBaseClass rjs.agent.TimeBB agentClass rjs.agent.LimitedAgent;
-		action_monitoring agentArchClass arch.agarch.ActionMonitoringAgArch beliefBaseClass rjs.agent.TimeBB agentClass agent.OntoAgent;
-	    human_management agentArchClass arch.agarch.ActionMonitoringAgArch beliefBaseClass rjs.agent.TimeBB agentClass agent.OntoAgent;
+//		action_monitoring agentArchClass arch.agarch.ActionMonitoringAgArch beliefBaseClass rjs.agent.TimeBB agentClass agent.OntoAgent;
+//	    human_management agentArchClass arch.agarch.ActionMonitoringAgArch beliefBaseClass rjs.agent.TimeBB agentClass agent.OntoAgent;
 		robot_management agentArchClass arch.agarch.LAASAgArch beliefBaseClass rjs.agent.TimeBB agentClass agent.OntoAgent;
 		robot_executor agentArchClass arch.agarch.LAASAgArch beliefBaseClass rjs.agent.TimeBB agentClass rjs.agent.LimitedAgent;
 		

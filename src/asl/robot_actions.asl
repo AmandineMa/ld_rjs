@@ -1,17 +1,16 @@
 //TODO faire finir les actions auprès du plan_manager quand il y a un fail
 
+// object monitoring added at the beginning of the plan and at the end remove it
 {begin rad}
 @pick[atomic]
 +!pick(Params): true <-
-	.nth(0, Params, Object);
 	+planPick("armUsed", right_arm);
-	planPick(Object);
+	planPick(Obj);
 	execute("pick").
 	
 @place[atomic]
 +!place(Params) : planPick("armUsed", Arm) <-
-	.nth(0, Params,Container);
-	planPlace(Container, Arm);
+	planPlace(Obj, Arm);
 	execute("place");
 	-planPick("armUsed", Arm).
 
@@ -20,8 +19,7 @@
 	
 @drop[atomic]
 +!drop(Params) : planPick("armUsed", Arm) <-
-	.nth(0, Params, Container);
-	planDrop(Arm, Container);
+	planDrop(Arm, Obj);
 	execute("drop"); 
 	.concat(Arm,"_home",PoseName);
 	!move_arm([Arm, PoseName]);
@@ -45,16 +43,22 @@
 	
 +!remove(Params): true <-
 	.nth(0, Params, Object);
-	.nth(1, Params, Container);
+	?container(C);
 	!pick([Object]);
-	!drop([Container]).
+	!drop([C]).
 
+//+!robot_tell_human_to_tidy(Params): true <-
+//	?humanName(Human);
+//	.findall(P,.member(P,Params) & jia.is_of_class(individual,P,"Cube"),CubeL);
+//	.findall(P,.member(P,Params) & jia.is_of_class(individual,P,"Box"),BoxL);
+//	?action(ID,_,Name,_,Params);
+//	.send(communication,askOne,askActionsTodo([action(ID,"PickAction",CubeL),action(ID,"DropAction",BoxL)],and),Answer).
 +!robot_tell_human_to_tidy(Params): true <-
 	?humanName(Human);
-	.findall(P,.member(P,Params) & jia.is_of_class(individual,P,"Cube"),CubeL);
-	.findall(P,.member(P,Params) & jia.is_of_class(individual,P,"Box"),BoxL);
+	.nth(1, Params, Object);
+	.nth(2, Params, Table);
 	?action(ID,_,Name,_,Params);
-	.send(communication,askOne,askActionsTodo([action(ID,"PickAction",CubeL),action(ID,"DropAction",BoxL)],and),Answer).
+	.send(communication,askOne,askActionsTodo([action(ID,"PickAndPlaceAction",[Object,Table])],and),Answer).
 
 +!robot_wait_for_human_to_tidy(Params): true <- true.
 

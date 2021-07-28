@@ -34,8 +34,9 @@ robotState(idle)[ground].
 +!executeAction(ID,Name,Agent,Params) : true <-
 	-+robotState(acting)[ground];
 	.lower_case(Name, Action);
-	if(jia.is_of_class(class,Name,"PhysicalAction")){
-		.send([robot_management,action_monitoring,human_management], tell, action(ID,"ongoing",Name,Agent,Params));
+	if(jia.is_of_class(class,Name,"PhysicalAction") | jia.is_of_class(class,Name,"Wait")){
+//		.send([robot_management,action_monitoring,human_management], tell, action(ID,"ongoing",Name,Agent,Params));
+		.send(robot_management, tell, action(ID,"ongoing",Name,Agent,Params));
 		+action(ID,"ongoing",Name,Agent,Params);
 	} elif(jia.is_of_class(class,Name,"CommunicateAction")){
 		.send([communication], tell, action(ID,"todo",Name,Agent,Params));
@@ -51,9 +52,10 @@ robotState(idle)[ground].
 	-+robotState(idle)[ground];
 	-action(ID,"ongoing",Name,Agent,Params)[source(_)];
 	+action(ID,Name,"executed");
-	if(jia.is_of_class(class,Name,"PhysicalAction")){
-		.send([robot_management,action_monitoring,human_management], tell, action(ID,"executed",Name,Agent,Params));
-	}else{
+	if(jia.is_of_class(class,Name,"PhysicalAction") | jia.is_of_class(class,Name,"Wait")){
+		.send(robot_management, tell, action(ID,"executed",Name,Agent,Params));
+//		.send([robot_management,action_monitoring,human_management], tell, action(ID,"executed",Name,Agent,Params));
+	} elif(jia.is_of_class(class,Name,"CommunicateAction")){
 		.send([robot_management,human_management], tell, action(ID,"executed",Name,Agent,Params));	
 	}.
 	

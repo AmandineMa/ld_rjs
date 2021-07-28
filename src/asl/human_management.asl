@@ -6,7 +6,7 @@ isActionMatching(Name,Agent,Params,Type,NewParams) :-
     Type &  Type=..[T,[A],[Source]] & .member(M,A) &
      M=..[Prop,RecoParamsWithAgent,[]] & .nth(0,RecoParamsWithAgent,Actor) & .delete(0,RecoParamsWithAgent,RecoParams) 
      & jia.is_same_action_class(Prop,Name)
-     & (Actor==Agent  | agentXName(Agent))
+     & (not .ground(Actor) | Actor==Agent  | agentXName(Agent))
      & rjs.function.length_allow_unground(RecoParams)==rjs.function.length_allow_unground(Params) 
      & jia.members_same_entity(RecoParams,Params,NewParams).
      
@@ -16,7 +16,7 @@ isMonitoredActionInPlan(Type,PlanActions) :-
     .nth(0,RecoParamsWithAgent,Actor) &
     .delete(0,RecoParamsWithAgent,RecoParams) &
     .setof(action(ID,State,Name,Agent,Params,Preds,Decompo),
-    	action(ID,State,Name,Agent,Params,Preds,Decompo)[source(_)] & (Actor==Agent  | agentXName(Agent)) & jia.is_same_action_class(Prop,Name) 
+    	action(ID,State,Name,Agent,Params,Preds,Decompo)[source(_)] & ( not .ground(Actor) | Actor==Agent  | agentXName(Agent)) & jia.is_same_action_class(Prop,Name) 
     			  & rjs.function.length_allow_unground(RecoParams)==rjs.function.length_allow_unground(Params) & jia.members_same_entity(RecoParams,Params),
     	PlanActions
     ).
@@ -43,12 +43,12 @@ actionEffectsVisible(Name,Params) :-
 	
 +!start : true <-
     rjs.jia.log_beliefs;
-//    .verbose(2);
+    .verbose(2);
     !initRosComponents;
     !getAgentNames;
     ?humanName(HName);
     ?robotName(Robot);
-    mementarSubscribe("?",HName,isInFoV,Robot,-1);
+    mementarSubscribe("?",HName,isPerceiving,Robot,-1);
     mementarSubscribe("?",HName,isLookingAt,Robot,-1);
     mementarSubscribe("?",Robot,isPerceiving,HName,-1).
  
@@ -189,9 +189,10 @@ actionEffectsVisible(Name,Params) :-
 			!waitForActionToFinish(ID,Name,Agent,Params,Preds,Decompo);
 		}
 	}.
-	
-+possibleFinishedActions(A)[source(action_monitoring)] : true <-
-	.send(communication,askOne,talk("I think you made a mistake, it was not part of the plan"),Answer).
+
+//TODO only during plan, maybe too many actions detected
+//+possibleFinishedActions(A)[source(action_monitoring)] : true <-
+//	.send(communication,askOne,talk("I think you made a mistake, it was not part of the plan"),Answer).
 	
 +said(cannot_do)[source(communication)] : action(ID,State,Name,Robot,Params,Preds,Decompo)  
 	& (State == "not_finished" | State == "not_starting" | State == "todo") & goal(GName,GState)[source(_)] <-
@@ -207,25 +208,19 @@ actionEffectsVisible(Name,Params) :-
 	-action(ID,_,Name,_,_,Preds,Decompo)[source(_)];
 	+action(ID,"ongoing",Name,Robot,Params,Preds,Decompo).
   
-+action(ID,"ongoing",Name,Robot,Params)[source(_)] : humanName(HName) & jia.is_relation_in_onto(Robot,isInFoV,HName,true,robot) <-
++action(ID,"ongoing",Name,Robot,Params)[source(_)] : humanName(HName) & isPerceiving(HName,Robot) <-
 	-action(ID,"ongoing",Name,Robot,Params)[source(_)];
 	!waitHumanToSeeAction(ID,Name,Robot,Params,HName).
 
 +action(ID,"ongoing",Name,Robot,Params)[source(_)] : humanName(HName) <-
 	-action(ID,"ongoing",Name,Robot,Params)[source(_)];
-//	mementarSubscribe("?",HName,isInFoV,Robot,-1);
 	!waitFoV(ID,Name,Robot,Params,HName) ||| .wait(action(ID,"executed",Name,Robot,Params)[source(robot_executor)]).
 
 +!waitHumanToSeeAction(ID,Name,Robot,Params,HName) : true <-
-	if(not jia.is_relation_in_onto(HName,isLookingAt,Robot,true,robot)){
-//		mementarSubscribe("?",HName,isLookingAt,Robot,-1);
-	}else{
-		+isLookingAt(HName,Robot);
-	}
 	!waitLookingAt(ID,Name,Robot,Params,HName) ||| .wait(action(ID,"executed",Name,Robot,Params)[source(robot_executor)]).
 
 +!waitFoV(ID,Name,Robot,Params,HName) : true <-
-	.wait(isInFoV(Robot,HName));
+	.wait(isPerceiving(HName,Robot));
 	!waitHumanToSeeAction(ID,Name,Robot,Params,HName).
 	
 +!waitLookingAt(ID,Name,Robot,Params,HName) : true <-
@@ -250,11 +245,6 @@ actionEffectsVisible(Name,Params) :-
 	!handleActionNotSeen(ID,"not_seen",Name,Robot,Params,Preds,Decompo).
 	
 +!handleActionNotSeen(ID,"not_seen",Name,Robot,Params,Preds,Decompo) : humanName(HName) <-
-	if(not jia.is_relation_in_onto(Robot,isPerceiving,HName,false,robot)){
-//		mementarSubscribe("?",Robot,isPerceiving,HName,-1);
-	}else{
-		+isPerceiving(Robot,HName);
-	};
 	.wait(isPerceiving(Robot,HName));
 	!checkActionEffects(Name,Params);
 	-action(ID,"not_seen",Name,Robot,Params,Preds,Decompo);
