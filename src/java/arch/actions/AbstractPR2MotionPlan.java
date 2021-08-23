@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import actionlib_msgs.GoalStatusArray;
 import jason.asSemantics.ActionExec;
+import jason.asSyntax.Literal;
 import pr2_motion_tasks_msgs.planActionFeedback;
 import pr2_motion_tasks_msgs.planActionGoal;
 import pr2_motion_tasks_msgs.planActionResult;
@@ -11,6 +12,7 @@ import pr2_motion_tasks_msgs.planGoal;
 import rjs.arch.actions.AbstractClientAction;
 import rjs.arch.actions.ros.RjsActionClient;
 import rjs.arch.agarch.AbstractROSAgArch;
+import rjs.utils.Tools;
 
 public abstract class AbstractPR2MotionPlan extends AbstractClientAction<planActionGoal, planActionFeedback, planActionResult> {
 	protected planGoal goal;
@@ -43,7 +45,15 @@ public abstract class AbstractPR2MotionPlan extends AbstractClientAction<planAct
 	public void setResultSucceeded(planActionResult result) {}
 
 	@Override
-	protected void setResultAborted(planActionResult result) {}
+	public void setResultAborted(planActionResult result) {
+		String error = "";
+		int errorCode = result.getResult().getErrorCode();
+		if(errorCode == -1)
+			error = "planning of the "+ actionGoal.getGoal().getAction() +" action failed";
+		else
+			error = "update of the world failed";
+		actionExec.setFailureReason(Tools.stringFunctorAndTermsToBelLiteral("actionFailed",Arrays.asList(Literal.parseLiteral("plan"+ actionGoal.getGoal().getAction()),errorCode)), error);
+	}
 	
 	
 

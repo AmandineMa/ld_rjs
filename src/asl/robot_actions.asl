@@ -2,31 +2,26 @@
 
 // object monitoring added at the beginning of the plan and at the end remove it
 {begin rad}
-@pick[atomic]
+@pick[max_attempts(2)]
 +!pick(Params): true <-
+	//TODO arm to used should be computed somewhere
 	+planPick("armUsed", right_arm);
 	planPick(Obj);
 	execute("pick").
 	
-@place[atomic]
+@place[max_attempts(2)]
 +!place(Params) : planPick("armUsed", Arm) <-
 	planPlace(Obj, Arm);
 	execute("place");
+	!move_arm([Arm]);
 	-planPick("armUsed", Arm).
-
--!place : true <- 
-	.print("place failed").
 	
 @drop[atomic]
 +!drop(Params) : planPick("armUsed", Arm) <-
 	planDrop(Arm, Obj);
 	execute("drop"); 
-	.concat(Arm,"_home",PoseName);
-	!move_arm([Arm, PoseName]);
+	!move_arm([Arm]);
 	-planPick("armUsed", Arm).
-	
--!drop(Params) : true <- 
-	.print("drop failed").
 	
 {end}
 	
@@ -34,9 +29,11 @@
 @move[atomic]
 +!move_arm(Params) : true <-
 	.nth(0, Params, Arm);
-	.nth(1, Params, Pose);
-	planMoveArm(Arm,Pose);
+	.concat(Arm,"_home",PoseName);
+	planMoveArm(Arm,PoseName);
 	execute("moveArm").
+	
+// Actions in shared plan
 	
 +!take(Params): true <-
 	!pick(Params).
@@ -46,21 +43,18 @@
 	?container(C);
 	!pick([Object]);
 	!drop([C]).
+	
++!robot_pick_cube(Params) : true <-
+	!pick(Params).
+	
++!robot_place_cube(Params): true <-
+	!place(Params).
 
-//+!robot_tell_human_to_tidy(Params): true <-
-//	?humanName(Human);
-//	.findall(P,.member(P,Params) & jia.is_of_class(individual,P,"Cube"),CubeL);
-//	.findall(P,.member(P,Params) & jia.is_of_class(individual,P,"Box"),BoxL);
-//	?action(ID,_,Name,_,Params);
-//	.send(communication,askOne,askActionsTodo([action(ID,"PickAction",CubeL),action(ID,"DropAction",BoxL)],and),Answer).
 +!robot_tell_human_to_tidy(Params): true <-
-	?humanName(Human);
 	.nth(1, Params, Object);
 	.nth(2, Params, Table);
 	?action(ID,_,Name,_,Params);
 	.send(communication,askOne,askActionsTodo([action(ID,"PickAndPlaceAction",[Object,Table])],and),Answer).
-
-+!robot_wait_for_human_to_tidy(Params): true <- true.
 
 @strafe[atomic]
 +!strafe(Params): true <-

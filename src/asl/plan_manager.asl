@@ -2,7 +2,7 @@
 
 // TODO: plan manager is generic but not receiver. should put the receiver somewhere else
 
-actionStates(["planned","todo","ongoing","executed","unnplanned","not_starting","not_finished","not_seen","suspended"])[ground].
+actionStates(["planned","todo","ongoing","executed","unplanned","not_starting","not_finished","not_seen","suspended"])[ground].
 
 wantedAction(ID) :-  action(ID,S,_,_,_,_,_) & (S=="todo" | S=="ongoing").
 isNotOver(S) :- S\=="executed" & S\=="unplanned".
@@ -34,13 +34,13 @@ isNotOver(S) :- S\=="executed" & S\=="unplanned".
 +!setUnplannedActions(Actions) : true <-
 	for(.member(A,Actions)){
 		A=..[action,[ID,State,Name,Agent,Params,Preds,Decompo],[]];
-		-A;
+		-A[source(_)];
 		+action(ID,"unplanned",Name,Agent,Params,Preds,Decompo);
 		!updatePlanTasksEnd(Decompo,"unplanned");
 		!removeChild(ID);
 	}.
 	
-+!removeChild(Parent) : action(ID,"planned",Name,Agent,Params,Preds,Decompo)  & .member(Parent,Preds) <-
++!removeChild(Parent) : action(IDi,"planned",Namei,Agenti,Paramsi,Preds,Decompoi)  & .member(Parent,Preds) <-
 	.findall(action(ID,"planned",Name,Agent,Params,Preds,Decompo), action(ID,"planned",Name,Agent,Params,Preds,Decompo) & .member(Parent,Preds), Actions);
 	!setUnplannedActions(Actions).
 	

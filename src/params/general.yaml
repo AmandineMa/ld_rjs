@@ -1,16 +1,17 @@
+## /!\ Warning ! Service names to change according to the agent names. No nice way to use variables in YAML
 
 supervisor:
-  robot_name: "robot"
-  human_name: "Helmet_2"
+  robot_name: "pr2_robot"
+  human_name: "human_0"
   agentX_name: "AGENTX"
   table_name: table_1
     
   services:
    onto_individual: 
-      name: /ontologenius/individual/robot
+      name: /ontologenius/individual/pr2_robot
       type: ontologenius/OntologeniusService
    onto_class: 
-      name: /ontologenius/class/robot
+      name: /ontologenius/class/pr2_robot
       type: ontologenius/OntologeniusService
    disambiguate: 
       name: /KSP/disambiguate
@@ -25,18 +26,20 @@ supervisor:
       name: /KSP/merge
       type: knowledge_sharing_planner_msgs/Merge
    sparql_robot:
-      name: /ontologenius/sparql/robot
+      name: /ontologenius/sparql/pr2_robot
       type: ontologenius/OntologeniusSparqlService
- #  TODO pas propre, service de l'humain à créer on the fly
-   sparql_human:
-      name: /ontologenius/sparql/Helmet_2
-      type: ontologenius/OntologeniusSparqlService
+#    sparql_human:
+#       name: /ontologenius/sparql/human_0
+#       type: ontologenius/OntologeniusSparqlService
    mementar_sub:
-      name: /mementar/subscribe/robot
+      name: /mementar/subscribe/pr2_robot
       type: mementar/MementarOccasionSubscription
    mementar_unsub:
-      name: /mementar/unsubscribe/robot
+      name: /mementar/unsubscribe/pr2_robot
       type: mementar/MementarOcassionUnsubscription
+   mementar_action:
+      name: /mementar/action/pr2_robot
+      type: mementar/MementarService
 #    hatp_planner:
 #       name: /hatp/planner
 #       type: hatp_msgs/PlanningRequest
@@ -44,7 +47,7 @@ supervisor:
   
   topics:
    mementar_occasions: 
-     name: /mementar/occasions/robot
+     name: /mementar/occasions/pr2_robot
      type: mementar/MementarOccasion
      function: sub
    plan:
@@ -64,7 +67,7 @@ supervisor:
       type: std_msgs/String
       function: pub
    insert_action:
-      name: /mementar/insert_action/robot
+      name: /mementar/insert_action/pr2_robot
       type: mementar/MementarAction
       function: pub
    pr2_head_environment_monitoring:

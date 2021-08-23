@@ -19,6 +19,9 @@ import knowledge_sharing_planner_msgs.Verbalization;
 import knowledge_sharing_planner_msgs.VerbalizationRequest;
 import knowledge_sharing_planner_msgs.VerbalizationResponse;
 import mementar.MementarAction;
+import mementar.MementarService;
+import mementar.MementarServiceRequest;
+import mementar.MementarServiceResponse;
 import ontologenius.OntologeniusService;
 import ontologenius.OntologeniusServiceRequest;
 import ontologenius.OntologeniusServiceResponse;
@@ -154,6 +157,13 @@ public class LAASAgArch extends AbstractROSAgArch {
 			break;
 		}
 		rosnode.publish("insert_action", memAction); 
+	}
+	
+	public MementarServiceResponse callMementarAction(String mementarAction, String action) {
+		MementarServiceRequest req = rosnode.newServiceRequestFromType(MementarService._TYPE);
+		req.setAction(mementarAction);
+		req.setParam(action);
+		return  rosnode.callSyncService("mementar_action", req);
 	}
 	
 	public void addMonitoringID(Integer id) {

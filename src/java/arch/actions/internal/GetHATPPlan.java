@@ -115,7 +115,7 @@ public class GetHATPPlan extends AbstractAction {
 		for(int i = 0; i < taskParameters.size(); i++) {
 			switch(taskParameters.get(i)) {
 			case "REDFLAG":
-				taskParameters.set(i,"?0 isA Cube. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }");
+				taskParameters.set(i,"?0 isA Cube. ?0 hasColor red. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }");
 				break;
 			case "GREENFLAG":
 				taskParameters.set(i,"?0 isA Cube. ?0 hasColor green. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }");

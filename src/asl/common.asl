@@ -54,6 +54,11 @@ rmBuffPrio(inhibit,-1)[ground].
 +!send_goal(Goal) : true <-
 	.send(robot_management, tell, goal(Goal,received)).
 	
++!waitFact(Fact) : Fact=..[Pred,[P1,P2],[]] & jia.is_relation_in_onto(P1,Pred,P2,false,robot) <-
+	true.
+
++!waitFact(Fact) : true <-
+	.wait(Fact).	
 //TODO idle human not removed
 	
 +!reset : true <-

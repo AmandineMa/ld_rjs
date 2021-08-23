@@ -10,8 +10,13 @@ plan_manager:
                   - throw_box_green
       dtRR: 
          name: robot_receiver
-         container: throw_box_green    
+         container: throw_box_green   
          
       stack:
          name: Build
-                                 
+         worldstate:
+            isOnTopOf:
+               blue_cube:
+                  - red_cube
+                  
+                            

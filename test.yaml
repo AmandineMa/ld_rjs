@@ -51,25 +51,54 @@
 # data: "[del]human_0|handMovingToward|box_C4"
 # ---
 # data: "[add]human_0|handMovingToward|throw_box_green"
+data: "[add]human|isA|Human"
+---
+data: "[add]support1|isA|Support"
+---
+data: "[add]support2|isA|Support"
+---
+data: "[add]RED_CUBE1|isA|Cube"
+---
+data: "[add]RED_CUBE1|hasColor|red"
+---
+data: "[add]RED_CUBE2|isA|Cube"
+---
+data: "[add]RED_CUBE2|hasColor|red"
+---
+data: "[add]BLUE_CUBE1|isA|Cube"
+---
+data: "[add]BLUE_CUBE1|hasColor|bue"
+---
+data: "[add]BLUE_CUBE2|isA|Cube"
+---
+data: "[add]BLUE_CUBE2|hasColor|bue"
+---
+data: "[add]GREEN_CUBE1|isA|Cube"
+---
+data: "[add]GREEN_CUBE1|hasColor|green"
+---
+data: "[add]STICK1|isA|Stick"
+---
+data: "[add]RED_CUBE1|isReachableBy|robot"
+# ---
+# data: "[add]RED_CUBE1|isReachableBy|human"
+# ---
+# data: "[add]RED_CUBE2|isReachableBy|robot"
+---
+data: "[add]RED_CUBE2|isReachableBy|human"
+---
+data: "[add]BLUE_CUBE2|isReachableBy|human"
+---
+data: "[add]STICK1|isReachableBy|human"
+---
+data: "[add]BLUE_CUBE1|isReachableBy|robot"
+---
+data: "[add]GREEN_CUBE1|isReachableBy|robot"
+# ---
+# data: "[add]human|isLookingAt|robot"
+---
+data: "[add]robot|isPerceiving|human"
 
-data: "[add]RED_CUBE1|isReachableBy|PR2_ROBOT"
----
-data: "[add]RED_CUBE1|isReachableBy|HERAKLES_HUMAN1"
----
-data: "[add]RED_CUBE2|isReachableBy|PR2_ROBOT"
----
-data: "[add]RED_CUBE2|isReachableBy|HERAKLES_HUMAN1"
----
-data: "[add]RED_CUBE2|isReachableBy|HERAKLES_HUMAN1"
----
-data: "[add]BLUE_CUBE1|isReachableBy|HERAKLES_HUMAN1"
----
-data: "[add]STICK1|isReachableBy|HERAKLES_HUMAN1"
----
-data: "[add]BLUE_CUBE2|isReachableBy|PR2_ROBOT"
----
-data: "[add]GREEN_CUBE1|isReachableBy|PR2_ROBOT"
----
-data: "[add]HERAKLES_HUMAN1|isLookingAt|PR2_ROBOT"
----
-data: "[add]PR2_ROBOT|isInFoV|HERAKLES_HUMAN1"
+# [add]human|hasInRightHand|RED_CUBE2
+# [del]human|hasInRightHand|RED_CUBE2
+# [add]RED_CUBE2|isOnTopOf|support1

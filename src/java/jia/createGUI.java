@@ -14,11 +14,13 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 
 import jason.asSemantics.DefaultInternalAction;
+import jason.asSemantics.Message;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import rjs.arch.agarch.AbstractROSAgArch;
+import rjs.utils.Tools;
 
 public class createGUI extends DefaultInternalAction {
 
@@ -76,9 +78,13 @@ public class createGUI extends DefaultInternalAction {
 
 		// add the event listeners
 		reset.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// creates a new event +!head_scan so that the agent can react to the button
+			public void actionPerformed(ActionEvent event) {
 				ts.getC().addAchvGoal(Literal.parseLiteral("reset"), null);
+				try {
+					ts.getAgArch().broadcast(new Message("achieve", null, null, "reset"));
+				} catch (Exception e) {
+					Tools.getStackTrace(e);
+				}
 			}
 		});
 		

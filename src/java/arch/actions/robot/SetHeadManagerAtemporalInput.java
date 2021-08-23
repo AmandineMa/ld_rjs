@@ -27,7 +27,8 @@ public class SetHeadManagerAtemporalInput extends AbstractAction {
 		ListTermImpl aBitLower = new ListTermImpl();
 		aBitLower.add(new NumberTermImpl(0));
 		aBitLower.add(new NumberTermImpl(0));
-		aBitLower.add(new NumberTermImpl(-0.3));
+//		aBitLower.add(new NumberTermImpl(-0.3));
+		aBitLower.add(new NumberTermImpl(0));
 		point.setData(getRosNode().buildPointStamped(frame, aBitLower));
 		getRosNode().publish("pr2_head_"+input, point); 
 		actionExec.setResult(true);

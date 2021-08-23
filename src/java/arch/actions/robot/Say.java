@@ -2,8 +2,6 @@ package arch.actions.robot;
 
 import java.util.Arrays;
 
-import arch.agarch.LAASAgArch;
-import arch.agarch.LAASAgArch.ActionIndicator;
 import jason.asSemantics.ActionExec;
 import jason.asSyntax.ListTerm;
 import rjs.arch.actions.AbstractAction;
@@ -12,12 +10,10 @@ import rjs.utils.Tools;
 
 public class Say extends AbstractAction {
 	
-	private double actionID;
 
 	public Say(ActionExec actionExec, AbstractROSAgArch rosAgArch) {
 		super(actionExec, rosAgArch);
 		setSync(true);
-		actionID = Math.round(Math.random()*1000000);
 	}
 
 	@Override
@@ -28,9 +24,6 @@ public class Say extends AbstractAction {
 		str.setData(Tools.removeQuotes(actionTerms.get(2).toString()));
 		getRosNode().publish("say", str); 
 		rosAgArch.addBelief("comm", Arrays.asList("r2h",commType,commParams));
-//		((LAASAgArch) rosAgArch).callInsertAction("speak_"+actionID, rosAgArch.getRosnode().getConnectedNode().getCurrentTime(), ActionIndicator.START);
-		Tools.sleep(5000);
-//		((LAASAgArch) rosAgArch).callInsertAction("speak_"+actionID,rosAgArch.getRosnode().getConnectedNode().getCurrentTime(), ActionIndicator.END);
 		actionExec.setResult(true);
 	}
 

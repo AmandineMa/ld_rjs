@@ -1,5 +1,6 @@
 { include("common.asl")}
 { include("plan_manager.asl")}
+{ include("action_models.asl")}
 { register_function("rjs.function.length_allow_unground") } 
 
 isActionMatching(Name,Agent,Params,Type,NewParams) :-
@@ -38,7 +39,7 @@ actionEffectsVisible(Name,Params) :-
 	& jia.members_same_class(Params,ParamsAction)
 	& .count(.member(M,Effects) & M=..[Pred,[P1,P2],[]] & jia.is_relation_in_onto(P1,Pred,P2,false,human),C)
 	& rjs.function.length_allow_unground(Effects)==C.
-	
+
 !start.
 	
 +!start : true <-
@@ -62,33 +63,45 @@ actionEffectsVisible(Name,Params) :-
 //////////////////////////////////////////////////////////////////	 
 ////////////////// Action to perform by human ////////////////////    
 //////////////////////////////////////////////////////////////////	
-
-+action(ID,"todo",Name,Agent,Params,Preds,Decompo) : humanName(Agent) & Name == "IDLE" <-
+//TODO replace with generic wait class
++action(ID,"todo",Name,Agent,Params,Preds,Decompo) : humanName(Agent) & jia.is_of_class(class,Name,"DefaultAction") <-
 	-action(ID,"todo",Name,Agent,Params,Preds,Decompo);
 	++action(ID,"executed",Name,Agent,Params,Preds,Decompo);
 	.send(robot_management,tell,action(ID,"executed",Name,Agent,Params)).
 	
++action(ID,"todo",Name,Agent,Params,Preds,Decompo) : humanName(Agent) & jia.is_of_class(class,Name,"WaitAction") <-
+	-action(ID,"todo",Name,Agent,Params,Preds,Decompo);
+	++action(ID,"ongoing",Name,Agent,Params,Preds,Decompo);
+	.send(robot_management,tell,action(ID,"ongoing",Name,Agent,Params));
+	!waitToSeeIfHumanActs(ID,Name,Agent,Params,Preds,Decompo).
+	
++!waitToSeeIfHumanActs(ID,Name,Agent,Params,Preds,Decompo) : true <-
+	.wait(action(ID2,State,_,Agent,_,Preds,_) & (State == "ongoing" | State == "executed") & ID2 \== ID,5000).
+	
 +action(ID,"todo",Name,Agent,Params,Preds,Decompo) : humanName(Agent) | agentXName(Agent) <-
     !waitForActionToStart(ID,Name,Agent,Params,Preds,Decompo).
     
-+!waitForActionToStart(ID,Name,Agent,Params,Preds,Decompo) : not .intend(waitForActionToStart(_,Name,Agent,Params,_,_)) & humanName(Human) <-
-    .wait(isActionMatching(Name,Agent,Params,possibleStartedActions(X)[source(action_monitoring)],NewParams), 30000);
+-!waitToSeeIfHumanActs(ID,Name,Agent,Params,Preds,Decompo) : true <-
+	!finishedAction(ID,Name,Agent,Params,Preds,Decompo).
+	
++!waitForActionToStart(ID,Name,Agent,Params,Preds,Decompo) : humanName(Human) <-
+    .wait(isActionMatching(Name,Agent,Params,possibleStartedActions(X)[source(action_monitoring)],NewParams) | isActionMatching(Name,Agent,Params,possibleProgressingActions(X)[source(action_monitoring)],NewParams), 30000); 
     -action(ID,"todo",Name,Agent,Params,Preds,Decompo);
     ++action(ID,"ongoing",Name,Human,NewParams,Preds,Decompo);
     .send(robot_management,tell,action(ID,"ongoing",Name,Human,NewParams));
-    !suspendActionsWithSamePreds(ID,Human,Preds);
     !waitForActionToFinish(ID,Name,Human,NewParams,Preds,Decompo).
     
 +!waitForActionToStart(ID,Name,Agent,Params,Preds,Decompo) : true.
 	
 +!suspendActionsWithSamePreds(ID,Agent,Preds) : true <-
-	.findall(action(IDX,"todo",NameX,Agent,ParamsX,Preds,DecompoX),action(IDX,"todo",NameX,Agent,ParamsX,Preds,DecompoX) & IDX \== ID,ActionList);
+	.findall(action(IDX,_,NameX,Agent,ParamsX,Preds,DecompoX),action(IDX,_,NameX,Agent,ParamsX,Preds,DecompoX) & IDX \== ID,ActionList);
     for(.member(A,ActionList)){
 		A=..[action,[IDX,StateX,NameX,AgentX,ParamsX,Preds,DecompoX],[]];
-		-A;
+		-A[source(_)];
 		.drop_intention(waitForActionToStart(IDX,NameX,AgentX,ParamsX,Preds,DecompoX));
 		++action(IDX,"suspended",NameX,AgentX,ParamsX,Preds,DecompoX);
-	}.
+		.send(robot_management,tell,action(IDX,"suspended",NameX,AgentX,ParamsX));
+	}. 
 	
 -!waitForActionToStart(ID,Name,Agent,Params,Preds,Decompo)[code(_),code_line(_),code_src(_),error(wait_timeout),error_msg(_),source(self)] : agentXName(Agent) <- true.
 
@@ -98,17 +111,22 @@ actionEffectsVisible(Name,Params) :-
     
  +!waitForActionToFinish(ID,Name,Agent,Params,Preds,Decompo) : humanName(Human) <-
     .wait(isActionMatching(Name,Agent,Params,possibleFinishedActions(A)[source(action_monitoring)],NewParams), 30000);
-    -action(ID,_,Name,Agent,Params,Preds,Decompo);
-    +action(ID,"executed",Name,Human,NewParams,Preds,Decompo);
-    .send(robot_management,tell,action(ID,"executed",Name,Human,NewParams));
+    !finishedAction(ID,Name,Human,NewParams,Preds,Decompo).
+    
++!finishedAction(ID,Name,Agent,Params,Preds,Decompo) : humanName(Human) <-
+	-action(ID,_,Name,Agent,_,Preds,Decompo)[source(_)];
+    +action(ID,"executed",Name,Human,Params,Preds,Decompo);
+	!suspendActionsWithSamePreds(ID,Human,Preds);
+    .send(robot_management,tell,action(ID,"executed",Name,Human,Params));
     !removeParallelStreams(Agent,Preds);
     !updatePlanActions.
     
  -!waitForActionToFinish(ID,Name,Agent,Params,Preds,Decompo)[code(_),code_line(_),code_src(_),error(wait_timeout),error_msg(_),source(self)] : true <-
  	-action(ID,"ongoing",Name,Agent,Params,Preds,Decompo);
- 	.send(robot_management,tell,action(ID,"todo",Name,Agent,Params));
+// 	.send(robot_management,tell,action(ID,"todo",Name,Agent,Params));
     ++action(ID,"not_finished",Name,Agent,Params,Preds,Decompo).
 
+//TODO add only once executed, the same for abstract
 @onga[atomic]
 +action(ID,"ongoing",Name,Agent,Params,Preds,Decompo) : humanName(Agent) <-
 	.random(X);
@@ -126,6 +144,12 @@ actionEffectsVisible(Name,Params) :-
 	Y=math.round(X*1000000);
 	.concat(Name,"_",Y, NameX);
 	jia.insert_task_mementar(NameX,end).
+	
++action(ID,"suspended",Name,Agent,Params,Preds,Decompo) : humanName(Agent) <-
+	.random(X);
+	Y=math.round(X*1000000);
+	.concat(Name,"_",Y, NameX);
+	jia.remove_task_mementar(NameX).
 
 +action(ID,"not_starting",Name,Agent,Params,Preds,Decompo) : notAlreadyAsked(ID) <-
 	!handleNotStarting(ID,"not_starting",Name,Agent,Params,Preds,Decompo).
@@ -133,6 +157,7 @@ actionEffectsVisible(Name,Params) :-
 +action(ID,"not_starting",Name,Agent,Params,Preds,Decompo) : true <-
 	!askStop.
 
+//TODO send only action state and not sentence
 +action(ID,"not_finished",Name,Agent,Params,Preds,Decompo) : notAlreadyAsked(ID) <-
  	.send(communication,askOne,askActionsTodo([action(ID,Name,Params)],_),Answer);
  	.send(communication,askOne,talk("I think you started to do it but did not finish it."),Answer2);
@@ -167,29 +192,34 @@ actionEffectsVisible(Name,Params) :-
 +!handleNotStarting(ID,"not_starting",Name,Agent,Params,Preds,Decompo) : true.
 	
 +possibleFinishedActions(ActionList)[source(action_monitoring)] : isMonitoredActionInPlan(possibleFinishedActions(ActionList),PlanActions)  & goal(GName,GState)[source(_)]<-
-	for(.member(A,PlanActions)){
-		A =.. [P,[ID,State,Name,Agent,Params,Preds,Decompo],[]];
-		if(State=="todo"){
-			.drop_desire(waitForActionToStart(ID,Name,Agent,Params,Preds,Decompo));
-			!suspendActionsWithSamePreds(ID,Agent,Preds);
-    		!waitForActionToFinish(ID,Name,Agent,Params,Preds,Decompo);
-		}elif(State=="planned"){
-			?robotName(Robot);
-			if(action(IDX,"ongoing",NameX,Robot,ParamsX,PredsX,DecompoX) & .member(IDX,Preds)){
-				.send(communication,askOne,talk("You are fast ! I was supposed to finish before you"),Answer);
-				!waitForActionToFinish(ID,Name,Agent,Params,Preds,Decompo);
+	jia.choose_most_probable_action(PlanActions,A);
+	A =.. [P,[ID,State,Name,Agent,Params,Preds,Decompo],[]];
+	.concat("I think you ",Name," ",Sentence);
+	.send(communication,askOne,talk(Sentence),Answer1);
+	if(State=="todo"){
+		.drop_desire(waitForActionToStart(ID,Name,Agent,Params,Preds,Decompo));
+		!suspendActionsWithSamePreds(ID,Agent,Preds);
+		!waitForActionToFinish(ID,Name,Agent,Params,Preds,Decompo);
+	}elif(State=="planned"){
+		?robotName(Robot);
+		if(action(IDX,"ongoing",NameX,Robot,ParamsX,PredsX,DecompoX) & .member(IDX,Preds)){
+			.send(communication,askOne,talk("You are fast ! I was supposed to finish before you"),Answer);
+			!waitForActionToFinish(ID,Name,Agent,Params,Preds,Decompo);
+		}else{
+			if(jia.are_planned_preds_only_wait(Agent,Name,Preds)){
+				!finishedAction(ID,Name,Agent,Params,Preds,Decompo);
 			}else{
 				.send(robot_management,tell,replan(GName));
 				.send(communication,askOne,talk("I replan"),Answer);
 			}
-		}elif(State=="unplanned"){
-			.send(robot_management,tell,replan(GName));
-			.send(communication,askOne,talk("I replan"),Answer);
-		}elif(State=="not_starting" | State=="not_finished"){
-			!waitForActionToFinish(ID,Name,Agent,Params,Preds,Decompo);
 		}
+	}elif(State=="unplanned"){
+//			.send(robot_management,tell,replan(GName));
+//			.send(communication,askOne,talk("I replan"),Answer);
+	}elif(State=="not_starting" | State=="not_finished"){
+		!waitForActionToFinish(ID,Name,Agent,Params,Preds,Decompo);
 	}.
-
+	
 //TODO only during plan, maybe too many actions detected
 //+possibleFinishedActions(A)[source(action_monitoring)] : true <-
 //	.send(communication,askOne,talk("I think you made a mistake, it was not part of the plan"),Answer).
@@ -220,15 +250,19 @@ actionEffectsVisible(Name,Params) :-
 	!waitLookingAt(ID,Name,Robot,Params,HName) ||| .wait(action(ID,"executed",Name,Robot,Params)[source(robot_executor)]).
 
 +!waitFoV(ID,Name,Robot,Params,HName) : true <-
-	.wait(isPerceiving(HName,Robot));
+//	.concat("I wait to perceive human ",Sentence);
+//	.send(communication,askOne,talk(Sentence),Answer);
+	!waitFact(isPerceiving(HName,Robot));
+//	.concat("I perceived human ",Sentence2);
+//	.send(communication,askOne,talk(Sentence2),Answer);
 	!waitHumanToSeeAction(ID,Name,Robot,Params,HName).
 	
 +!waitLookingAt(ID,Name,Robot,Params,HName) : true <-
-	.wait(isLookingAt(HName,Robot));
+	!waitFact(isLookingAt(HName,Robot));
 	-action(_,"ongoing",Name,Robot,Params)[source(_)];
 	-action(ID,_,Name,_,_,Preds,Decompo)[source(_)];
 	+action(ID,"ongoing",Name,Robot,Params,Preds,Decompo).
-	
+
 +action(ID,"executed",Name,Robot,Params)[source(robot_executor)] :  
 		action(ID,"ongoing",Name,Robot,Params,Preds,Decompo) | not jia.is_of_class(class,Name,"PhysicalAction") <-
 	-action(_,"executed",Name,_,_)[source(_)];
@@ -244,8 +278,10 @@ actionEffectsVisible(Name,Params) :-
 +action(ID,"not_seen",Name,Robot,Params,Preds,Decompo) : true <-
 	!handleActionNotSeen(ID,"not_seen",Name,Robot,Params,Preds,Decompo).
 	
+//TODO add non-observable action here and in onto
+	
 +!handleActionNotSeen(ID,"not_seen",Name,Robot,Params,Preds,Decompo) : humanName(HName) <-
-	.wait(isPerceiving(Robot,HName));
+	!waitFact(isPerceiving(Robot,HName));
 	!checkActionEffects(Name,Params);
 	-action(ID,"not_seen",Name,Robot,Params,Preds,Decompo);
 	+action(ID,"executed",Name,Robot,Params,Preds,Decompo);

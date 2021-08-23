@@ -58,7 +58,7 @@ isPredicateRobotAction(NewPredicate, Params) :-
 
 +!start : true <-
     rjs.jia.log_beliefs;
-    .verbose(2);
+//    .verbose(2);
 	!initRosComponents;
     !getAgentNames;
     !setActionsMementarMonitoring.
@@ -89,6 +89,7 @@ isPredicateRobotAction(NewPredicate, Params) :-
         mementarSubscribe(Function,"?",PropF,"?",-1);
     }.
 
+//TODO add when action starts
 +action(ID,"executed",Name,Agent,Params)[source(robot_executor)] : true <-
 	-action(ID,"ongoing",Name,Agent,Params)[source(robot_executor)];
 	.wait(2000);
@@ -115,7 +116,7 @@ isPredicateRobotAction(NewPredicate, Params) :-
 	++possibleProgressingActions(ActionList2).
 	
 // trigger with a progression effect -> action progressing
-// no check to see if it exists a possible human agent has all progression effect predicates have a human as object or subject
+// no check to see if it exists a possible human agent as all progression effect predicates have a human as object or subject
 @progressS2[atomic]
 +NewPredicate[source(percept)] : isProgressionEffect(NewPredicate,ActionList) <-
 	++possibleProgressingActions(ActionList).	
