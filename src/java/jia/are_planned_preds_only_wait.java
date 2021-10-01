@@ -3,16 +3,16 @@ package jia;
 import java.util.List;
 
 import arch.agarch.LAASAgArch;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
-import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
 import rjs.utils.Tools;
 
 
-public class are_planned_preds_only_wait extends is_same_action_class {
+public class are_planned_preds_only_wait extends DefaultInternalAction {
 	
 	@Override public int getMinArgs() {
         return 1;
@@ -32,19 +32,23 @@ public class are_planned_preds_only_wait extends is_same_action_class {
 			boolean waitClass = true;
 			int pred = preds.get(0).intValue();
 			while(waitClass) {
-				Literal actionBel = ((LAASAgArch) ts.getAgArch()).findBel("action("+pred+",_,_,_,_,_,_)");
+				Literal actionBel = ((LAASAgArch) ts.getAgArch()).findBel("action("+pred+",_,_,_,_,_,_)[source(_)]");
 				List<Term> actionBelTerms = (List<Term>) actionBel.getTerms();
 				agent = Tools.removeQuotes(actionBelTerms.get(3).toString());
 				preds = Tools.listTermNumbers_to_list((ListTermImpl) actionBelTerms.get(5));
-				pred = preds.get(0).intValue();
-				if(agent.equals(humanName)) {
-					String actionName = Tools.removeQuotes(actionBelTerms.get(2).toString());
-					List<String> ontoClass = ((LAASAgArch) ts.getAgArch()).callOnto("class","getUp", actionName+" -s DefaultAction").getValues();
-					if(ontoClass != null && !ontoClass.isEmpty()) {
-						lastHumanAction = actionName;
-					}else {
-						waitClass = false;
+				if(preds.size() == 1) {
+					pred = preds.get(0).intValue();
+					if(agent.equals(humanName)) {
+						String actionName = Tools.removeQuotes(actionBelTerms.get(2).toString());
+						List<String> ontoClass = ((LAASAgArch) ts.getAgArch()).callOnto("class","getUp", actionName+" -s DefaultAction").getValues();
+						if(ontoClass != null && !ontoClass.isEmpty()) {
+							lastHumanAction = actionName;
+						}else {
+							waitClass = false;
+						}
 					}
+				}else {
+					waitClass = false;
 				}
 			}
 			if(!lastHumanAction.equals(initialActionName))

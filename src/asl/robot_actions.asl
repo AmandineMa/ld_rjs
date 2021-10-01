@@ -1,15 +1,14 @@
-//TODO faire finir les actions auprès du plan_manager quand il y a un fail
-
 // object monitoring added at the beginning of the plan and at the end remove it
 {begin rad}
-@pick[max_attempts(2)]
+@pick[max_attempts(1)]
 +!pick(Params): true <-
 	//TODO arm to used should be computed somewhere
 	+planPick("armUsed", right_arm);
 	planPick(Obj);
-	execute("pick").
+	execute("pick");
+	!move_arm([right_arm]).
 	
-@place[max_attempts(2)]
+@place[max_attempts(1)]
 +!place(Params) : planPick("armUsed", Arm) <-
 	planPlace(Obj, Arm);
 	execute("place");
@@ -68,4 +67,18 @@
 
 +!robot_congratulate(Params): true <-
 	.send(communication,askOne,talk("Bravo, we did it !"),Answer).
+	
++!r_askPunctualHelp(Params): true <-
+	.nth(0,Params,Action);
+	.nth(1,Params,P1);
+	if(.length(Params)>2){
+		.nth(2,Params,P2);
+		.concat("Can you ",Action," the ",P1," on ",P2,Sentence);
+		.send(communication,askOne,talk(Sentence),Answer);
+	}else{
+		.concat("Can you ",Action,P1,Sentence);
+		.send(communication,askOne,talk(Sentence),Answer);
+	}.
+	
+	
 	

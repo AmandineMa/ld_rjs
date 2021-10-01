@@ -52,13 +52,13 @@ matchingProgressingActions(Predicate,ActionList,ActionList2) :-
 isPredicateRobotAction(NewPredicate, Params) :-
 	  NewPredicate=..[P,[T1,T2],[]] 
 	& humanName(H) & T1 \== H 
-	& .member(T1,Params) | .member(T2,Params).
+	& (.member(T1,Params) | .member(T2,Params)).
 	
 !start.
 
 +!start : true <-
     rjs.jia.log_beliefs;
-//    .verbose(2);
+    .verbose(2);
 	!initRosComponents;
     !getAgentNames;
     !setActionsMementarMonitoring.
@@ -150,7 +150,6 @@ isNecessaryEffect(NewPredicate,ActionList2) <-
 
 +!timeoutMovement(ActionList) : true <-
 	.wait(50000);
-	// ne fonctionne pas sans le add_time !! pourquoi ?? parce qu'ajouté via code ??
 	-possibleStartedActions(ActionList)[add_time(_)].
 	
 +possibleProgressingActions(ActionList) : true <-

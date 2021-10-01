@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import arch.agarch.LAASAgArch;
+import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.Literal;
@@ -21,7 +22,7 @@ import rjs.utils.Tools;
  *
  */
 
-public class get_action_class extends is_same_action_class {
+public class get_action_class extends DefaultInternalAction {
 	
 	@Override public int getMinArgs() {
         return 3;
@@ -41,7 +42,7 @@ public class get_action_class extends is_same_action_class {
 		Iterator<Literal> it = ((LAASAgArch) ts.getAgArch()).get_beliefs_iterator(bel);
 		while(it.hasNext()) {
 			LiteralImpl actionModel = (LiteralImpl) ((Rule) it.next()).getHead();
-			String actionModelName = supervisorNameToOntoName(((Literal) actionModel.getTerm(0)).getFunctor().toString());
+			String actionModelName = ((LAASAgArch) ts.getAgArch()).supervisorNameToOntoName(((Literal) actionModel.getTerm(0)).getFunctor().toString());
 			List<String> ontoClass = ((LAASAgArch) ts.getAgArch()).callOnto("class","getUp", action+" -s "+actionModelName).getValues();
 			if(ontoClass != null && !ontoClass.isEmpty()) {
 				return un.unifies(args[1], actionModel);

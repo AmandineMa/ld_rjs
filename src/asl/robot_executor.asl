@@ -40,16 +40,17 @@ robotState(idle)[ground].
 		.send([communication], tell, action(ID,"todo",Name,Agent,Params));
 		+action(ID,"todo",Name,Agent,Params);
 	}
+	?action(ID,_,_,_,_)[add_time(T)];
 	.random(X);
 	Y=math.round(X*1000000);
 	.concat(Name,"_",Y, NameX);
-	jia.insert_task_mementar(NameX,start);
+	jia.insert_task_mementar(NameX,start,T);
 	Act =.. [Action, [Params],[]];
 	-+robotState(acting)[ground];
 	if(not jia.is_of_class(class,Name,"WaitAction")){
 		!Act;	
 	}
-	jia.insert_task_mementar(NameX,end);
+	jia.insert_task_mementar(NameX,end,T);
 	-+robotState(idle)[ground];
 	-action(ID,"ongoing",Name,Agent,Params)[source(_)];
 	+action(ID,Name,"executed");

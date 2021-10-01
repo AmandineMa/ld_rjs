@@ -46,13 +46,13 @@ public class RobotActionsDir extends DefaultDirective implements Directive {
                 p.getBody().add(2,b1quar);
                 
                 // Add at the end
-//                Literal unsetHead = Literal.parseLiteral("setHMAtemp(Obj,environment_monitoring,void)");
-//                PlanBody b2 = new PlanBodyImpl(BodyType.action, unsetHead);
-//                p.getBody().add(b2);
-//                
-//                Literal unsetHeadBuff = Literal.parseLiteral("setHMBuff([environment_monitoring,normal])");
-//                PlanBody b2bis = new PlanBodyImpl(BodyType.action, unsetHeadBuff);
-//                p.getBody().add(b2bis);
+                Literal unsetHead = Literal.parseLiteral("setHMAtemp(Obj,environment_monitoring,void)");
+                PlanBody b2 = new PlanBodyImpl(BodyType.action, unsetHead);
+                p.getBody().add(b2);
+                
+                Literal unsetHeadBuff = Literal.parseLiteral("setHMBuff([environment_monitoring,normal])");
+                PlanBody b2bis = new PlanBodyImpl(BodyType.action, unsetHeadBuff);
+                p.getBody().add(b2bis);
 
                 newAg.getPL().add(p);
                 
@@ -61,9 +61,14 @@ public class RobotActionsDir extends DefaultDirective implements Directive {
                 		+"[Failure, code(Code),code_line(_),code_src(_),error(Error),error_msg(Msg)]: .substring(plan,Code) <- +error_msg(Msg);!"+planL+"."))
                 	.setSourceFile(outerContent.getASLSrc());
                 
+                newAg.getPL().add(ASSyntax.parsePlan("-!"+planL
+                		+"[Failure, code(Code),code_line(_),code_src(_),error(Error),error_msg(Msg)]: .substring(execute,Code) <- +error_msg(Msg);!"+planL+"."))
+                	.setSourceFile(outerContent.getASLSrc());
+                
                 newAg.getPL().add(ASSyntax.parsePlan("-!"+planL +": true <-"
                 		+ " ?error_msg(Msg);"
                 		+ "-error_msg(Msg);"
+                		+ "rjs.jia.reset_att_counter("+planL+");"
                 		+ "rjs.jia.fail_goal_with_annots(executeAction(_,_,_,_),[error_msg(Msg)])."))
                 	.setSourceFile(outerContent.getASLSrc());
                 

@@ -7,6 +7,8 @@
 	rjs.jia.log_beliefs;
 	!initRosComponents;
 	!getAgentNames;
+	?humanName(HName);
+    ?robotName(Robot);
 	mementarSubscribe("?",Robot,isPerceiving,HName,-1).
 
 // Plan added at the beginning of each plan of hpd	

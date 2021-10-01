@@ -5,7 +5,7 @@
 //action(2503, "planned", "PickAndPlace", "AGENTX", ["?0 isA Cube. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }","?0 isA Spot NOT EXISTS { ?0 isUnder ?2. ?2 isA Cube }"], [], 2501).
 //action(2508, "planned", "PickAndPlace", "AGENTX", ["?0 isA Cube. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }","?0 isA Spot NOT EXISTS { ?0 isUnder ?2. ?2 isA Cube }"], [], 2505).
 //action(2521, "planned", "PickAndPlaceStick", "HERAKLES_HUMAN1", ["?0 isA cube_GGTB. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }","red_cube_1","red_cube_2"], [2508,2503], 2499).
-//action(2525, "planned", "PickAndPlace", "AGENTX", ["?0 isA Cube. ?0 hasColor blue. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }","cube_GGTB1"], [2503,2521], 2522).
+//action(2525, "planned", "PickAndPlace", "AGENTX", ["?0 isA Cube. ?0 hasColor blue. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }","cube_GGTB"], [2503,2521], 2522).
 //action(2527, "planned", "PickAndPlace", "PR2_ROBOT", ["?0 isA Cube. ?0 hasColor green. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }","blue_cube_1"], [2525], 2523).
 //action(2528, "planned", "PickAndPlace", "AGENTX", ["?0 isA Cube. ?0 hasColor blue. ?0 isReachableBy ?1 NOT EXISTS { ?0 isOnTopOf ?2. ?2 isA Cube }","green_cube"], [2525,2527], 2524).
 
@@ -143,6 +143,7 @@
 //action(82, "planned", "human_wait_for_cube", "human_0", [], [77], 16).
 
 isBusy(Human) :- action(ID,"ongoing",Name,Human,Params,Preds,Decompo) | (robotName(Robot) & not jia.is_relation_in_onto(Human,isLookingAt,Robot,false,robot)).
+//isExecutedActionInPlan(Name,Agent,Params) :- action(ID,"planned",Name,Human,Params,Preds,Decompo).
 
 !start.
 
@@ -168,9 +169,9 @@ isBusy(Human) :- action(ID,"ongoing",Name,Human,Params,Preds,Decompo) | (robotNa
 	+abstractTask(17, "planned", "h_handle_blue_cube_2", 1);
 	+action(18, "planned", "human_pick_cube", "human_0", ["red_cube_2"], [11], 1);
 	+action(19, "planned", "robot_wait", "pr2_robot", [], [18], 0);
-	+action(21, "planned", "human_place_cube", "human_0", ["red_cube_2","cube_BBTG"], [19], 13);
-	+action(23, "planned", "human_place_cube", "human_0", ["red_cube_2","cube_BBCG"], [19], 13);
-	+action(26, "planned", "robot_place_cube", "pr2_robot", ["red_cube_1","cube_BBCG"], [21], 4);
+	+action(21, "planned", "human_place_cube", "human_0", ["red_cube_2","support1"], [19], 13);
+	+action(23, "planned", "human_place_cube", "human_0", ["red_cube_2","support2"], [19], 13);
+	+action(26, "planned", "robot_place_cube", "pr2_robot", ["red_cube_1","support2"], [21], 4);
 	+action(27, "planned", "human_pick_cube", "human_0", ["cube_GGTB"], [26], 1);
 	+action(30, "planned", "robot_wait", "pr2_robot", [], [27], 5);
 	+action(31, "planned", "human_place_stick", "human_0", ["cube_GGTB","red_cube_1","red_cube_2"], [30], 1);
@@ -195,7 +196,7 @@ isBusy(Human) :- action(ID,"ongoing",Name,Human,Params,Preds,Decompo) | (robotNa
 	+action(64, "planned", "human_pick_cube", "human_0", ["blue_cube_2"], [61], 17);
 	+action(67, "planned", "robot_wait", "pr2_robot", [], [64], 10);
 	+action(68, "planned", "human_place_cube", "human_0", ["blue_cube_2","green_cube"], [67], 17);
-	+action(71, "planned", "robot_place_cube", "pr2_robot", ["red_cube_1","cube_BBTG"], [23], 4);
+	+action(71, "planned", "robot_place_cube", "pr2_robot", ["red_cube_1","support1"], [23], 4);
 	+action(72, "planned", "human_pick_cube", "human_0", ["cube_GGTB"], [71], 1);
 	+action(75, "planned", "robot_wait", "pr2_robot", [], [72], 5);
 	+action(76, "planned", "human_place_stick", "human_0", ["cube_GGTB","red_cube_1","red_cube_2"], [75], 1);
@@ -221,7 +222,90 @@ isBusy(Human) :- action(ID,"ongoing",Name,Human,Params,Preds,Decompo) | (robotNa
 	+action(112, "planned", "robot_wait", "pr2_robot", [], [109], 10);
 	+action(113, "planned", "human_place_cube", "human_0", ["blue_cube_2","green_cube"], [112], 17).
 	
-	
+//+!add_plan_a_la_mano : true <-
+//  +action(124, "planned", "WAIT", "human_0", [], [123], (-1));
+//  +action(123, "planned", "robot_place_cube", "pr2_robot", ["green_cube","blue_cube_1"], [121], 118);
+//  +abstractTask(118, "planned", "placeUndef", 104);
+//  +abstractTask(104, "planned", "pickAndPlace", 91);
+//  +abstractTask(91, "planned", "buildTop", 69);
+//  +abstractTask(69, "planned", "stack", 22);
+//  +abstractTask(22, "planned", "r_involveHuman", 20);
+//  +abstractTask(20, "planned", "r_makeReachable", 16);
+//  +abstractTask(16, "planned", "r_checkReachable", 5);
+//  +abstractTask(5, "planned", "pickAndPlace", 1);
+//  +abstractTask(1, "planned", "buildBase", 0);
+//  +abstractTask(0, "planned", "stack", (-1));
+//  +action(121, "planned", "WAIT", "human_0", [], [120], (-1));
+//  +action(120, "planned", "robot_pick_cube", "pr2_robot", ["green_cube"], [114], 116);
+//  +abstractTask(116, "planned", "pickCheckNotHeld", 104);
+//  +action(114, "planned", "WAIT", "human_0", [], [113], (-1));
+//  +action(113, "planned", "robot_place_cube", "pr2_robot", ["blue_cube_1","cube_BBTG"], [111], 108);
+//  +abstractTask(108, "planned", "placeUndef", 103);
+//  +abstractTask(103, "planned", "pickAndPlace", 91);
+//  +action(111, "planned", "WAIT", "human_0", [], [110], (-1));
+//  +action(110, "planned", "robot_pick_cube", "pr2_robot", ["blue_cube_1"], [102], 106);
+//  +abstractTask(106, "planned", "pickCheckNotHeld", 103);
+//  +action(102, "planned", "WAIT", "human_0", [], [101], (-1));
+//  +action(101, "planned", "robot_place_cube", "pr2_robot", ["cube_BBTG","br"], [99], 96);
+//  +abstractTask(96, "planned", "placeUndef", 92);
+//  +abstractTask(90, "planned", "buildBridge", 69);
+//  +abstractTask(92, "planned", "pickAndPlace", 90);
+//  +action(99, "planned", "WAIT", "human_0", [], [98], (-1));
+//  +action(98, "planned", "robot_pick_cube", "pr2_robot", ["cube_BBTG"], [89], 94);
+//  +abstractTask(94, "planned", "pickCheckNotHeld", 92);
+//  +action(89, "planned", "human_place_cube", "human_0", ["red_cube_2","support2"], [87], 77);
+//  +abstractTask(77, "planned", "placeUndef", 73);
+//  +abstractTask(73, "planned", "pickAndPlace", 72);
+//  +abstractTask(72, "planned", "h_punctuallyHelpRobot", (-1));
+//  +action(87, "planned", "WAIT", "pr2_robot", [], [79], 22);
+//  +action(79, "planned", "human_pick_cube", "human_0", ["red_cube_2"], [71], 75);
+//  +abstractTask(75, "planned", "pickCheckNotHeld", 73);
+//  +action(71, "planned", "r_askPunctualHelp", "pr2_robot", ["pickAndPlace","red cube","base"], [15], 22);
+//  +action(15, "planned", "WAIT", "human_0", [], [14], (-1));
+//  +action(14, "planned", "robot_place_cube", "pr2_robot", ["red_cube_1","support1"], [12], 9);
+//  +abstractTask(9, "planned", "placeUndef", 4);
+//  +abstractTask(4, "planned", "pickAndPlace", 1);
+//  +action(12, "planned", "WAIT", "human_0", [], [11], (-1));
+//  +action(11, "planned", "robot_pick_cube", "pr2_robot", ["red_cube_1"], [], 7);
+//  +abstractTask(7, "planned", "pickCheckNotHeld", 4);
+//  +action(175, "planned", "WAIT", "human_0", [], [174], (-1));
+//  +action(174, "planned", "robot_place_cube", "pr2_robot", ["green_cube","blue_cube_1"], [172], 169);
+//  +abstractTask(169, "planned", "placeUndef", 155);
+//  +abstractTask(155, "planned", "pickAndPlace", 130);
+//  +abstractTask(130, "planned", "buildTop", 69);
+//  +action(172, "planned", "WAIT", "human_0", [], [171], (-1));
+//  +action(171, "planned", "robot_pick_cube", "pr2_robot", ["green_cube"], [165], 167);
+//  +abstractTask(167, "planned", "pickCheckNotHeld", 155);
+//  +action(165, "planned", "WAIT", "human_0", [], [164], (-1));
+//  +action(164, "planned", "robot_place_cube", "pr2_robot", ["blue_cube_1","cube_BBTG"], [162], 159);
+//  +abstractTask(159, "planned", "placeUndef", 154);
+//  +abstractTask(154, "planned", "pickAndPlace", 130);
+//  +action(162, "planned", "WAIT", "human_0", [], [161], (-1));
+//  +action(161, "planned", "robot_pick_cube", "pr2_robot", ["blue_cube_1"], [153], 157);
+//  +abstractTask(157, "planned", "pickCheckNotHeld", 154);
+//  +action(153, "planned", "WAIT", "human_0", [], [152], (-1));
+//  +action(152, "planned", "robot_place_cube", "pr2_robot", ["cube_BBTG","br"], [150], 147);
+//  +abstractTask(147, "planned", "placeUndef", 143);
+//  +abstractTask(143, "planned", "pickAndPlace", 129);
+//  +abstractTask(129, "planned", "buildBridge", 69);
+//  +action(150, "planned", "WAIT", "human_0", [], [149], (-1));
+//  +action(149, "planned", "robot_pick_cube", "pr2_robot", ["cube_BBTG"], [142], 145);
+//  +abstractTask(145, "planned", "pickCheckNotHeld", 143);
+//  +action(142, "planned", "WAIT", "human_0", [], [141], (-1));
+//  +action(141, "planned", "robot_place_cube", "pr2_robot", ["red_cube_2","support2"], [139], 136);
+//  +abstractTask(136, "planned", "placeUndef", 131);
+//  +abstractTask(131, "planned", "pickAndPlace", 128);
+//  +abstractTask(128, "planned", "buildBase", 69);
+//  +action(139, "planned", "WAIT", "human_0", [], [138], (-1));
+//  +action(138, "planned", "robot_pick_cube", "pr2_robot", ["red_cube_2"], [127], 134);
+//  +abstractTask(134, "planned", "pickCheckNotHeld", 131);
+//  +action(127, "planned", "human_place_cube", "human_0", ["red_cube_2","support3"], [125], 84);
+//  +abstractTask(84, "planned", "placeUndef", 80);
+//  +abstractTask(80, "planned", "pickAndPlace", 72);
+//  +action(125, "planned", "WAIT", "pr2_robot", [], [86], 22);
+//  +action(86, "planned", "human_pick_cube", "human_0", ["red_cube_2"], [71], 82);
+//  +abstractTask(82, "planned", "pickCheckNotHeld", 80).
+  	
 +goal(Name, State) : State == received & not .substring("dtRR",Name) <-
 	?humanName(Human);
 	.concat("plan_manager/goals/",Name,"/name",GoalName);
@@ -229,7 +313,7 @@ isBusy(Human) :- action(ID,"ongoing",Name,Human,Params,Preds,Decompo) | (robotNa
 	rjs.jia.get_param(GoalName, "String", N);
 	rjs.jia.get_param(GoalWS, "Map", G);
 	//[[name_t1,param1_t1,param2_t1],[name_t2, param1_t2]]
-//	getMAHTNPlan([[N,G]], [Human]);
+	//getMAHTNPlan([[N,G]], [Human]);
 //	getHATPPlan(N);
 	!add_plan_a_la_mano;
 	.findall(action(AID,AState,AName,AAgent,AParams,Preds,Decompo),action(AID,AState,AName,AAgent,AParams,Preds,Decompo),Actions);
@@ -339,8 +423,8 @@ isBusy(Human) :- action(ID,"ongoing",Name,Human,Params,Preds,Decompo) | (robotNa
 //@evExe[atomic]
 +action(ID,"executed",Name,Agent,Params)[source(S)] : wantedAction(ID) & humanName(Human) & robotName(Robot)<-
 	!chooseParamToMonitor(Name,Params,P);
-//	setHMAtemp(P,environment_monitoring,void);
-//	setHMBuff([environment_monitoring,normal]);
+	setHMAtemp(P,environment_monitoring,void);
+	setHMBuff([environment_monitoring,normal]);
 	!updateExecutedActionBels(ID,Name,Agent,Params);
 	?action(ID,_,Name,_,_,Preds,Decompo);
 	!removeParallelStreams(Agent,Preds);

@@ -28,7 +28,6 @@ public class action_verbalization extends DefaultInternalAction {
 
 		List<String> actionVerbaList = classVerbalization(ts, action, "HtnAction");
 		if(!actionVerbaList.isEmpty()) {
-			String actionVerba = fillParameters(ts, actionVerbaList, params, humanName);
 			String person = "ThirdSingularPersonalForm";
 			String pronoun = "";
 			if(actionAgent.equals(robotName)) {
@@ -38,6 +37,7 @@ public class action_verbalization extends DefaultInternalAction {
 				person = "SecondSingularPersonalForm";
 				pronoun = "you";
 			}
+			String actionVerba = fillParameters(ts, actionVerbaList, params, humanName, actionAgent);
 			int verbPose = actionVerba.indexOf("@")+1;
 			String verb = actionVerba.substring(verbPose, actionVerba.indexOf(" ", verbPose));
 			String verbTense = verb + tense;
@@ -74,7 +74,7 @@ public class action_verbalization extends DefaultInternalAction {
 		return classNameList;
 	}
 	
-	private String fillParameters(TransitionSystem ts, List<String> actionVerbaList, List<String> params, String humanName) {
+	private String fillParameters(TransitionSystem ts, List<String> actionVerbaList, List<String> params, String humanName, String actionAgent) {
 		String actionVerba = "";
 		
 		for(int i = 0; i < actionVerbaList.size() && actionVerba.isBlank(); i++) {
@@ -92,7 +92,7 @@ public class action_verbalization extends DefaultInternalAction {
 							if(actionVerba.isBlank())
 								actionVerba = actionVerbaList.get(i);
 							if(sameClass.contains("Pickable"))
-								actionVerba = actionVerba.replace("{"+className+"}",entityVerbalization(ts,param,humanName));
+								actionVerba = actionVerba.replace("{"+className+"}",entityVerbalization(ts,param,humanName, actionAgent));
 							else {
 								List<String> names = ((LAASAgArch) ts.getAgArch()).callOntoIndivRobot("getNames",param).getValues();
 								if(!names.isEmpty())
@@ -108,8 +108,8 @@ public class action_verbalization extends DefaultInternalAction {
 	}
 	
 
-	private String entityVerbalization(TransitionSystem ts, String entity, String humanName) {
-		List<String> paramSparql = ((LAASAgArch) ts.getAgArch()).getEntitySparql(Tools.removeQuotes(entity), humanName, false);
+	private String entityVerbalization(TransitionSystem ts, String entity, String humanName, String actionAgent) {
+		List<String> paramSparql = ((LAASAgArch) ts.getAgArch()).getEntitySparql(Tools.removeQuotes(entity), humanName, actionAgent, false);
 		return ((LAASAgArch) ts.getAgArch()).sparqlToVerba(paramSparql,humanName);
 	}
 

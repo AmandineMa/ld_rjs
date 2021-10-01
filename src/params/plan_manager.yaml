@@ -19,4 +19,12 @@ plan_manager:
                blue_cube:
                   - red_cube
                   
-                            
+   context:
+      dt:
+         from: ?0
+         relation: isAbove
+         on: table
+      stack:
+         from: robot
+         relation: isHolding
+         on: ?0                            

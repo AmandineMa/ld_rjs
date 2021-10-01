@@ -1,8 +1,11 @@
 package arch.actions.robot;
 
+import java.util.Arrays;
+
 import arch.actions.AbstractClientPhysicalAction;
 import arch.agarch.LAASAgArch;
 import jason.asSemantics.ActionExec;
+import jason.asSyntax.Literal;
 import pr2_motion_tasks_msgs.executeActionFeedback;
 import pr2_motion_tasks_msgs.executeActionGoal;
 import pr2_motion_tasks_msgs.executeActionResult;
@@ -32,7 +35,15 @@ public class PR2MotionExecute extends AbstractClientPhysicalAction<executeAction
 	protected void setResultSucceeded(executeActionResult result) {}
 
 	@Override
-	protected void setResultAborted(executeActionResult result) {}
+	public void setResultAborted(executeActionResult result) {
+		String error = "";
+		int errorCode = result.getResult().getErrorCode();
+		if(errorCode == -2)
+			error = "execution of "+ actionName +" failed";
+		else
+			error = "the planning had failed";
+		actionExec.setFailureReason(Tools.stringFunctorAndTermsToBelLiteral("actionFailed",Arrays.asList(Literal.parseLiteral("execute"+ actionName),errorCode)), error);
+	}
 
 	@Override
 	protected void endFeedbackReceived(executeActionFeedback fb) {

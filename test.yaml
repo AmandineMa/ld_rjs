@@ -1,6 +1,15 @@
 #restart setup pick
 # data: "[add]human_0|isA|Human"
 # ---
+# data: "[add]blue_cube_2|isOnTopOf|table_1"
+# ---
+# data: "[add]stick|isOnTopOf|table_1"
+# ---
+#test pick
+data: "[add]human_0|rightHandMovingToward|blue_cube_2"
+---
+data: "[add]human_0|rightHandMovingToward|stick"
+---
 # data: "[add]human_0|handEmpty|bool#true"
 # ---
 # data: "[del]human_0|hasInHand|cube_BBCG"
@@ -51,53 +60,53 @@
 # data: "[del]human_0|handMovingToward|box_C4"
 # ---
 # data: "[add]human_0|handMovingToward|throw_box_green"
-data: "[add]human|isA|Human"
----
-data: "[add]support1|isA|Support"
----
-data: "[add]support2|isA|Support"
----
-data: "[add]RED_CUBE1|isA|Cube"
----
-data: "[add]RED_CUBE1|hasColor|red"
----
-data: "[add]RED_CUBE2|isA|Cube"
----
-data: "[add]RED_CUBE2|hasColor|red"
----
-data: "[add]BLUE_CUBE1|isA|Cube"
----
-data: "[add]BLUE_CUBE1|hasColor|bue"
----
-data: "[add]BLUE_CUBE2|isA|Cube"
----
-data: "[add]BLUE_CUBE2|hasColor|bue"
----
-data: "[add]GREEN_CUBE1|isA|Cube"
----
-data: "[add]GREEN_CUBE1|hasColor|green"
----
-data: "[add]STICK1|isA|Stick"
----
-data: "[add]RED_CUBE1|isReachableBy|robot"
+# data: "[add]human|isA|Human"
+# ---
+# data: "[add]support1|isA|Support"
+# ---
+# data: "[add]support2|isA|Support"
+# ---
+# data: "[add]RED_CUBE1|isA|Cube"
+# ---
+# data: "[add]RED_CUBE1|hasColor|red"
+# ---
+# data: "[add]RED_CUBE2|isA|Cube"
+# ---
+# data: "[add]RED_CUBE2|hasColor|red"
+# ---
+# data: "[add]BLUE_CUBE1|isA|Cube"
+# ---
+# data: "[add]BLUE_CUBE1|hasColor|bue"
+# ---
+# data: "[add]BLUE_CUBE2|isA|Cube"
+# ---
+# data: "[add]BLUE_CUBE2|hasColor|bue"
+# ---
+# data: "[add]GREEN_CUBE1|isA|Cube"
+# ---
+# data: "[add]GREEN_CUBE1|hasColor|green"
+# ---
+# data: "[add]STICK1|isA|Stick"
+# ---
+# data: "[add]RED_CUBE1|isReachableBy|robot"
 # ---
 # data: "[add]RED_CUBE1|isReachableBy|human"
 # ---
 # data: "[add]RED_CUBE2|isReachableBy|robot"
 ---
-data: "[add]RED_CUBE2|isReachableBy|human"
----
-data: "[add]BLUE_CUBE2|isReachableBy|human"
----
-data: "[add]STICK1|isReachableBy|human"
----
-data: "[add]BLUE_CUBE1|isReachableBy|robot"
----
-data: "[add]GREEN_CUBE1|isReachableBy|robot"
+# data: "[add]RED_CUBE2|isReachableBy|human"
+# ---
+# data: "[add]BLUE_CUBE2|isReachableBy|human"
+# ---
+# data: "[add]STICK1|isReachableBy|human"
+# ---
+# data: "[add]BLUE_CUBE1|isReachableBy|robot"
+# ---
+# data: "[add]GREEN_CUBE1|isReachableBy|robot"
 # ---
 # data: "[add]human|isLookingAt|robot"
 ---
-data: "[add]robot|isPerceiving|human"
+# data: "[add]robot|isPerceiving|human"
 
 # [add]human|hasInRightHand|RED_CUBE2
 # [del]human|hasInRightHand|RED_CUBE2

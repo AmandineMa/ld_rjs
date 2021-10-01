@@ -23,7 +23,7 @@ public class MementarUnsubscribe extends AbstractAction {
 	@Override
 	public void execute() {
 		int id = Integer.parseInt(actionTerms.get(0).toString());
-		String action = Tools.removeQuotes(actionTerms.get(1).toString());
+//		String action = Tools.removeQuotes(actionTerms.get(1).toString());
 		
 		ServiceResponseListener<MementarOcassionUnsubscriptionResponse> respListener = new ServiceResponseListener<MementarOcassionUnsubscriptionResponse>() {
 
@@ -34,7 +34,7 @@ public class MementarUnsubscribe extends AbstractAction {
 
 			@Override
 			public void onSuccess(MementarOcassionUnsubscriptionResponse resp) {
-				rosAgArch.removeBelief("monitoring", Arrays.asList(resp.getId(),action,"_","_"));
+				rosAgArch.removeBelief("monitoring", Arrays.asList(resp.getId(),"_","_","_"));
 				((LAASAgArch) rosAgArch).addMonitoringID(resp.getId());
 				setActionExecuted(true);
 			}

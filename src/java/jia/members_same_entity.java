@@ -71,7 +71,7 @@ public class members_same_entity extends get_indiv_from_sparql {
         	return true;
     }
     
-    private ListTermImpl iterateOnLists(TransitionSystem ts, ListTerm list1, ListTerm list2) {
+    protected ListTermImpl iterateOnLists(TransitionSystem ts, ListTerm list1, ListTerm list2) {
     	ListTermImpl newParamList = new ListTermImpl();
     	for(int i=0; i < list1.size(); i++) {
         	Term el1 =  list1.get(i);

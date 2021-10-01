@@ -95,25 +95,34 @@ public class LAASAgArch extends AbstractROSAgArch {
 		return callOnto("class", action, param);
 	}
 	
+	public OntologeniusServiceResponse callOntoObjProperty(String action, String param) {
+		return callOnto("obj_prop", action, param);
+	}
 	public OntologeniusServiceResponse callOnto(String onto, String action, String param) {
 		OntologeniusServiceRequest req = rosnode.newServiceRequestFromType(OntologeniusService._TYPE);
 		req.setAction(action);
 		req.setParam(param);
 		return  rosnode.callSyncService("onto_"+onto, req);
 	}
-	
-	public List<String> getEntitySparql(String individual, String agent, boolean replan) {
+
+	public List<String> getEntitySparql(String individual, String agent, String actionAgent, boolean replan) {
 		DisambiguationRequest disambiReq = rosnode.newServiceRequestFromType(Disambiguation._TYPE);
 		disambiReq.setIndividual(individual);
 		disambiReq.setOntology(agent);
-		List<String> ontoRep = callOntoIndivRobot("getOn", individual+":isAbove").getValues();
-		if(!ontoRep.isEmpty()) {
+		//dt
+//		List<String> ontoRep = callOntoIndivRobot("getOn", individual+":isAbove").getValues();
+//		if(!ontoRep.isEmpty()) {
 			Triplet ctx = createMessage(Triplet._TYPE);
-			ctx.setFrom("?0");
-			ctx.setRelation("isAbove");
-			ctx.setOn(rosnode.getParameters().getString("supervisor/table_name"));
+			// for director task
+//			ctx.setFrom("?0"); //pr2_robot
+//			ctx.setRelation("isAbove"); //isHolding
+//			ctx.setOn(rosnode.getParameters().getString("supervisor/table_name")); //?0
+			// for stack task
+			ctx.setFrom("?0"); 
+			ctx.setRelation("isReachableBy");
+			ctx.setOn(actionAgent);
 			disambiReq.setBaseFacts(Arrays.asList(ctx));
-		}
+//		}
 		disambiReq.setReplan(replan);
 		SymbolTable symbT = createMessage(SymbolTable._TYPE);
 		symbT.setIndividuals(Arrays.asList(individual));
@@ -172,6 +181,10 @@ public class LAASAgArch extends AbstractROSAgArch {
 	
 	public void removeMonitoringID(Integer id) {
 		monitoringIDs.remove(id);
+	}
+	
+	public String supervisorNameToOntoName(String supName) {
+		return supName.substring(0, 1).toUpperCase() + supName.substring(1) + "Action";
 	}
 
 }

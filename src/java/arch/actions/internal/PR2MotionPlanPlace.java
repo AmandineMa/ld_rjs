@@ -23,11 +23,16 @@ public class PR2MotionPlanPlace extends AbstractPR2MotionPlan {
 	protected void setGoalFields() {
 		String object = Tools.removeQuotes(actionTerms.get(0).toString());
 		List<String> ontoClass = ((LAASAgArch)rosAgArch).callOntoIndiv("getUp", object,"robot").getValues();
-		if(ontoClass.contains("Spot")) {
-			goal.setAction("placeOnFrame");
-		}else if(ontoClass.contains("Cube")) {
+//		if(ontoClass.contains("Spot")) {
+//			goal.setAction("placeOnFrame");
+//		}else if(ontoClass.contains("Cube")) {
 			goal.setAction("placeOnTopCube");
-		}
+//		}
+//		if(ontoClass.contains("DtCube")) {
+//			goal.setAction("placeStick");
+//		}else {
+//			goal.setAction("placeOnTopCube");
+//		}
 		goal.setBoxId(object);
 		goal.setPlanGroup(Tools.removeQuotes(actionTerms.get(1).toString()));
 	}
